@@ -17,8 +17,8 @@
       --bg: #030508;
       --accent: #00ffcc;
       --live-red: #ff334b;
-      --card-bg: rgba(9, 14, 26, 0.92);
-      --border: rgba(255, 255, 255, 0.12);
+      --card-bg: rgba(9, 14, 26, 0.94);
+      --border: rgba(255, 255, 255, 0.14);
       --text: #f1f5f9;
       --muted: #94a3b8;
     }
@@ -48,7 +48,7 @@
       z-index: 1;
     }
 
-    /* HEADER CON BOTONES Y BUSCADOR */
+    /* HEADER */
     header {
       position: absolute;
       top: 1.25rem;
@@ -105,7 +105,6 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* BUSCADOR DE CIUDADES EN EL HEADER */
     .search-city-box {
       display: flex;
       align-items: center;
@@ -143,11 +142,6 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    .btn-search:hover {
-      opacity: 0.85;
-    }
-
-    /* BOTONES ADMIN */
     .btn-admin {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
@@ -195,7 +189,7 @@
       color: #fff;
     }
 
-    /* FORMULARIO ADMIN */
+    /* MODAL ADMIN */
     .admin-modal {
       display: none;
       position: absolute;
@@ -270,7 +264,6 @@
       cursor: wait;
     }
 
-    /* INSTRUCCIÓN FLOTANTE */
     .hint-overlay {
       position: absolute;
       bottom: 2rem;
@@ -289,46 +282,66 @@
       letter-spacing: 0.5px;
     }
 
-    /* REPRODUCTOR FLOTANTE */
+    /* ==========================================================
+       VENTANA FLOTANTE REDIMENSIONABLE Y MOVIBLE (DRAG & RESIZE)
+       ========================================================== */
     .player-dock {
-      position: absolute;
+      position: fixed;
       bottom: 1.5rem;
       right: 1.5rem;
       width: 440px;
-      max-width: calc(100vw - 3rem);
+      min-width: 280px;
+      max-width: 90vw;
       background: var(--card-bg);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(22px);
       border: 1px solid var(--border);
-      border-radius: 16px;
-      z-index: 20;
-      overflow: hidden;
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 255, 204, 0.15);
-      transform: translateY(120%);
-      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+      border-radius: 14px;
+      z-index: 50;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 255, 204, 0.15);
+      display: none;
+      flex-direction: column;
+      touch-action: none;
+      overflow: visible;
     }
 
     .player-dock.active {
-      transform: translateY(0);
+      display: flex;
     }
 
+    /* BARRA SUPERIOR ARRASTRABLE */
     .player-header {
-      padding: 0.85rem 1.15rem;
+      padding: 0.65rem 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border);
-      background: rgba(0, 0, 0, 0.3);
+      background: rgba(0, 0, 0, 0.4);
+      cursor: grab;
+      border-top-left-radius: 14px;
+      border-top-right-radius: 14px;
       gap: 0.5rem;
     }
 
+    .player-header:active {
+      cursor: grabbing;
+    }
+
+    .location-info {
+      overflow: hidden;
+      pointer-events: none;
+    }
+
     .location-info h2 {
-      font-size: 0.95rem;
+      font-size: 0.88rem;
       color: #fff;
       font-weight: 700;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .location-info p {
-      font-size: 0.72rem;
+      font-size: 0.68rem;
       color: var(--accent);
       font-family: 'JetBrains Mono', monospace;
     }
@@ -336,16 +349,35 @@
     .header-btns {
       display: flex;
       align-items: center;
-      gap: 0.5rem;
+      gap: 0.35rem;
+      flex-shrink: 0;
+    }
+
+    .size-btn {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 4px;
+      padding: 0.15rem 0.4rem;
+      font-size: 0.68rem;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      transition: all 0.15s;
+    }
+
+    .size-btn:hover {
+      color: #fff;
+      border-color: var(--accent);
     }
 
     .btn-del-cam {
       background: rgba(255, 51, 75, 0.15);
       border: 1px solid var(--live-red);
       color: var(--live-red);
-      font-size: 0.72rem;
-      padding: 0.25rem 0.55rem;
-      border-radius: 5px;
+      font-size: 0.68rem;
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
       cursor: pointer;
       display: none;
       font-family: 'JetBrains Mono', monospace;
@@ -355,9 +387,10 @@
       background: none;
       border: none;
       color: var(--muted);
-      font-size: 1.3rem;
+      font-size: 1.2rem;
       cursor: pointer;
       line-height: 1;
+      padding: 0 0.2rem;
     }
 
     .btn-close:hover {
@@ -369,6 +402,9 @@
       width: 100%;
       padding-top: 56.25%;
       background: #000;
+      border-bottom-left-radius: 14px;
+      border-bottom-right-radius: 14px;
+      overflow: hidden;
     }
 
     .video-frame iframe {
@@ -380,7 +416,29 @@
       border: 0;
     }
 
-    /* LISTA LATERAL */
+    /* MANILLA PARA AGRANDAR / ACHICAR CON EL MOUSE */
+    .resize-handle {
+      position: absolute;
+      bottom: 2px;
+      right: 2px;
+      width: 16px;
+      height: 16px;
+      cursor: nwse-resize;
+      z-index: 60;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--accent);
+      font-size: 10px;
+      font-weight: bold;
+      opacity: 0.6;
+    }
+
+    .resize-handle:hover {
+      opacity: 1;
+    }
+
+    /* LISTA LATERAL DERECHA DE CIUDADES */
     .quick-list {
       position: absolute;
       top: 1.25rem;
@@ -471,27 +529,31 @@
 
   <div id="globeViz"></div>
 
+  <!-- VENTANA FLOTANTE CON MANILLA Y BOTONES DE TAMAÑO -->
   <div class="player-dock" id="playerDock">
-    <div class="player-header">
+    <div class="player-header" id="playerDragHeader">
       <div class="location-info">
         <h2 id="streamTitle">Selecciona una ciudad</h2>
         <p id="streamCoords">--° N, --° E</p>
       </div>
       <div class="header-btns">
-        <button class="btn-del-cam" id="btnDeleteCam">🗑️ ELIMINAR</button>
+        <button class="size-btn" onclick="resizePlayer(320)" title="Tamaño Pequeño">S</button>
+        <button class="size-btn" onclick="resizePlayer(480)" title="Tamaño Mediano">M</button>
+        <button class="size-btn" onclick="resizePlayer(680)" title="Tamaño Grande">L</button>
+        <button class="btn-del-cam" id="btnDeleteCam">🗑️</button>
         <button class="btn-close" id="btnClose">&times;</button>
       </div>
     </div>
     <div class="video-frame">
       <iframe id="streamIframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
+    <!-- Pestaña para arrastrar y cambiar tamaño -->
+    <div class="resize-handle" id="resizeHandle" title="Arrastra para agrandar o achicar">◢</div>
   </div>
 
   <script>
-    // TU CONTRASEÑA DE ADMINISTRADOR CONFIGURADA
     const ADMIN_PASSWORD = "9066819";
 
-    // ESTA ES LA LISTA PERMANENTE QUE SE ACTUALIZA EN GITHUB
     const worldCamsIniciales = [
       { id: "ErUOGtBXhgY", city: "Santiago", country: "Chile", lat: -33.4489, lng: -70.6693, desc: "Plaza Baquedano" },
       { id: "tmS73xQ4zVc", city: "Viña del Mar", country: "Chile", lat: -33.0245, lng: -71.5518, desc: "Borde Costero" },
@@ -513,6 +575,8 @@
     let currentSelectedCam = null;
 
     const playerDock = document.getElementById('playerDock');
+    const playerDragHeader = document.getElementById('playerDragHeader');
+    const resizeHandle = document.getElementById('resizeHandle');
     const streamTitle = document.getElementById('streamTitle');
     const streamCoords = document.getElementById('streamCoords');
     const streamIframe = document.getElementById('streamIframe');
@@ -602,6 +666,81 @@
       globe.pointOfView({ altitude: 2.2 }, 1500);
     });
 
+    // ==========================================
+    // LOGICA DE MOVER LA VENTANA (DRAG & DROP)
+    // ==========================================
+    let isDragging = false;
+    let dragStartX, dragStartY, initialLeft, initialTop;
+
+    playerDragHeader.addEventListener('mousedown', (e) => {
+      if (e.target.closest('.header-btns')) return; // No mover si hace clic en los botones
+      isDragging = true;
+      dragStartX = e.clientX;
+      dragStartY = e.clientY;
+
+      const rect = playerDock.getBoundingClientRect();
+      initialLeft = rect.left;
+      initialTop = rect.top;
+
+      playerDock.style.bottom = 'auto';
+      playerDock.style.right = 'auto';
+      playerDock.style.left = `${initialLeft}px`;
+      playerDock.style.top = `${initialTop}px`;
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - dragStartX;
+      const dy = e.clientY - dragStartY;
+
+      let newLeft = initialLeft + dx;
+      let newTop = initialTop + dy;
+
+      // Limitar dentro de la pantalla
+      newLeft = Math.max(10, Math.min(window.innerWidth - playerDock.offsetWidth - 10, newLeft));
+      newTop = Math.max(10, Math.min(window.innerHeight - playerDock.offsetHeight - 10, newTop));
+
+      playerDock.style.left = `${newLeft}px`;
+      playerDock.style.top = `${newTop}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+      isDragging = false;
+    });
+
+    // ==========================================
+    // LOGICA DE AGRANDAR / ACHICAR (RESIZE)
+    // ==========================================
+    window.resizePlayer = function(widthPx) {
+      playerDock.style.width = `${Math.min(widthPx, window.innerWidth - 40)}px`;
+    };
+
+    let isResizing = false;
+    let resizeStartX, startWidth;
+
+    resizeHandle.addEventListener('mousedown', (e) => {
+      isResizing = true;
+      resizeStartX = e.clientX;
+      startWidth = playerDock.offsetWidth;
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    document.addEventListener('mousemove', (e) => {
+      if (!isResizing) return;
+      const deltaX = e.clientX - resizeStartX;
+      const newWidth = Math.max(280, Math.min(window.innerWidth * 0.9, startWidth + deltaX));
+      playerDock.style.width = `${newWidth}px`;
+    });
+
+    document.addEventListener('mouseup', () => {
+      isResizing = false;
+    });
+
+    // ==========================================
+    // BUSCADOR GEO Y ADMIN
+    // ==========================================
     async function searchAndFlyToCity(cityName) {
       if (!cityName.trim()) return;
 
@@ -679,7 +818,6 @@
       }
     }
 
-    // BOTÓN EXPORTAR PARA PEGAR EN GITHUB
     btnExportCam.addEventListener('click', () => {
       const codigoExport = `const worldCamsIniciales = ${JSON.stringify(worldCams, null, 2)};`;
       navigator.clipboard.writeText(codigoExport).then(() => {
