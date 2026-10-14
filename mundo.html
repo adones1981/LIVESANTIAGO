@@ -338,7 +338,7 @@
       letter-spacing: 0.5px;
     }
 
-    /* REPRODUCTOR */
+    /* REPRODUCTOR FLOTANTE */
     .player-dock {
       position: fixed;
       bottom: 2rem;
@@ -641,24 +641,25 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    // MOTOR DE MAPA LIBRE OPENSTREETMAP (100% PÚBLICO Y SIN API KEY)
+    // INICIALIZACIÓN DEL GLOBO
+    // globeTileEngineUrl integra la cartografía real con los nombres de países y ciudades nativos
     const globe = Globe()
       (document.getElementById('globeViz'))
       .backgroundColor('#020617')
-      .globeTileEngineUrl((x, y, l) => `https://tile.openstreetmap.org/${l}/${x}/${y}.png`)
+      .globeTileEngineUrl((x, y, l) => `https://basemaps.cartocdn.com/rastertiles/voyager/${l}/${x}/${y}.png`)
       .atmosphereColor('#00ff66')
-      .atmosphereAltitude(0.12)
+      .atmosphereAltitude(0.15)
 
-      // CÍRCULOS VERDES RADAR PLANOS (SIN CILINDROS 3D SALIENTES)
+      // CERO CILINDROS 3D: PUNTOS RADAR PLANOS RASANTES A LA TIERRA
       .ringsData(worldCams)
       .ringLat(d => d.lat)
       .ringLng(d => d.lng)
-      .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t * 0.75})`)
+      .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t * 0.8})`)
       .ringMaxRadius(1.6)
       .ringPropagationSpeed(1.4)
       .ringRepeatPeriod(1100)
 
-      // PUNTO VERDE CENTRAL EXACTO
+      // CÍRCULOS VERDES PLANOS EXACTOS (SIN ALTURA HACIA AFUERA)
       .bubblesData(worldCams)
       .bubbleLat(d => d.lat)
       .bubbleLng(d => d.lng)
@@ -677,7 +678,7 @@
     globe.controls().autoRotateSpeed = 0.4;
     globe.pointOfView({ lat: -33.4489, lng: -70.6693, altitude: 2.2 }, 1500);
 
-    // CONTROL MANUAL DEL GIRO
+    // CONTROL DE GIRO
     btnToggleRotate.addEventListener('click', () => {
       isAutoRotating = !isAutoRotating;
       globe.controls().autoRotate = isAutoRotating;
@@ -742,7 +743,7 @@
       globe.pointOfView({ altitude: 2.2 }, 1500);
     });
 
-    // DRAG DE LA VENTANA FLOTANTE
+    // DRAG DE LA VENTANA
     let isDragging = false;
     let dragStartX, dragStartY, initialLeft, initialTop;
 
