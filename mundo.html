@@ -1,1 +1,373 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>EarthCam Garden | Buscar por el Mundo</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
 
+  <!-- Motor 3D Globe.gl -->
+  <script src="https://unpkg.com/globe.gl"></script>
+
+  <style>
+    :root {
+      --bg: #030508;
+      --accent: #00ffcc;
+      --live-red: #ff334b;
+      --card-bg: rgba(9, 14, 26, 0.9);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      user-select: none;
+    }
+
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      overflow: hidden;
+      width: 100vw;
+      height: 100vh;
+    }
+
+    #globeViz {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+    }
+
+    /* HEADER CON BOTON VOLVER */
+    header {
+      position: absolute;
+      top: 1.25rem;
+      left: 1.5rem;
+      z-index: 10;
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 0.85rem 1.25rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+    }
+
+    .btn-back {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-decoration: none;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-back:hover {
+      background: var(--accent);
+      color: #07090e;
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+    }
+
+    .brand-title h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .brand-title h1 span {
+      color: var(--accent);
+    }
+
+    .brand-title p {
+      font-size: 0.72rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .hint-overlay {
+      position: absolute;
+      bottom: 2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+      pointer-events: none;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid var(--border);
+      backdrop-filter: blur(8px);
+      padding: 0.5rem 1.2rem;
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      color: var(--accent);
+      letter-spacing: 0.5px;
+    }
+
+    /* REPRODUCTOR FLOTANTE LATERAL */
+    .player-dock {
+      position: absolute;
+      bottom: 1.5rem;
+      right: 1.5rem;
+      width: 440px;
+      max-width: calc(100vw - 3rem);
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      z-index: 20;
+      overflow: hidden;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8), 0 0 25px rgba(0, 255, 204, 0.15);
+      transform: translateY(120%);
+      transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .player-dock.active {
+      transform: translateY(0);
+    }
+
+    .player-header {
+      padding: 0.85rem 1.15rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .location-info h2 {
+      font-size: 0.95rem;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .location-info p {
+      font-size: 0.72rem;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-close {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .btn-close:hover {
+      color: #fff;
+    }
+
+    .video-frame {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      background: #000;
+    }
+
+    .video-frame iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* LISTA LATERAL DERECHA DE CIUDADES */
+    .quick-list {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.5rem;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      max-height: 48vh;
+      overflow-y: auto;
+      padding-right: 0.2rem;
+    }
+
+    .city-btn {
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.75rem;
+      cursor: pointer;
+      text-align: right;
+      transition: all 0.2s ease;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .city-btn:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateX(-3px);
+      box-shadow: 0 0 10px rgba(0, 255, 204, 0.25);
+    }
+
+    .custom-tooltip {
+      background: rgba(10, 15, 25, 0.95);
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 0.4rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      pointer-events: none;
+      box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="btn-back">← VOLVER A CHILE</a>
+    <div class="brand-title">
+      <h1>EARTH<span>CAM</span> GARDEN</h1>
+      <p>EXPLORADOR DE CÁMARAS EN VIVO</p>
+    </div>
+  </header>
+
+  <div class="quick-list" id="quickList"></div>
+
+  <div class="hint-overlay">Gira el planeta y haz clic en los puntos luminosos</div>
+
+  <div id="globeViz"></div>
+
+  <div class="player-dock" id="playerDock">
+    <div class="player-header">
+      <div class="location-info">
+        <h2 id="streamTitle">Selecciona una ciudad</h2>
+        <p id="streamCoords">--° N, --° E</p>
+      </div>
+      <button class="btn-close" id="btnClose">&times;</button>
+    </div>
+    <div class="video-frame">
+      <iframe id="streamIframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    </div>
+  </div>
+
+  <script>
+    // LISTA DE CÁMARAS EN VIVO GLOBALES (CHILE + EL MUNDO)
+    const worldCams = [
+      // CHILE
+      { id: "ErUOGtBXhgY", city: "Santiago", country: "Chile", lat: -33.4489, lng: -70.6693, desc: "Plaza Baquedano" },
+      { id: "tmS73xQ4zVc", city: "Viña del Mar", country: "Chile", lat: -33.0245, lng: -71.5518, desc: "Borde Costero" },
+      { id: "oDErMN0_ehw", city: "Valparaíso", country: "Chile", lat: -33.0472, lng: -71.6127, desc: "Puerto y Bahía" },
+      { id: "HirKZqakDIA", city: "Concepción", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
+      { id: "M_Qk3Bv0-So", city: "La Serena", country: "Chile", lat: -29.9027, lng: -71.2519, desc: "Avenida del Mar" },
+
+      // AMÉRICA
+      { id: "499n8ZnbI", city: "Nueva York", country: "EE.UU.", lat: 40.7580, lng: -73.9855, desc: "Times Square" },
+      { id: "mRe-5144GQw", city: "Miami Beach", country: "EE.UU.", lat: 25.7617, lng: -80.1918, desc: "Ocean Drive" },
+      { id: "7dc4Y_Vb_Wc", city: "Río de Janeiro", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana" },
+      { id: "G4Hj6y2f4s4", city: "Buenos Aires", country: "Argentina", lat: -34.6037, lng: -58.3816, desc: "Obelisco" },
+
+      // EUROPA & ASIA & OCEANÍA
+      { id: "86YLFOog4GM", city: "Tokio", country: "Japón", lat: 35.6595, lng: 139.7004, desc: "Cruce de Shibuya" },
+      { id: "b2wf_3A7PjQ", city: "Londres", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge" },
+      { id: "fTmlb_KqP8A", city: "Venecia", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal" },
+      { id: "d_BqA5T8yW8", city: "Sídney", country: "Australia", lat: -33.8568, lng: 151.2153, desc: "Opera House" }
+    ];
+
+    const playerDock = document.getElementById('playerDock');
+    const streamTitle = document.getElementById('streamTitle');
+    const streamCoords = document.getElementById('streamCoords');
+    const streamIframe = document.getElementById('streamIframe');
+    const btnClose = document.getElementById('btnClose');
+    const quickList = document.getElementById('quickList');
+
+    const globe = Globe()
+      (document.getElementById('globeViz'))
+      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
+      .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
+      .atmosphereColor('#00ffcc')
+      .atmosphereAltitude(0.18)
+      
+      .pointsData(worldCams)
+      .pointLat(d => d.lat)
+      .pointLng(d => d.lng)
+      .pointColor(() => '#00ffcc')
+      .pointAltitude(0.06)
+      .pointRadius(0.7)
+      .pointLabel(d => `
+        <div class="custom-tooltip">
+          <b>${d.city}, ${d.country}</b><br/>
+          <span style="color:#94a3b8;">${d.desc}</span>
+        </div>
+      `)
+      
+      .ringsData(worldCams)
+      .ringLat(d => d.lat)
+      .ringLng(d => d.lng)
+      .ringColor(() => (t) => `rgba(0, 255, 204, ${1 - t})`)
+      .ringMaxRadius(3.5)
+      .ringPropagationSpeed(2)
+      .ringRepeatPeriod(1000)
+
+      .onPointClick(point => selectCamera(point));
+
+    globe.controls().autoRotate = true;
+    globe.controls().autoRotateSpeed = 0.4;
+
+    globe.pointOfView({ lat: -33.4489, lng: -70.6693, altitude: 2.2 }, 2000);
+
+    function selectCamera(cam) {
+      globe.controls().autoRotate = false;
+      globe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 1.15 }, 1500);
+
+      streamTitle.textContent = `${cam.city} - ${cam.desc}`;
+      streamCoords.textContent = `${cam.lat.toFixed(2)}° Lat, ${cam.lng.toFixed(2)}° Lng • ${cam.country}`;
+      streamIframe.src = `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&controls=1&rel=0`;
+
+      playerDock.classList.add('active');
+    }
+
+    btnClose.addEventListener('click', () => {
+      playerDock.classList.remove('active');
+      streamIframe.src = '';
+      globe.controls().autoRotate = true;
+      globe.pointOfView({ altitude: 2.2 }, 1500);
+    });
+
+    worldCams.forEach(cam => {
+      const btn = document.createElement('button');
+      btn.className = 'city-btn';
+      btn.innerHTML = `<span>${cam.city}</span> <small style="color:var(--muted);">${cam.country}</small>`;
+      btn.addEventListener('click', () => selectCamera(cam));
+      quickList.appendChild(btn);
+    });
+
+    window.addEventListener('resize', () => {
+      globe.width(window.innerWidth).height(window.innerHeight);
+    });
+  </script>
+</body>
+</html>
