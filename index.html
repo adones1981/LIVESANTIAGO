@@ -100,6 +100,31 @@
       flex-wrap: wrap;
     }
 
+    /* BOTON AL MUNDO TIPO RADIO GARDEN */
+    .btn-world {
+      background: linear-gradient(135deg, rgba(0, 255, 204, 0.15), rgba(0, 229, 255, 0.25));
+      border: 1px solid var(--accent);
+      color: #fff;
+      padding: 0.5rem 1rem;
+      border-radius: 8px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.25s ease;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+    }
+
+    .btn-world:hover {
+      background: var(--accent);
+      color: #07090e;
+      box-shadow: 0 0 25px rgba(0, 229, 255, 0.6);
+      transform: translateY(-1px);
+    }
+
     .btn-admin {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
@@ -136,7 +161,6 @@
     .btn-add:hover {
       background: var(--accent);
       color: #07090e;
-      box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
     }
 
     .clock-badge {
@@ -164,7 +188,6 @@
       flex: 1;
     }
 
-    /* FORMULARIO AGREGAR / EDITAR */
     .admin-form-panel {
       display: none;
       background: rgba(18, 25, 42, 0.95);
@@ -177,12 +200,6 @@
 
     .admin-form-panel.open {
       display: block;
-      animation: fadeIn 0.2s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-5px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .admin-panel-header {
@@ -326,7 +343,6 @@
       font-weight: 700;
     }
 
-    /* GRID */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
@@ -457,7 +473,6 @@
       border: 0;
     }
 
-    /* FOOTER */
     footer {
       border-top: 1px solid var(--border);
       padding: 1.5rem;
@@ -511,6 +526,8 @@
       </div>
     </div>
     <div class="header-actions">
+      <!-- BOTON PARA VIAJAR AL GLOBO MUNDIAL -->
+      <a href="mundo.html" class="btn-world">🌍 BUSCAR POR EL MUNDO</a>
       <button class="btn-add" id="btnToggleAdd">+ AGREGAR CÁMARA</button>
       <button class="btn-admin" id="btnAdmin">🔒 ACCESO ADMIN</button>
       <div class="clock-badge">
@@ -521,7 +538,6 @@
 
   <div class="container">
 
-    <!-- PANEL ADMIN (AGREGAR / EDITAR) -->
     <div class="admin-form-panel" id="adminPanel">
       <div class="admin-panel-header">
         <span id="panelTitle">+ AGREGAR NUEVA CÁMARA</span>
@@ -542,7 +558,6 @@
       </form>
     </div>
 
-    <!-- FILTROS -->
     <div class="filters-section">
       <div class="search-wrapper">
         <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
@@ -551,7 +566,6 @@
       <div class="city-pills" id="cityPills"></div>
     </div>
 
-    <!-- GRID CÁMARAS -->
     <div class="grid" id="gridCamaras"></div>
   </div>
 
@@ -564,11 +578,7 @@
   </footer>
 
   <script>
-    // ==========================================
-    // CONFIGURACIÓN DE CONTRASEÑA ADMIN
-    // (Cambia '1234' por la clave secreta que quieras)
-    // ==========================================
-    const ADMIN_PASSWORD = "9066819";
+    const ADMIN_PASSWORD = "1234"; // Tu clave para administrar cámaras
 
     const camarasIniciales = [
       { id: "ErUOGtBXhgY", titulo: "Santiago Centro / Plaza Italia", ciudad: "Santiago" },
@@ -608,7 +618,6 @@
       return (match && match[2].length === 11) ? match[2] : null;
     }
 
-    // GESTIÓN LOGIN ADMIN
     btnAdmin.addEventListener('click', () => {
       if (isAdmin) {
         if (confirm('¿Deseas cerrar la sesión de administrador?')) {
@@ -643,7 +652,6 @@
       renderCamaras();
     }
 
-    // ABRIR / CERRAR PANEL AGREGAR
     btnToggleAdd.addEventListener('click', () => {
       resetForm();
       adminPanel.classList.toggle('open');
@@ -652,7 +660,6 @@
       }
     });
 
-    // GUARDAR O EDITAR CÁMARA
     formCam.addEventListener('submit', (e) => {
       e.preventDefault();
       const rawUrl = document.getElementById('camUrl').value;
@@ -667,10 +674,8 @@
       }
 
       if (index >= 0) {
-        // Editar existente
         camaras[index] = { id: videoId, titulo: title, ciudad: city };
       } else {
-        // Nueva
         camaras.unshift({ id: videoId, titulo: title, ciudad: city });
       }
 
@@ -693,11 +698,10 @@
       adminPanel.classList.remove('open');
     });
 
-    // ELIMINAR CÁMARA
     window.eliminarCamara = function(index) {
       if (!isAdmin) return;
       const cam = camaras[index];
-      if (confirm(`¿Seguro que deseas eliminar la cámara "${cam.titulo}"?`)) {
+      if (confirm(`¿Seguro que deseas eliminar "${cam.titulo}"?`)) {
         camaras.splice(index, 1);
         localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
         renderPills();
@@ -705,7 +709,6 @@
       }
     };
 
-    // EDITAR CÁMARA
     window.editarCamara = function(index) {
       if (!isAdmin) return;
       const cam = camaras[index];
