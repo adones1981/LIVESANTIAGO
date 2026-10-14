@@ -15,7 +15,8 @@
   <style>
     :root {
       --bg: #020617;
-      --accent: #00f2fe;
+      --accent: #00ff66; /* Verde radar limpio */
+      --accent-glow: rgba(0, 255, 102, 0.4);
       --live-red: #ff334b;
       --card-bg: rgba(10, 17, 33, 0.95);
       --border: rgba(255, 255, 255, 0.16);
@@ -86,7 +87,7 @@
     .btn-back:hover {
       background: var(--accent);
       color: #07090e;
-      box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
+      box-shadow: 0 0 15px var(--accent-glow);
     }
 
     .brand-title h1 {
@@ -203,7 +204,7 @@
     }
 
     .dropdown-item:hover {
-      background: rgba(0, 242, 254, 0.15);
+      background: rgba(0, 255, 102, 0.15);
       color: var(--accent);
     }
 
@@ -226,7 +227,7 @@
     }
 
     .btn-add-cam, .btn-export-cam {
-      background: rgba(0, 242, 254, 0.15);
+      background: rgba(0, 255, 102, 0.15);
       border: 1px solid var(--accent);
       color: var(--accent);
       padding: 0.45rem 0.85rem;
@@ -267,7 +268,7 @@
       border-radius: 14px;
       padding: 1.25rem;
       width: 360px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 242, 254, 0.15);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 255, 102, 0.15);
       backdrop-filter: blur(20px);
     }
 
@@ -350,7 +351,7 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       z-index: 40;
-      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 242, 254, 0.15);
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 255, 102, 0.15);
       display: none;
       flex-direction: column;
       touch-action: none;
@@ -513,7 +514,7 @@
       font-size: 0.75rem;
       font-family: 'JetBrains Mono', monospace;
       pointer-events: none;
-      box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
+      box-shadow: 0 0 15px var(--accent-glow);
     }
   </style>
 </head>
@@ -550,14 +551,14 @@
     </h3>
     <form id="formAddWorldCam">
       <input type="text" id="worldCamUrl" class="modal-input" placeholder="Enlace de YouTube..." required>
-      <input type="text" id="worldCamTitle" class="modal-input" placeholder="Nombre o sector..." required>
-      <input type="text" id="worldCamCity" class="modal-input" placeholder="Ciudad (ej. Ámsterdam)" required>
-      <input type="text" id="worldCamCountry" class="modal-input" placeholder="País (ej. Países Bajos)" required>
+      <input type="text" id="worldCamTitle" class="modal-input" placeholder="Nombre o sector (ej. Centro)" required>
+      <input type="text" id="worldCamCity" class="modal-input" placeholder="Ciudad (ej. Roma)" required>
+      <input type="text" id="worldCamCountry" class="modal-input" placeholder="País (ej. Italia)" required>
       <button type="submit" class="btn-submit-cam" id="btnSubmitCam">GEOLOCALIZAR Y CLAVAR</button>
     </form>
   </div>
 
-  <div class="hint-overlay">Haz clic en una ciudad o haz zoom para separar las cámaras</div>
+  <div class="hint-overlay">Haz clic en los puntos verdes para abrir las cámaras en vivo</div>
 
   <div id="globeViz"></div>
 
@@ -585,10 +586,10 @@
   <script>
     const ADMIN_PASSWORD = "9066819";
 
-    // 1. CÁMARAS UBICADAS CON PRECISIÓN GEOGRÁFICA
+    // CÁMARAS EN VIVO VERIFICADAS (CON COORDENADAS PRECISAS)
     const worldCamsIniciales = [
       // CHILE
-      { id: "ErUOGtBXhgY", city: "Santiago", sector: "Centro / Plaza Italia", country: "Chile", lat: -33.4372, lng: -70.6345, desc: "Plaza Baquedano" },
+      { id: "ErUOGtBXhgY", city: "Santiago", sector: "Centro - Plaza Italia", country: "Chile", lat: -33.4372, lng: -70.6345, desc: "Plaza Baquedano" },
       { id: "_Nrt155MExU", city: "Santiago", sector: "Providencia", country: "Chile", lat: -33.4290, lng: -70.6120, desc: "Eje Alameda - Providencia" },
       { id: "tmS73xQ4zVc", city: "Viña del Mar", sector: "Borde Costero", country: "Chile", lat: -33.0150, lng: -71.5518, desc: "Costanera y Playa" },
       { id: "oDErMN0_ehw", city: "Valparaíso", sector: "Puerto", country: "Chile", lat: -33.0420, lng: -71.6250, desc: "Bahía y Muelle Barón" },
@@ -596,7 +597,7 @@
       { id: "HirKZqakDIA", city: "Concepción", sector: "Centro", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
 
       // EUROPA (TUS ENLACES INTERNACIONALES VERIFICADOS)
-      { id: "asO_10T0k2k", city: "París", sector: "Torre Eiffel", country: "Francia", lat: 48.8584, lng: 2.2945, desc: "Torre Eiffel y Skyline de París" },
+      { id: "asO_10T0k2k", city: "París", sector: "Torre Eiffel", country: "Francia", lat: 48.8584, lng: 2.2945, desc: "Torre Eiffel y Skyline" },
       { id: "2GgaZAqFE5U", city: "Londres", sector: "Tower Bridge", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge y Río Támesis" },
       { id: "mt7uE-n0YPI", city: "Venecia", sector: "Puente Rialto", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal de Venecia" },
 
@@ -606,29 +607,14 @@
 
       // ASIA & BRASIL
       { id: "xoyKM6BQceM", city: "Tokio", sector: "Shibuya", country: "Japón", lat: 35.6595, lng: 139.7004, desc: "Cruce Shibuya Live" },
-      { id: "wyEi0OPai5g", city: "Seúl", sector: "Centro", country: "Corea del Sur", lat: 37.5665, lng: 126.9780, desc: "Panorama Urbano Metropolitano" },
+      { id: "wyEi0OPai5g", city: "Seúl", sector: "Centro", country: "Corea del Sur", lat: 37.5665, lng: 126.9780, desc: "Panorama Metropolitano" },
       { id: "7dc4Y_Vb_Wc", city: "Río de Janeiro", sector: "Copacabana", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana" }
-    ];
-
-    // CIUDADES DE REFERENCIA DEL MUNDO
-    const worldCitiesRef = [
-      { name: "Madrid", country: "España", lat: 40.4168, lng: -3.7038 },
-      { name: "Roma", country: "Italia", lat: 41.9028, lng: 12.4964 },
-      { name: "Berlín", country: "Alemania", lat: 52.5200, lng: 13.4050 },
-      { name: "El Cairo", country: "Egipto", lat: 30.0444, lng: 31.2357 },
-      { name: "Pekín", country: "China", lat: 39.9042, lng: 116.4074 },
-      { name: "Sídney", country: "Australia", lat: -33.8688, lng: 151.2093 },
-      { name: "Buenos Aires", country: "Argentina", lat: -34.6037, lng: -58.3816 },
-      { name: "Lima", country: "Perú", lat: -12.0464, lng: -77.0428 },
-      { name: "Bogotá", country: "Colombia", lat: 4.7110, lng: -74.0721 },
-      { name: "Ciudad de México", country: "México", lat: 19.4326, lng: -99.1332 }
     ];
 
     let worldCams = JSON.parse(localStorage.getItem('earthcam_garden_cams')) || worldCamsIniciales;
     let isAdmin = sessionStorage.getItem('is_admin') === 'true';
     let currentSelectedCam = null;
     let isAutoRotating = false;
-    let currentAltitude = 2.2;
 
     const playerDock = document.getElementById('playerDock');
     const playerDragHeader = document.getElementById('playerDragHeader');
@@ -655,111 +641,44 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    function getDisplayPoints(altitude) {
-      const isZoomedIn = altitude < 1.4;
-      const points = [];
-
-      const cityGroups = {};
-      worldCams.forEach(cam => {
-        const key = `${cam.city}-${cam.country}`;
-        if (!cityGroups[key]) cityGroups[key] = [];
-        cityGroups[key].push(cam);
-      });
-
-      Object.values(cityGroups).forEach(group => {
-        if (!isZoomedIn && group.length > 1) {
-          const avgLat = group.reduce((s, c) => s + c.lat, 0) / group.length;
-          const avgLng = group.reduce((s, c) => s + c.lng, 0) / group.length;
-          points.push({
-            lat: avgLat,
-            lng: avgLng,
-            text: `${group[0].city} (${group.length})`,
-            subtext: `${group[0].country} • ${group.length} cámaras`,
-            isCluster: true,
-            cams: group,
-            size: 0.9,
-            color: '#00f2fe'
-          });
-        } else {
-          group.forEach(cam => {
-            points.push({
-              lat: cam.lat,
-              lng: cam.lng,
-              text: cam.sector ? `${cam.city} - ${cam.sector}` : cam.city,
-              subtext: `${cam.country} • ${cam.desc}`,
-              isCluster: false,
-              camData: cam,
-              size: 0.75,
-              color: '#00f2fe'
-            });
-          });
-        }
-      });
-
-      worldCitiesRef.forEach(ci => {
-        const hasCam = worldCams.some(c => c.city.toLowerCase() === ci.name.toLowerCase());
-        if (!hasCam) {
-          points.push({
-            lat: ci.lat,
-            lng: ci.lng,
-            text: ci.name,
-            subtext: ci.country,
-            isReferenceCity: true,
-            size: 0.65,
-            color: 'rgba(255, 255, 255, 0.65)'
-          });
-        }
-      });
-
-      return points;
-    }
-
+    // INICIALIZACIÓN GLOBO (PUNTOS VERDES DISCRETOS, SIN TEXTOS GIGANTES)
     const globe = Globe()
       (document.getElementById('globeViz'))
       .backgroundColor('#020617')
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-      .atmosphereColor('#00f2fe')
+      .atmosphereColor('#00ff66')
       .atmosphereAltitude(0.18)
 
-      .labelsData(getDisplayPoints(2.2))
-      .labelLat(d => d.lat)
-      .labelLng(d => d.lng)
-      .labelText(d => d.text)
-      .labelSize(d => d.size)
-      .labelDotRadius(0.35)
-      .labelColor(d => d.color)
-      .labelResolution(2)
-      .labelAltitude(0.01)
-      .onLabelClick(d => {
-        if (d.isCluster) {
-          globe.pointOfView({ lat: d.lat, lng: d.lng, altitude: 0.9 }, 1200);
-        } else if (d.camData) {
-          selectCamera(d.camData);
-        } else {
-          globe.pointOfView({ lat: d.lat, lng: d.lng, altitude: 1.1 }, 1200);
-        }
-      })
+      // PUNTOS VERDES LIMPIOS TIPO RADAR
+      .pointsData(worldCams)
+      .pointLat(d => d.lat)
+      .pointLng(d => d.lng)
+      .pointColor(() => '#00ff66')
+      .pointAltitude(0.02)
+      .pointRadius(0.55) // Punto pequeño y bien proporcionado
+      .pointLabel(d => `
+        <div class="custom-tooltip">
+          <b>🟢 ${d.city}</b> (${d.country})<br/>
+          <span style="color:#00ff66;">${d.sector ? d.sector + ' • ' : ''}${d.desc}</span>
+        </div>
+      `)
+      .onPointClick(d => selectCamera(d))
 
+      // ONDAS RADAR SUAVES VERDES
       .ringsData(worldCams)
       .ringLat(d => d.lat)
       .ringLng(d => d.lng)
-      .ringColor(() => (t) => `rgba(0, 242, 254, ${1 - t})`)
+      .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t})`)
       .ringMaxRadius(2.2)
-      .ringPropagationSpeed(1.8)
-      .ringRepeatPeriod(1000);
+      .ringPropagationSpeed(1.6)
+      .ringRepeatPeriod(1200);
 
+    // GLOBO ESTÁTICO (NO SE MUEVE SOLO)
     globe.controls().autoRotate = false;
     globe.controls().autoRotateSpeed = 0.4;
     globe.pointOfView({ lat: -33.4489, lng: -70.6693, altitude: 2.2 }, 1500);
 
-    globe.controls().addEventListener('change', () => {
-      const pov = globe.pointOfView();
-      if (Math.abs(pov.altitude - currentAltitude) > 0.25) {
-        currentAltitude = pov.altitude;
-        globe.labelsData(getDisplayPoints(currentAltitude));
-      }
-    });
-
+    // BOTÓN ACTIVAR/PAUSAR GIRO
     btnToggleRotate.addEventListener('click', () => {
       isAutoRotating = !isAutoRotating;
       globe.controls().autoRotate = isAutoRotating;
@@ -767,13 +686,14 @@
       btnToggleRotate.style.borderColor = isAutoRotating ? 'var(--accent)' : 'var(--border)';
     });
 
+    // CAPA POLÍTICA CON NOMBRES REALES DE PAÍSES
     fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
       .then(res => res.json())
       .then(countries => {
         globe.polygonsData(countries.features)
           .polygonCapColor(() => 'rgba(255, 255, 255, 0.0)')
           .polygonSideColor(() => 'rgba(0, 0, 0, 0)')
-          .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.25)')
+          .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.28)') // Líneas de fronteras limpias
           .polygonLabel(({ properties: d }) => `
             <div class="custom-tooltip">
               <b>🌍 ${d.ADMIN}</b>
@@ -783,7 +703,7 @@
       .catch(() => {});
 
     function refreshGlobeData() {
-      globe.labelsData(getDisplayPoints(currentAltitude));
+      globe.pointsData(worldCams);
       globe.ringsData(worldCams);
       renderDropdownCities();
     }
@@ -794,7 +714,7 @@
         const item = document.createElement('button');
         item.className = 'dropdown-item';
         const label = cam.sector ? `${cam.city} (${cam.sector})` : cam.city;
-        item.innerHTML = `<span>📹 ${label}</span> <small style="color:var(--muted);">${cam.country}</small>`;
+        item.innerHTML = `<span>🟢 ${label}</span> <small style="color:var(--muted);">${cam.country}</small>`;
         item.addEventListener('click', () => {
           dropdownCities.classList.remove('open');
           selectCamera(cam);
@@ -816,7 +736,7 @@
 
     function selectCamera(cam) {
       currentSelectedCam = cam;
-      globe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 0.9 }, 1500);
+      globe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 0.95 }, 1500);
 
       const sectorStr = cam.sector ? `[${cam.sector}] ` : '';
       streamTitle.textContent = `${cam.city} - ${sectorStr}${cam.desc}`;
@@ -839,7 +759,7 @@
       globe.pointOfView({ altitude: 2.2 }, 1500);
     });
 
-    // DRAG DE LA VENTANA
+    // DRAG DE LA VENTANA FLOTANTE
     let isDragging = false;
     let dragStartX, dragStartY, initialLeft, initialTop;
 
