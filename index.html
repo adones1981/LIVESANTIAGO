@@ -3,18 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Cámaras en Vivo Santiago de Chile</title>
+  <title>Chile Live Cams | Monitoreo en Vivo</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   <style>
     :root {
-      --bg: #0b0f19;
-      --card-bg: rgba(17, 24, 39, 0.75);
+      --bg: #07090e;
+      --card-bg: rgba(15, 21, 35, 0.75);
       --border: rgba(255, 255, 255, 0.08);
+      --border-hover: rgba(0, 229, 255, 0.35);
       --accent: #00e5ff;
-      --red: #ef4444;
-      --text: #f8fafc;
+      --live-red: #ff334b;
+      --text: #f1f5f9;
       --muted: #94a3b8;
     }
 
@@ -31,81 +32,281 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      background-image: 
+        radial-gradient(circle at 10% 10%, rgba(0, 229, 255, 0.03) 0%, transparent 40%),
+        radial-gradient(circle at 90% 90%, rgba(255, 51, 75, 0.03) 0%, transparent 40%);
     }
 
+    /* HEADER */
     header {
-      background: rgba(11, 15, 25, 0.9);
-      backdrop-filter: blur(12px);
+      background: rgba(10, 15, 26, 0.9);
+      backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
-      padding: 1rem 1.5rem;
+      padding: 0.9rem 1.5rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      position: sticky;
-      top: 0;
-      z-index: 50;
       flex-wrap: wrap;
       gap: 1rem;
     }
 
-    .brand h1 {
-      font-size: 1.25rem;
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      background: rgba(0, 229, 255, 0.1);
+      border: 1px solid var(--accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+    }
+
+    .brand-logo svg {
+      width: 18px;
+      height: 18px;
+      fill: var(--accent);
+    }
+
+    .brand-text h1 {
+      font-size: 1.15rem;
       font-weight: 700;
       color: #fff;
+      line-height: 1.2;
+    }
+
+    .brand-text h1 span {
+      color: var(--accent);
+    }
+
+    .brand-text p {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+
+    .btn-add {
+      background: rgba(0, 229, 255, 0.12);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      padding: 0.45rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-add:hover {
+      background: var(--accent);
+      color: #07090e;
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.4);
+    }
+
+    .clock-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.85rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      padding: 0.45rem 0.85rem;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       gap: 0.5rem;
     }
 
-    .brand h1 span {
+    .clock-badge span {
       color: var(--accent);
+      font-weight: 700;
     }
 
-    .brand p {
-      font-size: 0.8rem;
-      color: var(--muted);
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    .time-badge {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.85rem;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      padding: 0.4rem 0.8rem;
-      border-radius: 6px;
-      color: var(--accent);
-    }
-
+    /* CONTENEDOR Y FILTROS */
     .container {
-      max-width: 1600px;
+      max-width: 1650px;
       margin: 0 auto;
       padding: 1.5rem;
       width: 100%;
       flex: 1;
     }
 
-    .search-box {
+    /* PANEL AGREGAR CÁMARA */
+    .add-panel {
+      display: none;
+      background: rgba(18, 25, 42, 0.95);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      padding: 1.25rem;
       margin-bottom: 1.5rem;
-      max-width: 400px;
+      box-shadow: 0 8px 30px rgba(0, 229, 255, 0.15);
     }
 
-    .search-box input {
-      width: 100%;
+    .add-panel.open {
+      display: block;
+      animation: fadeIn 0.2s ease;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-5px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .add-panel-title {
+      font-size: 0.95rem;
+      font-weight: 700;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      color: var(--accent);
+    }
+
+    .add-form {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr auto;
+      gap: 0.75rem;
+      align-items: center;
+    }
+
+    .input-field {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.7rem 1rem;
+      border-radius: 6px;
+      padding: 0.6rem 0.85rem;
       color: #fff;
-      font-size: 0.9rem;
+      font-size: 0.85rem;
       outline: none;
-      transition: border-color 0.2s;
+      width: 100%;
     }
 
-    .search-box input:focus {
+    .input-field:focus {
       border-color: var(--accent);
     }
 
+    .btn-save {
+      background: var(--accent);
+      color: #07090e;
+      border: none;
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: opacity 0.2s;
+    }
+
+    .btn-save:hover {
+      opacity: 0.9;
+    }
+
+    .filters-section {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .search-wrapper {
+      position: relative;
+      max-width: 420px;
+      width: 100%;
+    }
+
+    .search-wrapper input {
+      width: 100%;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.65rem 1rem 0.65rem 2.3rem;
+      color: #fff;
+      font-size: 0.88rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-wrapper input:focus {
+      border-color: var(--accent);
+      box-shadow: 0 0 12px rgba(0, 229, 255, 0.2);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 15px;
+      height: 15px;
+      fill: var(--muted);
+    }
+
+    .city-pills {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .city-pill {
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.4rem 0.85rem;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .city-pill .pill-count {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.7rem;
+      background: rgba(255, 255, 255, 0.08);
+      padding: 0.1rem 0.4rem;
+      border-radius: 10px;
+    }
+
+    .city-pill:hover {
+      color: #fff;
+      border-color: rgba(0, 229, 255, 0.4);
+    }
+
+    .city-pill.active {
+      background: rgba(0, 229, 255, 0.12);
+      border-color: var(--accent);
+      color: var(--accent);
+      font-weight: 600;
+    }
+
+    .city-pill.active .pill-count {
+      background: var(--accent);
+      color: #07090e;
+      font-weight: 700;
+    }
+
+    /* GRID DE CÁMARAS */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
@@ -118,15 +319,15 @@
       border-radius: 12px;
       overflow: hidden;
       backdrop-filter: blur(8px);
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
       display: flex;
       flex-direction: column;
-      transition: transform 0.2s, border-color 0.2s;
+      transition: transform 0.2s ease, border-color 0.2s ease;
     }
 
     .card:hover {
       transform: translateY(-2px);
-      border-color: rgba(0, 229, 255, 0.3);
+      border-color: var(--border-hover);
     }
 
     .card-header {
@@ -134,8 +335,25 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
+      background: rgba(0, 0, 0, 0.25);
       border-bottom: 1px solid var(--border);
-      background: rgba(0, 0, 0, 0.2);
+      gap: 0.5rem;
+    }
+
+    .card-titles {
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 0.15rem;
+    }
+
+    .card-city {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 600;
     }
 
     .card-title {
@@ -144,6 +362,7 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
+      color: #fff;
     }
 
     .badge-live {
@@ -151,26 +370,28 @@
       align-items: center;
       gap: 0.35rem;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.7rem;
+      font-size: 0.65rem;
       font-weight: 700;
-      color: var(--red);
-      background: rgba(239, 68, 68, 0.15);
-      border: 1px solid rgba(239, 68, 68, 0.3);
+      color: var(--live-red);
+      background: rgba(255, 51, 75, 0.12);
+      border: 1px solid rgba(255, 51, 75, 0.3);
       padding: 0.2rem 0.5rem;
       border-radius: 4px;
+      letter-spacing: 0.5px;
+      flex-shrink: 0;
     }
 
     .dot {
       width: 6px;
       height: 6px;
-      background: var(--red);
+      background: var(--live-red);
       border-radius: 50%;
       animation: pulse 1.5s infinite;
     }
 
     @keyframes pulse {
       0%, 100% { opacity: 1; transform: scale(1); }
-      50% { opacity: 0.3; transform: scale(1.2); }
+      50% { opacity: 0.3; transform: scale(1.3); }
     }
 
     .video-wrapper {
@@ -189,16 +410,41 @@
       border: 0;
     }
 
+    /* FOOTER Y CONTADOR */
     footer {
       border-top: 1px solid var(--border);
-      padding: 1.5rem;
-      text-align: center;
-      font-size: 0.8rem;
+      padding: 1.5rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      font-size: 0.78rem;
       color: var(--muted);
       font-family: 'JetBrains Mono', monospace;
+      background: rgba(10, 15, 26, 0.5);
     }
 
-    @media (max-width: 640px) {
+    .counter-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      padding: 0.35rem 0.85rem;
+      border-radius: 20px;
+    }
+
+    .counter-number {
+      color: var(--accent);
+      font-weight: 700;
+      letter-spacing: 1px;
+    }
+
+    @media (max-width: 768px) {
+      .add-form {
+        grid-template-columns: 1fr;
+      }
       .grid {
         grid-template-columns: 1fr;
       }
@@ -207,63 +453,182 @@
 </head>
 <body>
 
+  <!-- ENCABEZADO -->
   <header>
     <div class="brand">
-      <h1>SANTIAGO <span>EN VIVO</span></h1>
-      <p>Cámaras de vigilancia y tránsito en tiempo real</p>
+      <div class="brand-logo">
+        <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg>
+      </div>
+      <div class="brand-text">
+        <h1>CHILE <span>EN VIVO</span></h1>
+        <p>Centro de Monitoreo Urbano</p>
+      </div>
     </div>
-    <div class="time-badge">
-      STGO: <span id="reloj">--:--:--</span>
+    <div class="header-actions">
+      <button class="btn-add" id="btnToggleAdd">+ AGREGAR CÁMARA</button>
+      <div class="clock-badge">
+        HORA CHILE: <span id="reloj">--:--:--</span>
+      </div>
     </div>
   </header>
 
+  <!-- CONTENIDO -->
   <div class="container">
-    <div class="search-box">
-      <input type="text" id="filtro" placeholder="Buscar por sector o número...">
+
+    <!-- PANEL EXPANDIBLE PARA AGREGAR NUEVAS CÁMARAS -->
+    <div class="add-panel" id="addPanel">
+      <div class="add-panel-title">
+        <span>+ AGREGAR NUEVA TRANSMISIÓN EN VIVO</span>
+      </div>
+      <form class="add-form" id="formAddCam">
+        <input type="text" id="newUrl" class="input-field" placeholder="Pega el enlace de YouTube aquí..." required>
+        <input type="text" id="newTitle" class="input-field" placeholder="Nombre (ej. Costanera Norte)" required>
+        <select id="newCity" class="input-field">
+          <option value="Santiago">Santiago</option>
+          <option value="Valparaíso / Viña">Valparaíso / Viña</option>
+          <option value="Concepción">Concepción</option>
+          <option value="La Serena">La Serena</option>
+          <option value="Otras">Otras</option>
+        </select>
+        <button type="submit" class="btn-save">AGREGAR</button>
+      </form>
     </div>
 
-    <div class="grid" id="contenedorCamaras"></div>
+    <!-- BARRA DE BÚSQUEDA Y FILTROS POR CIUDAD -->
+    <div class="filters-section">
+      <div class="search-wrapper">
+        <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+        <input type="text" id="filtroTexto" placeholder="Buscar por ciudad, comuna o sector...">
+      </div>
+
+      <div class="city-pills" id="cityPills"></div>
+    </div>
+
+    <!-- GRILLA DE CÁMARAS -->
+    <div class="grid" id="gridCamaras"></div>
   </div>
 
+  <!-- PIE DE PÁGINA CON CONTADOR -->
   <footer>
-    Santiago Live Cams • Transmisiones públicas de YouTube
+    <div class="counter-badge">
+      <span>VISITAS AL PANEL:</span>
+      <span class="counter-number" id="visitCount">...</span>
+    </div>
+    <div>CHILE LIVE MONITOR • TRANSMISIONES EN TIEMPO REAL VÍA YOUTUBE</div>
   </footer>
 
   <script>
-    const camaras = [
-      { id: "ErUOGtBXhgY", titulo: "Cámara 01 - Santiago Centro" },
-      { id: "_Nrt155MExU", titulo: "Cámara 02 - Eje Alameda / Providencia" },
-      { id: "UpHOS_enhjI", titulo: "Cámara 03 - Vista Panorámica Oriente" },
-      { id: "vXKn4qUQFMA", titulo: "Cámara 04 - Sector Costanera" },
-      { id: "ulBAncoXWws", titulo: "Cámara 05 - Autopista / Flujo Vial" },
-      { id: "uyt8JsITTac", titulo: "Cámara 06 - Gran Santiago Tráfico" },
-      { id: "RhdmP5017VM", titulo: "Cámara 07 - Sector Cívico" },
-      { id: "tmS73xQ4zVc", titulo: "Cámara 08 - Conexión Metropolitana" },
-      { id: "oDErMN0_ehw", titulo: "Cámara 09 - Vista Cordillera" },
-      { id: "HirKZqakDIA", titulo: "Cámara 10 - Control Urbano" },
-      { id: "M_Qk3Bv0-So", titulo: "Cámara 11 - Sector Oriente" },
-      { id: "itVGNflL6eo", titulo: "Cámara 12 - Panorámica Ciudad" }
+    // LISTA DE CÁMARAS BASE
+    const camarasIniciales = [
+      { id: "ErUOGtBXhgY", titulo: "Santiago Centro / Plaza Italia", ciudad: "Santiago" },
+      { id: "_Nrt155MExU", titulo: "Eje Alameda - Providencia", ciudad: "Santiago" },
+      { id: "UpHOS_enhjI", titulo: "Panorámica Santiago Oriente", ciudad: "Santiago" },
+      { id: "vXKn4qUQFMA", titulo: "Sector Costanera Center", ciudad: "Santiago" },
+      { id: "ulBAncoXWws", titulo: "Flujo Autopista Central", ciudad: "Santiago" },
+      { id: "uyt8JsITTac", titulo: "Conexión Vial Gran Santiago", ciudad: "Santiago" },
+      { id: "RhdmP5017VM", titulo: "Centro Cívico y Moneda", ciudad: "Santiago" },
+      { id: "tmS73xQ4zVc", titulo: "Viña del Mar / Borde Costero", ciudad: "Valparaíso / Viña" },
+      { id: "oDErMN0_ehw", titulo: "Valparaíso Puerto y Bahía", ciudad: "Valparaíso / Viña" },
+      { id: "HirKZqakDIA", titulo: "Concepción Centro / Biobío", ciudad: "Concepción" },
+      { id: "M_Qk3Bv0-So", titulo: "Costanera La Serena / Coquimbo", ciudad: "La Serena" },
+      { id: "itVGNflL6eo", titulo: "Panorámica Cordillera / Valle", ciudad: "Santiago" }
     ];
 
-    const contenedor = document.getElementById('contenedorCamaras');
-    const inputFiltro = document.getElementById('filtro');
+    // Cargar cámaras de localStorage o usar las iniciales
+    let camaras = JSON.parse(localStorage.getItem('chile_live_cams')) || camarasIniciales;
 
-    function mostrarCamaras(texto = '') {
-      contenedor.innerHTML = '';
-      const filtradas = camaras.filter(c => c.titulo.toLowerCase().includes(texto.toLowerCase()));
+    let ciudadActiva = 'Todas';
+    let textoBusqueda = '';
+
+    const grid = document.getElementById('gridCamaras');
+    const cityPillsContainer = document.getElementById('cityPills');
+    const inputFiltro = document.getElementById('filtroTexto');
+    const btnToggleAdd = document.getElementById('btnToggleAdd');
+    const addPanel = document.getElementById('addPanel');
+    const formAddCam = document.getElementById('formAddCam');
+
+    // Extraer YouTube Video ID de cualquier formato de URL
+    function extractYouTubeID(url) {
+      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
+      const match = url.trim().match(regExp);
+      return (match && match[2].length === 11) ? match[2] : null;
+    }
+
+    // Toggle panel agregar cámara
+    btnToggleAdd.addEventListener('click', () => {
+      addPanel.classList.toggle('open');
+      if (addPanel.classList.contains('open')) {
+        document.getElementById('newUrl').focus();
+      }
+    });
+
+    // Agregar nueva cámara
+    formAddCam.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const rawUrl = document.getElementById('newUrl').value;
+      const title = document.getElementById('newTitle').value.trim();
+      const city = document.getElementById('newCity').value;
+
+      const videoId = extractYouTubeID(rawUrl);
+      if (!videoId) {
+        alert('Por favor introduce un enlace válido de YouTube.');
+        return;
+      }
+
+      camaras.unshift({ id: videoId, titulo: title, ciudad: city });
+      localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
+
+      formAddCam.reset();
+      addPanel.classList.remove('open');
+      renderPills();
+      renderCamaras();
+    });
+
+    // Generar botones de filtro por ciudad con contadores
+    function renderPills() {
+      const ciudades = ['Todas', ...new Set(camaras.map(c => c.ciudad))];
+      cityPillsContainer.innerHTML = '';
+
+      ciudades.forEach(c => {
+        const count = c === 'Todas' ? camaras.length : camaras.filter(cam => cam.ciudad === c).length;
+        const pill = document.createElement('button');
+        pill.className = `city-pill ${ciudadActiva === c ? 'active' : ''}`;
+        pill.innerHTML = `${c} <span class="pill-count">${count}</span>`;
+        pill.addEventListener('click', () => {
+          ciudadActiva = c;
+          renderPills();
+          renderCamaras();
+        });
+        cityPillsContainer.appendChild(pill);
+      });
+    }
+
+    // Renderizar tarjetas de cámaras
+    function renderCamaras() {
+      grid.innerHTML = '';
+
+      const filtradas = camaras.filter(c => {
+        const coincideCiudad = (ciudadActiva === 'Todas' || c.ciudad === ciudadActiva);
+        const coincideTexto = c.titulo.toLowerCase().includes(textoBusqueda.toLowerCase()) || 
+                              c.ciudad.toLowerCase().includes(textoBusqueda.toLowerCase());
+        return coincideCiudad && coincideTexto;
+      });
 
       if (filtradas.length === 0) {
-        contenedor.innerHTML = '<p style="color: var(--muted); grid-column: 1/-1; text-align: center;">No se encontraron cámaras.</p>';
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 4rem;">No se encontraron cámaras que coincidan.</div>`;
         return;
       }
 
       filtradas.forEach(cam => {
-        const tarjeta = document.createElement('div');
-        tarjeta.className = 'card';
-        tarjeta.innerHTML = `
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.innerHTML = `
           <div class="card-header">
-            <span class="card-title" title="${cam.titulo}">${cam.titulo}</span>
-            <span class="badge-live"><span class="dot"></span>EN VIVO</span>
+            <div class="card-titles">
+              <span class="card-city">${cam.ciudad}</span>
+              <span class="card-title" title="${cam.titulo}">${cam.titulo}</span>
+            </div>
+            <span class="badge-live"><span class="dot"></span>LIVE</span>
           </div>
           <div class="video-wrapper">
             <iframe 
@@ -275,20 +640,47 @@
             </iframe>
           </div>
         `;
-        contenedor.appendChild(tarjeta);
+        grid.appendChild(card);
       });
     }
 
-    inputFiltro.addEventListener('input', (e) => mostrarCamaras(e.target.value));
+    // Buscador
+    inputFiltro.addEventListener('input', (e) => {
+      textoBusqueda = e.target.value;
+      renderCamaras();
+    });
 
+    // Reloj hora de Chile
     function actualizarReloj() {
+      const ahora = new Date();
       const opciones = { timeZone: 'America/Santiago', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-      document.getElementById('reloj').textContent = new Intl.DateTimeFormat('es-CL', opciones).format(new Date());
+      document.getElementById('reloj').textContent = new Intl.DateTimeFormat('es-CL', opciones).format(ahora);
     }
     setInterval(actualizarReloj, 1000);
     actualizarReloj();
 
-    mostrarCamaras();
+    // Contador de visitas persistente
+    async function initCounter() {
+      const counterEl = document.getElementById('visitCount');
+      try {
+        const res = await fetch('https://api.counterapi.dev/v1/livesantiago-julio/visitas/up');
+        if (res.ok) {
+          const data = await res.json();
+          counterEl.textContent = String(data.count).padStart(5, '0');
+          return;
+        }
+      } catch (err) {
+        // Respaldo local
+      }
+      let localVisits = parseInt(localStorage.getItem('page_visits') || '0', 10) + 1;
+      localStorage.setItem('page_visits', localVisits);
+      counterEl.textContent = String(localVisits).padStart(5, '0');
+    }
+
+    // Inicialización al cargar la página
+    renderPills();
+    renderCamaras();
+    initCounter();
   </script>
 </body>
 </html>
