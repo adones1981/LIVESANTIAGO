@@ -14,7 +14,7 @@
 
   <style>
     :root {
-      --bg: #0f172a;
+      --bg: #ffffff;
       --accent: #059669;
       --accent-glow: rgba(5, 150, 105, 0.3);
       --card-bg: rgba(255, 255, 255, 0.95);
@@ -32,7 +32,7 @@
     }
 
     body {
-      background-color: #f1f5f9;
+      background-color: #f8fafc;
       color: var(--text);
       font-family: 'Plus Jakarta Sans', sans-serif;
       overflow: hidden;
@@ -43,7 +43,7 @@
 
     /* PANEL LATERAL IZQUIERDO */
     aside {
-      width: 320px;
+      width: 300px;
       height: 100vh;
       background: #ffffff;
       border-right: 1px solid var(--border);
@@ -52,7 +52,7 @@
       flex-direction: column;
       gap: 1.25rem;
       z-index: 30;
-      box-shadow: 5px 0 30px rgba(0,0,0,0.05);
+      box-shadow: 5px 0 20px rgba(0,0,0,0.03);
     }
 
     .brand-area {
@@ -152,46 +152,6 @@
       letter-spacing: 0.8px;
     }
 
-    .search-box-side {
-      display: flex;
-      background: #f8fafc;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.4rem 0.75rem;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .search-box-side input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: var(--text-bright);
-      font-size: 0.8rem;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-      width: 100%;
-      user-select: text;
-    }
-
-    .btn-dial {
-      width: 100%;
-      background: var(--accent);
-      color: #ffffff;
-      border: none;
-      border-radius: 8px;
-      padding: 0.75rem;
-      font-weight: 700;
-      font-size: 0.82rem;
-      cursor: pointer;
-      font-family: 'JetBrains Mono', monospace;
-      box-shadow: 0 4px 15px var(--accent-glow);
-      transition: transform 0.1s;
-    }
-
-    .btn-dial:active {
-      transform: scale(0.98);
-    }
-
     .sidebar-footer-info {
       margin-top: auto;
       font-size: 0.72rem;
@@ -202,12 +162,12 @@
       border-top: 1px solid var(--border);
     }
 
-    /* CONTENEDOR DEL GLOBO (MAPA CLARO Y VISIBLE) */
+    /* CONTENEDOR DEL GLOBO */
     #viewerContainer {
       flex: 1;
       height: 100vh;
       position: relative;
-      background: #e2e8f0;
+      background: #dbeafe; /* Mar azul claro */
     }
 
     #globeViz {
@@ -220,18 +180,82 @@
       cursor: grabbing;
     }
 
+    /* CONTROLES SUPERIORES (Buscador y Giro arriba a la derecha) */
+    .top-controls {
+      position: absolute;
+      top: 1.25rem;
+      right: 1.5rem;
+      z-index: 20;
+      display: flex;
+      gap: 0.6rem;
+      align-items: center;
+    }
+
+    .search-box-top {
+      display: flex;
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.35rem 0.75rem;
+      gap: 0.5rem;
+      align-items: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      backdrop-filter: blur(10px);
+    }
+
+    .search-box-top input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: var(--text-bright);
+      font-size: 0.8rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      width: 200px;
+      user-select: text;
+    }
+
+    .btn-search-top {
+      background: var(--accent);
+      color: #ffffff;
+      border: none;
+      border-radius: 6px;
+      padding: 0.35rem 0.65rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-ctrl-top {
+      background: rgba(255, 255, 255, 0.95);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.5rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+      backdrop-filter: blur(10px);
+    }
+
+    .btn-ctrl-top:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
     /* LEYENDA DE POPULARIDAD */
     .popularity-legend {
       position: absolute;
       bottom: 1.5rem;
       right: 1.5rem;
-      background: rgba(255, 255, 255, 0.9);
+      background: rgba(255, 255, 255, 0.95);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 0.85rem 1rem;
       z-index: 20;
       backdrop-filter: blur(12px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.08);
     }
 
     .popularity-legend h4 {
@@ -439,33 +463,6 @@
       border: 1px solid var(--border);
       white-space: nowrap;
     }
-
-    /* CONTROLES SUPERIORES */
-    .top-controls {
-      position: absolute;
-      top: 1.25rem;
-      right: 1.5rem;
-      z-index: 20;
-      display: flex;
-      gap: 0.5rem;
-    }
-
-    .btn-ctrl-top {
-      background: rgba(255, 255, 255, 0.9);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.45rem 0.85rem;
-      border-radius: 8px;
-      font-size: 0.75rem;
-      font-family: 'JetBrains Mono', monospace;
-      cursor: pointer;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    }
-
-    .btn-ctrl-top:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-    }
   </style>
 </head>
 <body>
@@ -490,32 +487,28 @@
       </div>
     </div>
 
-    <div class="sidebar-section">
-      <span class="sidebar-label">BÚSQUEDA GLOBAL</span>
-      <div class="search-box-side">
-        <input type="text" id="inputCitySearch" placeholder="Ej. Paris, London, Santiago...">
-      </div>
-    </div>
-
-    <button class="btn-dial" id="btnSearchCity">BUSCAR EN EL ORBE</button>
-
-    <div class="sidebar-section" style="margin-top: 1rem;">
+    <div class="sidebar-section" style="margin-top: auto;">
       <span class="sidebar-label">ADMINISTRACIÓN</span>
       <div style="display:flex; gap:0.4rem;">
-        <button class="btn-ctrl-top" id="btnAdmin" style="flex:1; background:#f8fafc;">🔒 ADMIN</button>
-        <button class="btn-ctrl-top" id="btnResetCam" title="Restaurar" style="flex:1; background:#f8fafc;">🔄 RESET</button>
+        <button class="btn-ctrl-top" id="btnAdmin" style="flex:1; background:#f8fafc; text-align:center;">🔒 ADMIN</button>
+        <button class="btn-ctrl-top" id="btnResetCam" title="Restaurar" style="flex:1; background:#f8fafc; text-align:center;">🔄 RESET</button>
       </div>
     </div>
 
     <div class="sidebar-footer-info">
-      Live Cam Global v6.0
+      Live Cam Global v6.1
     </div>
   </aside>
 
   <!-- CONTENEDOR PRINCIPAL DEL GLOBO -->
   <div id="viewerContainer">
+    <!-- BUSCADOR Y GIRO EN LA PARTE SUPERIOR DERECHA -->
     <div class="top-controls">
-      <button class="btn-ctrl-top" id="btnToggleRotate">▶ GIRO AUTOMÁTICO</button>
+      <div class="search-box-top">
+        <input type="text" id="inputCitySearch" placeholder="Buscar país, ciudad...">
+        <button class="btn-search-top" id="btnSearchCity">IR</button>
+      </div>
+      <button class="btn-ctrl-top" id="btnToggleRotate">▶ GIRO</button>
     </div>
 
     <div id="globeViz"></div>
@@ -558,7 +551,7 @@
 
   <script>
     const ADMIN_PASSWORD = "9066819";
-    const STORAGE_KEY = "livecam_garden_cams_v8";
+    const STORAGE_KEY = "livecam_garden_cams_v9";
 
     // CÁMARAS VERIFICADAS CON UBICACIONES EXACTAS DIFERENCIADAS EN SANTIAGO Y EL MUNDO
     const worldCamsIniciales = [
@@ -698,10 +691,10 @@
       });
     }
 
-    // INICIALIZACIÓN DEL GLOBO (MAPA CLARO Y BRILLANTE)
+    // INICIALIZACIÓN DEL GLOBO (MAR CLARO Y TIERRA CASI BLANCA CON NOMBRES DE PAÍSES)
     const globe = Globe()
       (document.getElementById('globeViz'))
-      .backgroundColor('#e2e8f0')
+      .backgroundColor('#dbeafe')
       .showGlobe(true)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .atmosphereColor('#059669')
@@ -748,9 +741,9 @@
       .then(countries => {
         globe.polygonsData(countries.features)
           .polygonAltitude(0.002)
-          .polygonCapColor(() => '#f8fafc')
-          .polygonSideColor(() => '#e2e8f0')
-          .polygonStrokeColor(() => '#cbd5e1')
+          .polygonCapColor(() => '#f0fdf4') // Tierra verde casi blanco
+          .polygonSideColor(() => '#dcfce7')
+          .polygonStrokeColor(() => '#bbf7d0')
           .polygonLabel(({ properties: d }) => {
             const nombrePais = traduccionPaises[d.ADMIN] || d.NAME_ES || d.ADMIN;
             return `<div style="background:#ffffff; padding:3px 8px; border-radius:4px; font-size:11px; border:1px solid #cbd5e1; color:#111827;"><b>🌍 ${nombrePais}</b></div>`;
@@ -767,7 +760,7 @@
     btnToggleRotate.addEventListener('click', () => {
       isAutoRotating = !isAutoRotating;
       globe.controls().autoRotate = isAutoRotating;
-      btnToggleRotate.textContent = isAutoRotating ? '⏸ PAUSAR GIRO' : '▶ GIRO AUTOMÁTICO';
+      btnToggleRotate.textContent = isAutoRotating ? '⏸ PAUSAR' : '▶ GIRO';
     });
 
     function refreshGlobeData() {
