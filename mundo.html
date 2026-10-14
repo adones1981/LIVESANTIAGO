@@ -558,7 +558,7 @@
     </form>
   </div>
 
-  <div class="hint-overlay">Haz clic en los puntos verdes circulares para abrir la transmisión</div>
+  <div class="hint-overlay">Haz clic en los puntos verdes para abrir las cámaras en vivo</div>
 
   <div id="globeViz"></div>
 
@@ -586,17 +586,17 @@
   <script>
     const ADMIN_PASSWORD = "9066819";
 
-    // CÁMARAS CON COORDENADAS EXACTAS
+    // CÁMARAS EN VIVO VERIFICADAS (CON COORDENADAS PRECISAS)
     const worldCamsIniciales = [
       // CHILE
-      { id: "ErUOGtBXhgY", city: "Santiago", sector: "Plaza Baquedano", country: "Chile", lat: -33.4372, lng: -70.6345, desc: "Centro de Santiago" },
+      { id: "ErUOGtBXhgY", city: "Santiago", sector: "Centro - Plaza Italia", country: "Chile", lat: -33.4372, lng: -70.6345, desc: "Plaza Baquedano" },
       { id: "_Nrt155MExU", city: "Santiago", sector: "Providencia", country: "Chile", lat: -33.4290, lng: -70.6120, desc: "Eje Alameda - Providencia" },
       { id: "tmS73xQ4zVc", city: "Viña del Mar", sector: "Borde Costero", country: "Chile", lat: -33.0150, lng: -71.5518, desc: "Costanera y Playa" },
       { id: "oDErMN0_ehw", city: "Valparaíso", sector: "Puerto", country: "Chile", lat: -33.0420, lng: -71.6250, desc: "Bahía y Muelle Barón" },
       { id: "M_Qk3Bv0-So", city: "La Serena", sector: "Avenida del Mar", country: "Chile", lat: -29.9027, lng: -71.2519, desc: "Faro y Costanera" },
       { id: "HirKZqakDIA", city: "Concepción", sector: "Centro", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
 
-      // EUROPA (TUS ENLACES INTERNACIONALES)
+      // EUROPA (TUS ENLACES INTERNACIONALES VERIFICADOS)
       { id: "asO_10T0k2k", city: "París", sector: "Torre Eiffel", country: "Francia", lat: 48.8584, lng: 2.2945, desc: "Torre Eiffel y Skyline" },
       { id: "2GgaZAqFE5U", city: "Londres", sector: "Tower Bridge", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge y Río Támesis" },
       { id: "mt7uE-n0YPI", city: "Venecia", sector: "Puente Rialto", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal de Venecia" },
@@ -641,43 +641,44 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    // MOTOR DE MAPA LIBRE OPENSTREETMAP (100% PÚBLICO Y SIN API KEY)
+    // INICIALIZACIÓN GLOBO (PUNTOS VERDES DISCRETOS, SIN TEXTOS GIGANTES)
     const globe = Globe()
       (document.getElementById('globeViz'))
       .backgroundColor('#020617')
-      .globeTileEngineUrl((x, y, l) => `https://tile.openstreetmap.org/${l}/${x}/${y}.png`)
+      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .atmosphereColor('#00ff66')
-      .atmosphereAltitude(0.12)
+      .atmosphereAltitude(0.18)
 
-      // CÍRCULOS VERDES RADAR PLANOS (SIN CILINDROS 3D SALIENTES)
-      .ringsData(worldCams)
-      .ringLat(d => d.lat)
-      .ringLng(d => d.lng)
-      .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t * 0.75})`)
-      .ringMaxRadius(1.6)
-      .ringPropagationSpeed(1.4)
-      .ringRepeatPeriod(1100)
-
-      // PUNTO VERDE CENTRAL EXACTO
-      .bubblesData(worldCams)
-      .bubbleLat(d => d.lat)
-      .bubbleLng(d => d.lng)
-      .bubbleRadius(0.35)
-      .bubbleColor(() => '#00ff66')
-      .bubbleLabel(d => `
+      // PUNTOS VERDES LIMPIOS TIPO RADAR
+      .pointsData(worldCams)
+      .pointLat(d => d.lat)
+      .pointLng(d => d.lng)
+      .pointColor(() => '#00ff66')
+      .pointAltitude(0.02)
+      .pointRadius(0.55) // Punto pequeño y bien proporcionado
+      .pointLabel(d => `
         <div class="custom-tooltip">
           <b>🟢 ${d.city}</b> (${d.country})<br/>
           <span style="color:#00ff66;">${d.sector ? d.sector + ' • ' : ''}${d.desc}</span>
         </div>
       `)
-      .onBubbleClick(d => selectCamera(d));
+      .onPointClick(d => selectCamera(d))
+
+      // ONDAS RADAR SUAVES VERDES
+      .ringsData(worldCams)
+      .ringLat(d => d.lat)
+      .ringLng(d => d.lng)
+      .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t})`)
+      .ringMaxRadius(2.2)
+      .ringPropagationSpeed(1.6)
+      .ringRepeatPeriod(1200);
 
     // GLOBO ESTÁTICO (NO SE MUEVE SOLO)
     globe.controls().autoRotate = false;
     globe.controls().autoRotateSpeed = 0.4;
     globe.pointOfView({ lat: -33.4489, lng: -70.6693, altitude: 2.2 }, 1500);
 
-    // CONTROL MANUAL DEL GIRO
+    // BOTÓN ACTIVAR/PAUSAR GIRO
     btnToggleRotate.addEventListener('click', () => {
       isAutoRotating = !isAutoRotating;
       globe.controls().autoRotate = isAutoRotating;
@@ -685,9 +686,25 @@
       btnToggleRotate.style.borderColor = isAutoRotating ? 'var(--accent)' : 'var(--border)';
     });
 
+    // CAPA POLÍTICA CON NOMBRES REALES DE PAÍSES
+    fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
+      .then(res => res.json())
+      .then(countries => {
+        globe.polygonsData(countries.features)
+          .polygonCapColor(() => 'rgba(255, 255, 255, 0.0)')
+          .polygonSideColor(() => 'rgba(0, 0, 0, 0)')
+          .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.28)') // Líneas de fronteras limpias
+          .polygonLabel(({ properties: d }) => `
+            <div class="custom-tooltip">
+              <b>🌍 ${d.ADMIN}</b>
+            </div>
+          `);
+      })
+      .catch(() => {});
+
     function refreshGlobeData() {
+      globe.pointsData(worldCams);
       globe.ringsData(worldCams);
-      globe.bubblesData(worldCams);
       renderDropdownCities();
     }
 
