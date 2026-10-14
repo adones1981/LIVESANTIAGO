@@ -3,25 +3,26 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EarthCam Garden | Explorador Global</title>
+  <title>EarthCam Garden | Orbital Explorer</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
 
   <!-- Motor Globe.gl estable -->
   <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.35.1/dist/globe.gl.min.js"></script>
 
   <style>
     :root {
-      --bg: #020813;
+      --bg: #010409;
       --accent: #00ff66;
-      --accent-glow: rgba(0, 255, 102, 0.45);
+      --accent-glow: rgba(0, 255, 102, 0.35);
       --live-red: #ff334b;
-      --card-bg: rgba(10, 17, 33, 0.95);
-      --border: rgba(255, 255, 255, 0.16);
-      --text: #f1f5f9;
-      --muted: #94a3b8;
+      --card-bg: rgba(13, 17, 23, 0.85);
+      --border: rgba(255, 255, 255, 0.12);
+      --text: #c9d1d9;
+      --text-bright: #f0f6fc;
+      --muted: #8b949e;
     }
 
     * {
@@ -54,18 +55,18 @@
       cursor: grabbing;
     }
 
-    /* HEADER */
+    /* HEADER / PANEL DE CONTROL ORBITAL */
     header {
       position: absolute;
       top: 1.25rem;
       left: 1.5rem;
       z-index: 30;
       background: var(--card-bg);
-      backdrop-filter: blur(16px);
+      backdrop-filter: blur(20px);
       border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 0.75rem 1.25rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+      border-radius: 12px;
+      padding: 0.65rem 1.15rem;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.7);
       display: flex;
       align-items: center;
       gap: 0.75rem;
@@ -74,32 +75,33 @@
     }
 
     .btn-back {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border);
       color: var(--accent);
-      padding: 0.45rem 0.85rem;
-      border-radius: 8px;
-      font-size: 0.78rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 7px;
+      font-size: 0.75rem;
       font-weight: 700;
       text-decoration: none;
       font-family: 'JetBrains Mono', monospace;
       display: flex;
       align-items: center;
-      gap: 0.4rem;
+      gap: 0.35rem;
       transition: all 0.2s ease;
     }
 
     .btn-back:hover {
       background: var(--accent);
-      color: #07090e;
+      color: #010409;
       box-shadow: 0 0 15px var(--accent-glow);
     }
 
     .brand-title h1 {
-      font-size: 1.05rem;
+      font-size: 1rem;
       font-weight: 700;
-      color: #fff;
+      color: var(--text-bright);
       line-height: 1.1;
+      letter-spacing: 0.5px;
     }
 
     .brand-title h1 span {
@@ -107,18 +109,19 @@
     }
 
     .brand-title p {
-      font-size: 0.68rem;
+      font-size: 0.62rem;
       color: var(--muted);
       font-family: 'JetBrains Mono', monospace;
+      letter-spacing: 1px;
     }
 
     .search-city-box {
       display: flex;
       align-items: center;
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.3);
       border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.2rem 0.6rem;
+      border-radius: 7px;
+      padding: 0.2rem 0.5rem;
       gap: 0.4rem;
       transition: border-color 0.2s;
     }
@@ -131,42 +134,37 @@
       background: transparent;
       border: none;
       outline: none;
-      color: #fff;
-      font-size: 0.8rem;
+      color: var(--text-bright);
+      font-size: 0.78rem;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      width: 165px;
+      width: 150px;
       user-select: text;
     }
 
     .search-city-box input::placeholder {
       color: var(--muted);
-      font-size: 0.75rem;
+      font-size: 0.72rem;
     }
 
     .btn-search {
       background: var(--accent);
-      color: #07090e;
+      color: #010409;
       border: none;
-      border-radius: 6px;
-      padding: 0.35rem 0.65rem;
-      font-size: 0.72rem;
+      border-radius: 5px;
+      padding: 0.3rem 0.55rem;
+      font-size: 0.7rem;
       font-weight: 700;
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
-      transition: transform 0.1s;
-    }
-
-    .btn-search:active {
-      transform: scale(0.95);
     }
 
     .btn-control {
-      background: rgba(255, 255, 255, 0.06);
+      background: rgba(255, 255, 255, 0.04);
       border: 1px solid var(--border);
       color: var(--text);
-      padding: 0.45rem 0.75rem;
-      border-radius: 8px;
-      font-size: 0.75rem;
+      padding: 0.4rem 0.7rem;
+      border-radius: 7px;
+      font-size: 0.72rem;
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 600;
@@ -185,17 +183,17 @@
     .dropdown-menu {
       display: none;
       position: absolute;
-      top: calc(100% + 8px);
+      top: calc(100 + 8px);
       left: 0;
       width: 310px;
       max-height: 55vh;
       overflow-y: auto;
       background: var(--card-bg);
-      backdrop-filter: blur(20px);
+      backdrop-filter: blur(22px);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 0.4rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.85);
       z-index: 50;
     }
 
@@ -208,12 +206,12 @@
       background: none;
       border: none;
       color: var(--text);
-      padding: 0.5rem 0.75rem;
-      font-size: 0.74rem;
+      padding: 0.45rem 0.7rem;
+      font-size: 0.72rem;
       font-family: 'JetBrains Mono', monospace;
       text-align: left;
       cursor: pointer;
-      border-radius: 6px;
+      border-radius: 5px;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -222,18 +220,18 @@
     }
 
     .dropdown-item:hover {
-      background: rgba(0, 255, 102, 0.15);
+      background: rgba(0, 255, 102, 0.12);
       color: var(--accent);
     }
 
-    /* ADMIN */
+    /* ADMIN & BOTONES ESPECIALES */
     .btn-admin {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(255, 255, 255, 0.03);
       border: 1px solid var(--border);
       color: var(--muted);
-      padding: 0.45rem 0.75rem;
-      border-radius: 8px;
-      font-size: 0.75rem;
+      padding: 0.4rem 0.65rem;
+      border-radius: 7px;
+      font-size: 0.72rem;
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
       transition: all 0.2s ease;
@@ -245,12 +243,12 @@
     }
 
     .btn-add-cam, .btn-export-cam, .btn-reset-cam {
-      background: rgba(0, 255, 102, 0.15);
+      background: rgba(0, 255, 102, 0.12);
       border: 1px solid var(--accent);
       color: var(--accent);
-      padding: 0.45rem 0.85rem;
-      border-radius: 8px;
-      font-size: 0.75rem;
+      padding: 0.4rem 0.75rem;
+      border-radius: 7px;
+      font-size: 0.72rem;
       font-weight: 700;
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
@@ -260,44 +258,34 @@
 
     .btn-add-cam:hover {
       background: var(--accent);
-      color: #07090e;
+      color: #010409;
     }
 
     .btn-export-cam {
       border-color: #a855f7;
       color: #d8b4fe;
-      background: rgba(168, 85, 247, 0.15);
-    }
-
-    .btn-export-cam:hover {
-      background: #a855f7;
-      color: #fff;
+      background: rgba(168, 85, 247, 0.12);
     }
 
     .btn-reset-cam {
       border-color: #f59e0b;
       color: #fcd34d;
-      background: rgba(245, 158, 11, 0.15);
-    }
-
-    .btn-reset-cam:hover {
-      background: #f59e0b;
-      color: #07090e;
+      background: rgba(245, 158, 11, 0.12);
     }
 
     /* MODAL ADMIN */
     .admin-modal {
       display: none;
       position: absolute;
-      top: 5.5rem;
+      top: 5.2rem;
       left: 1.5rem;
       z-index: 35;
       background: var(--card-bg);
       border: 1px solid var(--accent);
-      border-radius: 14px;
-      padding: 1.25rem;
-      width: 360px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 255, 102, 0.15);
+      border-radius: 12px;
+      padding: 1.15rem;
+      width: 350px;
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), 0 0 20px rgba(0, 255, 102, 0.15);
       backdrop-filter: blur(20px);
     }
 
@@ -306,10 +294,10 @@
     }
 
     .admin-modal h3 {
-      font-size: 0.88rem;
+      font-size: 0.85rem;
       color: var(--accent);
       font-family: 'JetBrains Mono', monospace;
-      margin-bottom: 0.85rem;
+      margin-bottom: 0.75rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -318,16 +306,16 @@
     .admin-modal form {
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
+      gap: 0.6rem;
     }
 
     .modal-input {
-      background: rgba(255, 255, 255, 0.05);
+      background: rgba(0, 0, 0, 0.4);
       border: 1px solid var(--border);
       border-radius: 6px;
-      padding: 0.55rem 0.75rem;
-      color: #fff;
-      font-size: 0.8rem;
+      padding: 0.5rem 0.7rem;
+      color: var(--text-bright);
+      font-size: 0.78rem;
       outline: none;
       width: 100%;
       user-select: text;
@@ -339,50 +327,50 @@
 
     .btn-submit-cam {
       background: var(--accent);
-      color: #07090e;
+      color: #010409;
       border: none;
       border-radius: 6px;
-      padding: 0.6rem;
+      padding: 0.55rem;
       font-weight: 700;
-      font-size: 0.8rem;
+      font-size: 0.75rem;
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
-      margin-top: 0.4rem;
+      margin-top: 0.3rem;
     }
 
     .hint-overlay {
       position: absolute;
-      bottom: 2rem;
+      bottom: 1.75rem;
       left: 50%;
       transform: translateX(-50%);
       z-index: 10;
       pointer-events: none;
-      background: rgba(0, 0, 0, 0.75);
+      background: rgba(13, 17, 23, 0.8);
       border: 1px solid var(--border);
       backdrop-filter: blur(8px);
-      padding: 0.5rem 1.2rem;
+      padding: 0.45rem 1.1rem;
       border-radius: 20px;
       font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       color: var(--accent);
       letter-spacing: 0.5px;
       white-space: nowrap;
     }
 
-    /* REPRODUCTOR FLOTANTE */
+    /* REPRODUCTOR FLOTANTE ORBITAL */
     .player-dock {
       position: fixed;
-      bottom: 2rem;
-      left: 2rem;
-      width: 440px;
+      bottom: 1.75rem;
+      left: 1.75rem;
+      width: 420px;
       min-width: 280px;
       max-width: 90vw;
       background: var(--card-bg);
-      backdrop-filter: blur(22px);
+      backdrop-filter: blur(25px);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 12px;
       z-index: 40;
-      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 255, 102, 0.15);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(0, 255, 102, 0.12);
       display: none;
       flex-direction: column;
       touch-action: none;
@@ -394,15 +382,15 @@
     }
 
     .player-header {
-      padding: 0.65rem 1rem;
+      padding: 0.6rem 0.9rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border);
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.45);
       cursor: grab;
-      border-top-left-radius: 14px;
-      border-top-right-radius: 14px;
+      border-top-left-radius: 12px;
+      border-top-right-radius: 12px;
       gap: 0.5rem;
     }
 
@@ -416,8 +404,8 @@
     }
 
     .location-info h2 {
-      font-size: 0.86rem;
-      color: #fff;
+      font-size: 0.82rem;
+      color: var(--text-bright);
       font-weight: 700;
       white-space: nowrap;
       overflow: hidden;
@@ -425,7 +413,7 @@
     }
 
     .location-info p {
-      font-size: 0.66rem;
+      font-size: 0.64rem;
       color: var(--accent);
       font-family: 'JetBrains Mono', monospace;
       white-space: nowrap;
@@ -441,29 +429,29 @@
     }
 
     .size-btn {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
       color: var(--muted);
       border-radius: 4px;
-      padding: 0.15rem 0.4rem;
-      font-size: 0.68rem;
+      padding: 0.12rem 0.35rem;
+      font-size: 0.65rem;
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 700;
     }
 
     .size-btn:hover {
-      color: #fff;
+      color: var(--text-bright);
       border-color: var(--accent);
     }
 
     .btn-yt-direct {
-      background: rgba(255, 255, 255, 0.08);
+      background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
       color: var(--accent);
       border-radius: 4px;
-      padding: 0.15rem 0.4rem;
-      font-size: 0.68rem;
+      padding: 0.12rem 0.35rem;
+      font-size: 0.65rem;
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 700;
@@ -474,15 +462,15 @@
 
     .btn-yt-direct:hover {
       background: var(--accent);
-      color: #07090e;
+      color: #010409;
     }
 
     .btn-del-cam {
       background: rgba(255, 51, 75, 0.15);
       border: 1px solid var(--live-red);
       color: var(--live-red);
-      font-size: 0.68rem;
-      padding: 0.15rem 0.4rem;
+      font-size: 0.65rem;
+      padding: 0.12rem 0.35rem;
       border-radius: 4px;
       cursor: pointer;
       display: none;
@@ -493,14 +481,14 @@
       background: none;
       border: none;
       color: var(--muted);
-      font-size: 1.2rem;
+      font-size: 1.15rem;
       cursor: pointer;
       line-height: 1;
-      padding: 0 0.2rem;
+      padding: 0 0.15rem;
     }
 
     .btn-close:hover {
-      color: #fff;
+      color: var(--text-bright);
     }
 
     .video-frame {
@@ -508,8 +496,8 @@
       width: 100%;
       padding-top: 56.25%;
       background: #000;
-      border-bottom-left-radius: 14px;
-      border-bottom-right-radius: 14px;
+      border-bottom-left-radius: 12px;
+      border-bottom-right-radius: 12px;
       overflow: hidden;
     }
 
@@ -526,32 +514,32 @@
       position: absolute;
       bottom: 2px;
       right: 2px;
-      width: 16px;
-      height: 16px;
+      width: 14px;
+      height: 14px;
       cursor: nwse-resize;
       z-index: 60;
       display: flex;
       align-items: center;
       justify-content: center;
       color: var(--accent);
-      font-size: 10px;
+      font-size: 9px;
       font-weight: bold;
       opacity: 0.6;
     }
 
     .custom-tooltip {
-      background: rgba(10, 17, 33, 0.95);
+      background: rgba(13, 17, 23, 0.95);
       border: 1px solid var(--accent);
-      color: #fff;
-      padding: 0.4rem 0.65rem;
+      color: var(--text-bright);
+      padding: 0.35rem 0.6rem;
       border-radius: 6px;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-family: 'JetBrains Mono', monospace;
       pointer-events: none;
       box-shadow: 0 0 15px var(--accent-glow);
     }
 
-    /* PIN PLANO EN EL MAPA (SIN CILINDROS 3D) */
+    /* PINES Y ETIQUETAS ORBITALES */
     .cam-marker-wrap {
       position: relative;
       display: flex;
@@ -568,54 +556,52 @@
     }
 
     .cam-pin {
-      width: 11px;
-      height: 11px;
+      width: 10px;
+      height: 10px;
       background: var(--accent);
       border: 2px solid #ffffff;
       border-radius: 50%;
-      box-shadow: 0 0 10px var(--accent), 0 0 4px rgba(0, 0, 0, 0.9);
+      box-shadow: 0 0 10px var(--accent), 0 0 3px rgba(0, 0, 0, 0.9);
       transition: transform 0.18s ease, background-color 0.18s ease;
     }
 
     .cam-marker-wrap:hover .cam-pin {
-      transform: scale(1.45);
+      transform: scale(1.5);
       background: #ffffff;
       border-color: var(--accent);
     }
 
-    /* ETIQUETA DE CIUDAD PLANA Y PEQUEÑA */
     .map-city-label {
       margin-top: 3px;
-      color: rgba(241, 245, 249, 0.92);
+      color: rgba(240, 246, 252, 0.9);
       font-family: 'Plus Jakarta Sans', sans-serif;
-      font-size: 9px;
+      font-size: 8.5px;
       font-weight: 600;
-      letter-spacing: 0.2px;
+      letter-spacing: 0.3px;
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 5px rgba(0, 0, 0, 0.9);
       pointer-events: none;
       white-space: nowrap;
-      background: rgba(2, 8, 19, 0.6);
+      background: rgba(1, 4, 9, 0.7);
       padding: 1px 4px;
       border-radius: 3px;
     }
 
-    /* TOOLTIP FLOTANTE AL PASAR EL MOUSE SOBRE EL PIN */
     .pin-tooltip {
       display: none;
       position: absolute;
-      bottom: calc(100% + 7px);
+      bottom: calc(100 + 6px);
       left: 50%;
       transform: translateX(-50%);
-      background: rgba(10, 17, 33, 0.96);
+      background: rgba(13, 17, 23, 0.96);
       border: 1px solid var(--accent);
-      color: #fff;
-      padding: 0.35rem 0.6rem;
-      border-radius: 6px;
-      font-size: 0.7rem;
+      color: var(--text-bright);
+      padding: 0.3rem 0.55rem;
+      border-radius: 5px;
+      font-size: 0.68rem;
       font-family: 'JetBrains Mono', monospace;
       white-space: nowrap;
       pointer-events: none;
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), 0 0 12px var(--accent-glow);
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.8), 0 0 10px var(--accent-glow);
     }
 
     .cam-marker-wrap:hover .pin-tooltip {
@@ -628,12 +614,12 @@
   <header>
     <a href="index.html" class="btn-back">← CHILE</a>
     <div class="brand-title">
-      <h1>EARTH<span>CAM</span></h1>
-      <p>EXPLORADOR MUNDIAL</p>
+      <h1>ORBIT<span>CAM</span></h1>
+      <p>LIVE RADAR GLOBAL</p>
     </div>
 
     <div class="dropdown-container">
-      <button class="btn-control" id="btnToggleCities">📋 CÁMARAS EN VIVO ▼</button>
+      <button class="btn-control" id="btnToggleCities">📋 CÁMARAS ▼</button>
       <div class="dropdown-menu" id="dropdownCities"></div>
     </div>
 
@@ -645,40 +631,40 @@
     </div>
 
     <button class="btn-admin" id="btnAdmin">🔒 ADMIN</button>
-    <button class="btn-add-cam" id="btnToggleAdd">+ AÑADIR CÁMARA</button>
-    <button class="btn-reset-cam" id="btnResetCam" title="Restaurar cámaras verificadas por defecto">🔄 RESET</button>
-    <button class="btn-export-cam" id="btnExportCam" title="Copiar lista para GitHub">📋 COPIAR PARA GITHUB</button>
+    <button class="btn-add-cam" id="btnToggleAdd">+ CÁMARA</button>
+    <button class="btn-reset-cam" id="btnResetCam" title="Restaurar cámaras oficiales">🔄 RESET</button>
+    <button class="btn-export-cam" id="btnExportCam" title="Copiar para GitHub">📋 COPIAR</button>
   </header>
 
   <div class="admin-modal" id="adminModal">
     <h3>
-      <span>+ NUEVA CÁMARA AL GLOBO</span>
+      <span>+ NUEVA CÁMARA ORBITAL</span>
       <span style="cursor:pointer;" id="btnCloseModal">&times;</span>
     </h3>
     <form id="formAddWorldCam">
       <input type="text" id="worldCamUrl" class="modal-input" placeholder="Enlace de YouTube..." required>
-      <input type="text" id="worldCamTitle" class="modal-input" placeholder="Nombre o sector (ej. Centro)" required>
+      <input type="text" id="worldCamTitle" class="modal-input" placeholder="Sector (ej. Centro)" required>
       <input type="text" id="worldCamCity" class="modal-input" placeholder="Ciudad (ej. Roma)" required>
       <input type="text" id="worldCamCountry" class="modal-input" placeholder="País (ej. Italia)" required>
       <button type="submit" class="btn-submit-cam" id="btnSubmitCam">VERIFICAR Y CLAVAR</button>
     </form>
   </div>
 
-  <div class="hint-overlay">Haz clic en cualquier pin verde para ver la cámara en vivo</div>
+  <div class="hint-overlay">Haz clic en cualquier pin verde para abrir el enlace de video en vivo</div>
 
   <div id="globeViz"></div>
 
   <div class="player-dock" id="playerDock">
     <div class="player-header" id="playerDragHeader">
       <div class="location-info">
-        <h2 id="streamTitle">Selecciona una ciudad</h2>
+        <h2 id="streamTitle">Selecciona una ubicación</h2>
         <p id="streamCoords">--° N, --° E</p>
       </div>
       <div class="header-btns">
         <a id="btnYtDirect" class="btn-yt-direct" href="#" target="_blank" title="Abrir en YouTube">↗ YT</a>
-        <button class="size-btn" onclick="resizePlayer(320)">S</button>
-        <button class="size-btn" onclick="resizePlayer(480)">M</button>
-        <button class="size-btn" onclick="resizePlayer(660)">L</button>
+        <button class="size-btn" onclick="resizePlayer(300)">S</button>
+        <button class="size-btn" onclick="resizePlayer(440)">M</button>
+        <button class="size-btn" onclick="resizePlayer(600)">L</button>
         <button class="btn-del-cam" id="btnDeleteCam">🗑️</button>
         <button class="btn-close" id="btnClose">&times;</button>
       </div>
@@ -691,12 +677,11 @@
 
   <script>
     const ADMIN_PASSWORD = "9066819";
-    // Nueva clave de almacenamiento para descartar automáticamente la lista vieja con errores guardada en el navegador
-    const STORAGE_KEY = "earthcam_garden_cams_v3";
+    const STORAGE_KEY = "orbitcam_garden_cams_v4";
 
-    // CÁMARAS AUDITADAS Y VERIFICADAS (UBICACIÓN REAL === STREAM REAL)
+    // CÁMARAS OFICIALES VERIFICADAS 24/7 EN YOUTUBE
     const worldCamsIniciales = [
-      // CHILE (Coordenadas exactas correspondientes a cada video real)
+      // CHILE
       {
         id: "ErUOGtBXhgY",
         city: "Santiago",
@@ -724,7 +709,6 @@
         lng: -70.2498,
         desc: "Valle Nevado Ski Resort (Cordillera)"
       },
-
       // AMÉRICA
       {
         id: "7dc4Y_Vb_Wc",
@@ -753,7 +737,6 @@
         lng: -118.4695,
         desc: "Venice Beach Boardwalk Live"
       },
-
       // EUROPA
       {
         id: "mt7uE-n0YPI",
@@ -782,7 +765,6 @@
         lng: -6.2643,
         desc: "EarthCam: Centro Histórico Temple Bar"
       },
-
       // ASIA
       {
         id: "dfVK7ld38Ys",
@@ -795,37 +777,15 @@
       }
     ];
 
-    // DICCIONARIO DE TRADUCCIÓN DE PAÍSES DEL MAPA PARA HOVER EN ESPAÑOL
     const traduccionPaises = {
-      "Chile": "Chile",
-      "Argentina": "Argentina",
-      "Peru": "Perú",
-      "Bolivia": "Bolivia",
-      "Brazil": "Brasil",
-      "United States of America": "Estados Unidos",
-      "Mexico": "México",
-      "Canada": "Canadá",
-      "France": "Francia",
-      "Spain": "España",
-      "United Kingdom": "Reino Unido",
-      "Ireland": "Irlanda",
-      "Italy": "Italia",
-      "Germany": "Alemania",
-      "Japan": "Japón",
-      "South Korea": "Corea del Sur",
-      "China": "China",
-      "Australia": "Australia",
-      "Russia": "Rusia",
-      "Colombia": "Colombia",
-      "Uruguay": "Uruguay",
-      "Paraguay": "Paraguay",
-      "Ecuador": "Ecuador",
-      "Venezuela": "Venezuela"
+      "Chile": "Chile", "Argentina": "Argentina", "Peru": "Perú", "Bolivia": "Bolivia",
+      "Brazil": "Brasil", "United States of America": "Estados Unidos", "Mexico": "México",
+      "Canada": "Canadá", "France": "Francia", "Spain": "España", "United Kingdom": "Reino Unido",
+      "Ireland": "Irlanda", "Italy": "Italia", "Germany": "Alemania", "Japan": "Japón",
+      "South Korea": "Corea del Sur", "China": "China", "Australia": "Australia", "Russia": "Rusia"
     };
 
-    // Limpiar la llave vieja defectuosa para que no interfiera nunca más
-    localStorage.removeItem('earthcam_garden_cams');
-
+    localStorage.removeItem('earthcam_garden_cams_v3');
     let worldCams = JSON.parse(localStorage.getItem(STORAGE_KEY)) || worldCamsIniciales;
     let isAdmin = sessionStorage.getItem('is_admin') === 'true';
     let currentSelectedCam = null;
@@ -857,12 +817,10 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    // Función para normalizar texto (quita tildes y pasa a minúsculas)
     function norm(str) {
       return (str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
     }
 
-    // Marca solo 1 cámara por ciudad para mostrar etiqueta de texto y evitar duplicados superpuestos
     function buildMarkerData(cams) {
       const seenCities = new Set();
       return cams.map(cam => {
@@ -873,27 +831,25 @@
       });
     }
 
-    // Textura de océano azul marino en memoria
-    function createOceanTextureUrl() {
+    function createSpaceOceanTexture() {
       const canvas = document.createElement('canvas');
       canvas.width = 64;
       canvas.height = 64;
       const ctx = canvas.getContext('2d');
-      ctx.fillStyle = '#0b4f8a';
+      ctx.fillStyle = '#030712';
       ctx.fillRect(0, 0, 64, 64);
       return canvas.toDataURL();
     }
 
-    // INICIALIZACIÓN DEL GLOBO (CON PINES PLANOS HTML)
+    // INICIALIZACIÓN DEL GLOBO ESTILO ORBITAL
     const globe = Globe()
       (document.getElementById('globeViz'))
-      .backgroundColor('#020813')
+      .backgroundColor('#010409')
       .showGlobe(true)
-      .globeImageUrl(createOceanTextureUrl())
+      .globeImageUrl(createSpaceOceanTexture())
       .atmosphereColor('#38bdf8')
-      .atmosphereAltitude(0.16)
+      .atmosphereAltitude(0.18)
 
-      // PINES PLANOS HTML Y ETIQUETAS DE CIUDAD
       .htmlElementsData(buildMarkerData(worldCams))
       .htmlLat(d => d.lat)
       .htmlLng(d => d.lng)
@@ -902,21 +858,15 @@
         const wrap = document.createElement('div');
         wrap.className = 'cam-marker-wrap';
 
-        // Tooltip al pasar el mouse
         const tooltip = document.createElement('div');
         tooltip.className = 'pin-tooltip';
-        tooltip.innerHTML = `
-          <b>🟢 ${d.city}</b> (${d.country})<br/>
-          <span style="color:#00ff66;">${d.sector ? d.sector + ' • ' : ''}${d.desc}</span>
-        `;
+        tooltip.innerHTML = `<b>🟢 ${d.city}</b> (${d.country})<br/><span style="color:#00ff66;">${d.sector ? d.sector + ' • ' : ''}${d.desc}</span>`;
         wrap.appendChild(tooltip);
 
-        // Pin circular plano
         const pin = document.createElement('div');
         pin.className = 'cam-pin';
         wrap.appendChild(pin);
 
-        // Nombre de ciudad (1 sola vez por ciudad)
         if (d.showCityLabel) {
           const label = document.createElement('div');
           label.className = 'map-city-label';
@@ -924,7 +874,6 @@
           wrap.appendChild(label);
         }
 
-        // Evento clic en el pin
         wrap.addEventListener('click', (e) => {
           e.stopPropagation();
           selectCamera(d);
@@ -933,7 +882,6 @@
         return wrap;
       })
 
-      // ONDAS RADAR PLANAS SUAVES EN CADA CIUDAD
       .ringsData(buildMarkerData(worldCams).filter(d => d.showCityLabel))
       .ringLat(d => d.lat)
       .ringLng(d => d.lng)
@@ -943,31 +891,25 @@
       .ringPropagationSpeed(1.2)
       .ringRepeatPeriod(1400);
 
-    // CARGAR CONTINENTES Y PAÍSES EN COLOR VERDE CLARO
+    // CONTINENTES EN VERDE OSCURO TÉCNICO (ESTILO ORBITAL)
     fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
       .then(res => res.json())
       .then(countries => {
         globe.polygonsData(countries.features)
           .polygonAltitude(0.002)
-          .polygonCapColor(() => '#3b8c52')
-          .polygonSideColor(() => '#286639')
-          .polygonStrokeColor(() => '#1b4727')
+          .polygonCapColor(() => '#0d2118')
+          .polygonSideColor(() => '#071610')
+          .polygonStrokeColor(() => '#164e32')
           .polygonLabel(({ properties: d }) => {
             const nombrePais = traduccionPaises[d.ADMIN] || d.NAME_ES || d.ADMIN;
-            return `
-              <div class="custom-tooltip" style="padding: 0.25rem 0.5rem; font-size: 0.68rem;">
-                <b>🌍 ${nombrePais}</b>
-              </div>
-            `;
+            return `<div class="custom-tooltip" style="padding: 0.2rem 0.4rem; font-size: 0.65rem;"><b>🌍 ${nombrePais}</b></div>`;
           });
       });
 
-    // GLOBO QUIETO POR DEFECTO EN CHILE
     globe.controls().autoRotate = false;
     globe.controls().autoRotateSpeed = 0.4;
     globe.pointOfView({ lat: -33.4489, lng: -70.6693, altitude: 2.1 }, 1500);
 
-    // BOTÓN ACTIVAR/PAUSAR GIRO
     btnToggleRotate.addEventListener('click', () => {
       isAutoRotating = !isAutoRotating;
       globe.controls().autoRotate = isAutoRotating;
@@ -1008,7 +950,6 @@
       }
     });
 
-    // Selecciona la cámara y verifica en vivo con la API oficial de YouTube (oEmbed) el nombre real del stream
     async function selectCamera(cam) {
       currentSelectedCam = cam;
       globe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 0.85 }, 1500);
@@ -1025,16 +966,13 @@
 
       playerDock.classList.add('active');
 
-      // Verificación en tiempo real del título oficial del stream en YouTube
       try {
         const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${cam.id}`);
         const info = await res.json();
         if (info && info.title && currentSelectedCam && currentSelectedCam.id === cam.id) {
           streamCoords.textContent = `📡 ${info.title.substring(0, 48)} (${cam.country})`;
         }
-      } catch (e) {
-        // Silencioso si falla la consulta de metadatos
-      }
+      } catch (e) {}
     }
 
     btnClose.addEventListener('click', () => {
@@ -1103,7 +1041,7 @@
     document.addEventListener('mousemove', (e) => {
       if (!isResizing) return;
       const deltaX = e.clientX - resizeStartX;
-      const newWidth = Math.max(280, Math.min(window.innerWidth * 0.9, startWidth + deltaX));
+      const newWidth = Math.max(260, Math.min(window.innerWidth * 0.9, startWidth + deltaX));
       playerDock.style.width = `${newWidth}px`;
     });
 
@@ -1111,12 +1049,10 @@
       isResizing = false;
     });
 
-    // BUSCADOR INTELIGENTE DE PAÍS O CIUDAD
     async function searchAndFlyToLocation(rawQuery) {
       const q = norm(rawQuery);
       if (!q) return;
 
-      // 1. Si escribió el nombre de un PAÍS que ya tenemos en nuestras cámaras (ej. "chile")
       const countryMatches = worldCams.filter(c => norm(c.country) === q);
       if (countryMatches.length > 0) {
         const avgLat = countryMatches.reduce((acc, c) => acc + c.lat, 0) / countryMatches.length;
@@ -1125,19 +1061,14 @@
         return;
       }
 
-      // 2. Coincidencia exacta con una CIUDAD o SECTOR de nuestras cámaras
       const exactCityOrSector = worldCams.find(c => norm(c.city) === q || norm(c.sector) === q);
       if (exactCityOrSector) {
         selectCamera(exactCityOrSector);
         return;
       }
 
-      // 3. Coincidencia parcial en cámaras locales
       const partialMatch = worldCams.find(c =>
-        norm(c.city).includes(q) ||
-        norm(c.sector).includes(q) ||
-        norm(c.desc).includes(q) ||
-        norm(c.country).includes(q)
+        norm(c.city).includes(q) || norm(c.sector).includes(q) || norm(c.desc).includes(q) || norm(c.country).includes(q)
       );
       if (partialMatch) {
         if (norm(partialMatch.country).includes(q)) {
@@ -1151,7 +1082,6 @@
         return;
       }
 
-      // 4. Búsqueda global en OpenStreetMap para cualquier otro país o ciudad
       btnSearchCity.textContent = '...';
       try {
         const url = `https://nominatim.openstreetmap.org/search?format=json&accept-language=es&limit=1&q=${encodeURIComponent(rawQuery.trim())}`;
@@ -1162,11 +1092,8 @@
           const item = data[0];
           const lat = parseFloat(item.lat);
           const lng = parseFloat(item.lon);
-
-          const isCountry = item.addresstype === 'country' || item.type === 'country' || item.type === 'administrative';
-          const targetAltitude = isCountry ? 1.8 : 1.05;
-
-          globe.pointOfView({ lat: lat, lng: lng, altitude: targetAltitude }, 1800);
+          const isCountry = item.addresstype === 'country' || item.type === 'country';
+          globe.pointOfView({ lat: lat, lng: lng, altitude: isCountry ? 1.8 : 1.05 }, 1800);
         } else {
           alert('No encontramos ese país o ciudad en el mapa.');
         }
@@ -1230,9 +1157,8 @@
       }
     }
 
-    // Botón para restaurar la lista limpia si alguna vez se desordena el localStorage
     btnResetCam.addEventListener('click', () => {
-      if (confirm('¿Restaurar la lista oficial verificada de cámaras y borrar cambios locales?')) {
+      if (confirm('¿Restaurar la lista oficial de cámaras orbitales?')) {
         localStorage.removeItem(STORAGE_KEY);
         worldCams = [...worldCamsIniciales];
         refreshGlobeData();
@@ -1246,7 +1172,7 @@
       }));
       const codigoExport = `const worldCamsIniciales = ${JSON.stringify(cleanCams, null, 2)};`;
       navigator.clipboard.writeText(codigoExport).then(() => {
-        alert('¡Copiado al portapapeles!\n\nAbre mundo.html en GitHub, busca la línea "const worldCamsIniciales" y reemplázala pegando lo que acabas de copiar.');
+        alert('¡Copiado al portapapeles!\n\nPégalo en tu archivo de GitHub.');
       });
     });
 
@@ -1272,10 +1198,9 @@
       if (!videoId) return alert('Enlace de YouTube no válido.');
 
       btnSubmitCam.disabled = true;
-      btnSubmitCam.textContent = 'VERIFICANDO Y LOCALIZANDO...';
+      btnSubmitCam.textContent = 'VERIFICANDO EN ORBITA...';
 
       try {
-        // 1. Verificar que el video exista en YouTube antes de clavarlo
         const ytCheck = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`);
         const ytData = await ytCheck.json();
         if (ytData.error) {
@@ -1283,12 +1208,10 @@
           return;
         }
 
-        // 2. Geolocalizar exactamente el sector + ciudad + país
         const geoQuery = `${desc}, ${city}, ${country}`;
         let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&accept-language=es&limit=1&q=${encodeURIComponent(geoQuery)}`);
         let data = await res.json();
 
-        // Si no encuentra el sector específico, busca por ciudad + país
         if (!data || data.length === 0) {
           res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&accept-language=es&limit=1&q=${encodeURIComponent(`${city},${country}`)}`);
           data = await res.json();
@@ -1307,10 +1230,10 @@
           adminModal.classList.remove('open');
           selectCamera(newCam);
         } else {
-          alert('No pudimos geolocalizar esa ciudad.');
+          alert('No pudimos geolocalizar esa ubicación.');
         }
       } catch (err) {
-        alert('Error al contactar el mapa.');
+        alert('Error al conectar con el servicio geográfico.');
       } finally {
         btnSubmitCam.disabled = false;
         btnSubmitCam.textContent = 'VERIFICAR Y CLAVAR';
