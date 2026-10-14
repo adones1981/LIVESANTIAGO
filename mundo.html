@@ -17,7 +17,7 @@
       --bg: #030508;
       --accent: #00ffcc;
       --live-red: #ff334b;
-      --card-bg: rgba(9, 14, 26, 0.94);
+      --card-bg: rgba(9, 14, 26, 0.95);
       --border: rgba(255, 255, 255, 0.14);
       --text: #f1f5f9;
       --muted: #94a3b8;
@@ -53,7 +53,7 @@
       position: absolute;
       top: 1.25rem;
       left: 1.5rem;
-      z-index: 10;
+      z-index: 30;
       background: var(--card-bg);
       backdrop-filter: blur(16px);
       border: 1px solid var(--border);
@@ -64,6 +64,7 @@
       align-items: center;
       gap: 0.85rem;
       flex-wrap: wrap;
+      max-width: calc(100vw - 3rem);
     }
 
     .btn-back {
@@ -122,7 +123,7 @@
       color: #fff;
       font-size: 0.8rem;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      width: 160px;
+      width: 150px;
     }
 
     .search-city-box input::placeholder {
@@ -142,6 +143,75 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
+    /* BOTÓN CIUDADES DESPLEGABLE */
+    .dropdown-container {
+      position: relative;
+    }
+
+    .btn-dropdown {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: #fff;
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s;
+    }
+
+    .btn-dropdown:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .dropdown-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 0;
+      width: 250px;
+      max-height: 50vh;
+      overflow-y: auto;
+      background: var(--card-bg);
+      backdrop-filter: blur(20px);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.4rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+      z-index: 50;
+    }
+
+    .dropdown-menu.open {
+      display: block;
+    }
+
+    .dropdown-item {
+      width: 100%;
+      background: none;
+      border: none;
+      color: var(--text);
+      padding: 0.5rem 0.75rem;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-align: left;
+      cursor: pointer;
+      border-radius: 6px;
+      display: flex;
+      justify-content: space-between;
+      transition: background 0.15s;
+    }
+
+    .dropdown-item:hover {
+      background: rgba(0, 255, 204, 0.12);
+      color: var(--accent);
+    }
+
+    /* BOTONES ADMIN */
     .btn-admin {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
@@ -189,13 +259,13 @@
       color: #fff;
     }
 
-    /* MODAL ADMIN */
+    /* MODAL FORMULARIO ADMIN */
     .admin-modal {
       display: none;
       position: absolute;
       top: 5.5rem;
       left: 1.5rem;
-      z-index: 25;
+      z-index: 35;
       background: var(--card-bg);
       border: 1px solid var(--accent);
       border-radius: 14px;
@@ -207,12 +277,6 @@
 
     .admin-modal.open {
       display: block;
-      animation: fadeIn 0.25s ease;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-8px); }
-      to { opacity: 1; transform: translateY(0); }
     }
 
     .admin-modal h3 {
@@ -259,11 +323,6 @@
       margin-top: 0.4rem;
     }
 
-    .btn-submit-cam:disabled {
-      opacity: 0.6;
-      cursor: wait;
-    }
-
     .hint-overlay {
       position: absolute;
       bottom: 2rem;
@@ -282,13 +341,11 @@
       letter-spacing: 0.5px;
     }
 
-    /* ==========================================================
-       VENTANA FLOTANTE REDIMENSIONABLE Y MOVIBLE (DRAG & RESIZE)
-       ========================================================== */
+    /* REPRODUCTOR FLOTANTE DRAGGABLE & RESIZABLE */
     .player-dock {
       position: fixed;
-      bottom: 1.5rem;
-      right: 1.5rem;
+      bottom: 2rem;
+      left: 2rem;
       width: 440px;
       min-width: 280px;
       max-width: 90vw;
@@ -296,7 +353,7 @@
       backdrop-filter: blur(22px);
       border: 1px solid var(--border);
       border-radius: 14px;
-      z-index: 50;
+      z-index: 40;
       box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 255, 204, 0.15);
       display: none;
       flex-direction: column;
@@ -308,7 +365,6 @@
       display: flex;
     }
 
-    /* BARRA SUPERIOR ARRASTRABLE */
     .player-header {
       padding: 0.65rem 1rem;
       display: flex;
@@ -363,7 +419,6 @@
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
       font-weight: 700;
-      transition: all 0.15s;
     }
 
     .size-btn:hover {
@@ -416,7 +471,6 @@
       border: 0;
     }
 
-    /* MANILLA PARA AGRANDAR / ACHICAR CON EL MOUSE */
     .resize-handle {
       position: absolute;
       bottom: 2px;
@@ -436,45 +490,6 @@
 
     .resize-handle:hover {
       opacity: 1;
-    }
-
-    /* LISTA LATERAL DERECHA DE CIUDADES */
-    .quick-list {
-      position: absolute;
-      top: 1.25rem;
-      right: 1.5rem;
-      z-index: 10;
-      display: flex;
-      flex-direction: column;
-      gap: 0.4rem;
-      max-height: 48vh;
-      overflow-y: auto;
-      padding-right: 0.2rem;
-    }
-
-    .city-btn {
-      background: var(--card-bg);
-      backdrop-filter: blur(12px);
-      border: 1px solid var(--border);
-      color: var(--text);
-      padding: 0.45rem 0.85rem;
-      border-radius: 8px;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.75rem;
-      cursor: pointer;
-      text-align: right;
-      transition: all 0.2s ease;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 1rem;
-    }
-
-    .city-btn:hover {
-      border-color: var(--accent);
-      color: var(--accent);
-      transform: translateX(-3px);
-      box-shadow: 0 0 10px rgba(0, 255, 204, 0.25);
     }
 
     .custom-tooltip {
@@ -499,16 +514,25 @@
       <p>EXPLORADOR MUNDIAL</p>
     </div>
 
+    <!-- MENÚ DESPLEGABLE DE CIUDADES (YA NO MOLESTA EN PANTALLA) -->
+    <div class="dropdown-container">
+      <button class="btn-dropdown" id="btnToggleCities">📋 CIUDADES ▼</button>
+      <div class="dropdown-menu" id="dropdownCities"></div>
+    </div>
+
+    <!-- BUSCADOR GEO -->
     <div class="search-city-box">
-      <input type="text" id="inputCitySearch" placeholder="Escribe una ciudad (ej. París)...">
+      <input type="text" id="inputCitySearch" placeholder="Escribe una ciudad...">
       <button class="btn-search" id="btnSearchCity">IR</button>
     </div>
 
+    <!-- ADMIN -->
     <button class="btn-admin" id="btnAdmin">🔒 ADMIN</button>
     <button class="btn-add-cam" id="btnToggleAdd">+ AÑADIR CÁMARA</button>
     <button class="btn-export-cam" id="btnExportCam" title="Copiar lista para GitHub">📋 COPIAR PARA GITHUB</button>
   </header>
 
+  <!-- FORMULARIO ADMIN -->
   <div class="admin-modal" id="adminModal">
     <h3>
       <span>+ NUEVA CÁMARA AL GLOBO</span>
@@ -516,20 +540,18 @@
     </h3>
     <form id="formAddWorldCam">
       <input type="text" id="worldCamUrl" class="modal-input" placeholder="Enlace de YouTube..." required>
-      <input type="text" id="worldCamTitle" class="modal-input" placeholder="Nombre o punto (ej. Torre Eiffel)" required>
-      <input type="text" id="worldCamCity" class="modal-input" placeholder="Ciudad (ej. París)" required>
-      <input type="text" id="worldCamCountry" class="modal-input" placeholder="País (ej. Francia)" required>
+      <input type="text" id="worldCamTitle" class="modal-input" placeholder="Nombre o sector (ej. Centro)" required>
+      <input type="text" id="worldCamCity" class="modal-input" placeholder="Ciudad (ej. Seúl)" required>
+      <input type="text" id="worldCamCountry" class="modal-input" placeholder="País (ej. Corea del Sur)" required>
       <button type="submit" class="btn-submit-cam" id="btnSubmitCam">GEOLOCALIZAR Y CLAVAR</button>
     </form>
   </div>
-
-  <div class="quick-list" id="quickList"></div>
 
   <div class="hint-overlay">Escribe una ciudad arriba o haz clic en los puntos del globo</div>
 
   <div id="globeViz"></div>
 
-  <!-- VENTANA FLOTANTE CON MANILLA Y BOTONES DE TAMAÑO -->
+  <!-- VISOR MOVIBLE Y REDIMENSIONABLE -->
   <div class="player-dock" id="playerDock">
     <div class="player-header" id="playerDragHeader">
       <div class="location-info">
@@ -537,9 +559,9 @@
         <p id="streamCoords">--° N, --° E</p>
       </div>
       <div class="header-btns">
-        <button class="size-btn" onclick="resizePlayer(320)" title="Tamaño Pequeño">S</button>
-        <button class="size-btn" onclick="resizePlayer(480)" title="Tamaño Mediano">M</button>
-        <button class="size-btn" onclick="resizePlayer(680)" title="Tamaño Grande">L</button>
+        <button class="size-btn" onclick="resizePlayer(320)">S</button>
+        <button class="size-btn" onclick="resizePlayer(480)">M</button>
+        <button class="size-btn" onclick="resizePlayer(660)">L</button>
         <button class="btn-del-cam" id="btnDeleteCam">🗑️</button>
         <button class="btn-close" id="btnClose">&times;</button>
       </div>
@@ -547,27 +569,37 @@
     <div class="video-frame">
       <iframe id="streamIframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
     </div>
-    <!-- Pestaña para arrastrar y cambiar tamaño -->
-    <div class="resize-handle" id="resizeHandle" title="Arrastra para agrandar o achicar">◢</div>
+    <div class="resize-handle" id="resizeHandle" title="Arrastra para agrandar">◢</div>
   </div>
 
   <script>
     const ADMIN_PASSWORD = "9066819";
 
+    // CÁMARAS GLOBALES SELECCIONADAS (ON-LINE Y EN VIVO)
     const worldCamsIniciales = [
+      // CHILE
       { id: "ErUOGtBXhgY", city: "Santiago", country: "Chile", lat: -33.4489, lng: -70.6693, desc: "Plaza Baquedano" },
       { id: "tmS73xQ4zVc", city: "Viña del Mar", country: "Chile", lat: -33.0245, lng: -71.5518, desc: "Borde Costero" },
       { id: "oDErMN0_ehw", city: "Valparaíso", country: "Chile", lat: -33.0472, lng: -71.6127, desc: "Puerto y Bahía" },
       { id: "HirKZqakDIA", city: "Concepción", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
       { id: "M_Qk3Bv0-So", city: "La Serena", country: "Chile", lat: -29.9027, lng: -71.2519, desc: "Avenida del Mar" },
-      { id: "499n8ZnbI", city: "Nueva York", country: "EE.UU.", lat: 40.7580, lng: -73.9855, desc: "Times Square" },
-      { id: "mRe-5144GQw", city: "Miami Beach", country: "EE.UU.", lat: 25.7617, lng: -80.1918, desc: "Ocean Drive" },
-      { id: "7dc4Y_Vb_Wc", city: "Río de Janeiro", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Copacabana" },
-      { id: "G4Hj6y2f4s4", city: "Buenos Aires", country: "Argentina", lat: -34.6037, lng: -58.3816, desc: "Obelisco" },
-      { id: "86YLFOog4GM", city: "Tokio", country: "Japón", lat: 35.6595, lng: 139.7004, desc: "Cruce Shibuya" },
-      { id: "b2wf_3A7PjQ", city: "Londres", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge" },
-      { id: "fTmlb_KqP8A", city: "Venecia", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal" },
-      { id: "d_BqA5T8yW8", city: "Sídney", country: "Australia", lat: -33.8568, lng: 151.2153, desc: "Opera House" }
+
+      // ESTADOS UNIDOS
+      { id: "1-iS7LArMPA", city: "Nueva York", country: "Estados Unidos", lat: 40.7580, lng: -73.9855, desc: "Times Square Live 4K" },
+      { id: "mRe-5144GQw", city: "Miami Beach", country: "Estados Unidos", lat: 25.7617, lng: -80.1918, desc: "Ocean Drive" },
+
+      // AMÉRICA LATINA
+      { id: "7dc4Y_Vb_Wc", city: "Río de Janeiro", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana" },
+      { id: "z7Si_4UjRk4", city: "Buenos Aires", country: "Argentina", lat: -34.6037, lng: -58.3816, desc: "Avenida 9 de Julio y Obelisco" },
+
+      // EUROPA
+      { id: "fTmlb_KqP8A", city: "Venecia", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal y Puente Rialto" },
+      { id: "W8_rGfZq6U8", city: "Roma", country: "Italia", lat: 41.8902, lng: 12.4922, desc: "Coliseo Romano" },
+      { id: "b2wf_3A7PjQ", city: "Londres", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge y Río Támesis" },
+
+      // ASIA
+      { id: "86YLFOog4GM", city: "Tokio", country: "Japón", lat: 35.6595, lng: 139.7004, desc: "Cruce de Shibuya" },
+      { id: "4jVd8d3-T5g", city: "Seúl", country: "Corea del Sur", lat: 37.5665, lng: 126.9780, desc: "Torre Namsan y Vista Urbana" }
     ];
 
     let worldCams = JSON.parse(localStorage.getItem('earthcam_garden_cams')) || worldCamsIniciales;
@@ -581,7 +613,9 @@
     const streamCoords = document.getElementById('streamCoords');
     const streamIframe = document.getElementById('streamIframe');
     const btnClose = document.getElementById('btnClose');
-    const quickList = document.getElementById('quickList');
+
+    const btnToggleCities = document.getElementById('btnToggleCities');
+    const dropdownCities = document.getElementById('dropdownCities');
 
     const inputCitySearch = document.getElementById('inputCitySearch');
     const btnSearchCity = document.getElementById('btnSearchCity');
@@ -595,6 +629,7 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
+    // INICIALIZACIÓN DEL GLOBO 3D
     const globe = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
@@ -627,19 +662,33 @@
     function refreshGlobeData() {
       globe.pointsData(worldCams);
       globe.ringsData(worldCams);
-      renderQuickList();
+      renderDropdownCities();
     }
 
-    function renderQuickList() {
-      quickList.innerHTML = '';
+    function renderDropdownCities() {
+      dropdownCities.innerHTML = '';
       worldCams.forEach(cam => {
-        const btn = document.createElement('button');
-        btn.className = 'city-btn';
-        btn.innerHTML = `<span>${cam.city}</span> <small style="color:var(--muted);">${cam.country}</small>`;
-        btn.addEventListener('click', () => selectCamera(cam));
-        quickList.appendChild(btn);
+        const item = document.createElement('button');
+        item.className = 'dropdown-item';
+        item.innerHTML = `<span>${cam.city}</span> <small style="color:var(--muted);">${cam.country}</small>`;
+        item.addEventListener('click', () => {
+          dropdownCities.classList.remove('open');
+          selectCamera(cam);
+        });
+        dropdownCities.appendChild(item);
       });
     }
+
+    btnToggleCities.addEventListener('click', (e) => {
+      e.stopPropagation();
+      dropdownCities.classList.toggle('open');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!dropdownCities.contains(e.target) && e.target !== btnToggleCities) {
+        dropdownCities.classList.remove('open');
+      }
+    });
 
     function selectCamera(cam) {
       currentSelectedCam = cam;
@@ -666,14 +715,12 @@
       globe.pointOfView({ altitude: 2.2 }, 1500);
     });
 
-    // ==========================================
-    // LOGICA DE MOVER LA VENTANA (DRAG & DROP)
-    // ==========================================
+    // DRAG AND DROP DEL VISOR
     let isDragging = false;
     let dragStartX, dragStartY, initialLeft, initialTop;
 
     playerDragHeader.addEventListener('mousedown', (e) => {
-      if (e.target.closest('.header-btns')) return; // No mover si hace clic en los botones
+      if (e.target.closest('.header-btns')) return;
       isDragging = true;
       dragStartX = e.clientX;
       dragStartY = e.clientY;
@@ -697,7 +744,6 @@
       let newLeft = initialLeft + dx;
       let newTop = initialTop + dy;
 
-      // Limitar dentro de la pantalla
       newLeft = Math.max(10, Math.min(window.innerWidth - playerDock.offsetWidth - 10, newLeft));
       newTop = Math.max(10, Math.min(window.innerHeight - playerDock.offsetHeight - 10, newTop));
 
@@ -709,9 +755,7 @@
       isDragging = false;
     });
 
-    // ==========================================
-    // LOGICA DE AGRANDAR / ACHICAR (RESIZE)
-    // ==========================================
+    // REDIMENSIÓN MANUAL
     window.resizePlayer = function(widthPx) {
       playerDock.style.width = `${Math.min(widthPx, window.innerWidth - 40)}px`;
     };
@@ -738,9 +782,7 @@
       isResizing = false;
     });
 
-    // ==========================================
-    // BUSCADOR GEO Y ADMIN
-    // ==========================================
+    // BUSCADOR GEO
     async function searchAndFlyToCity(cityName) {
       if (!cityName.trim()) return;
 
@@ -867,7 +909,7 @@
           adminModal.classList.remove('open');
           selectCamera(newCam);
         } else {
-          alert('No pudimos geolocalizar esa ciudad. Revisa que esté bien escrita.');
+          alert('No pudimos geolocalizar esa ciudad.');
         }
       } catch (err) {
         alert('Error al contactar el mapa.');
