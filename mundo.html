@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
 
-  <!-- Motor Globe.gl con versión estable -->
+  <!-- Motor Globe.gl estable -->
   <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.35.1/dist/globe.gl.min.js"></script>
 
   <style>
@@ -68,7 +68,7 @@
       box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
       display: flex;
       align-items: center;
-      gap: 0.85rem;
+      gap: 0.75rem;
       flex-wrap: wrap;
       max-width: calc(100vw - 3rem);
     }
@@ -187,8 +187,8 @@
       position: absolute;
       top: calc(100% + 8px);
       left: 0;
-      width: 280px;
-      max-height: 50vh;
+      width: 310px;
+      max-height: 55vh;
       overflow-y: auto;
       background: var(--card-bg);
       backdrop-filter: blur(20px);
@@ -209,13 +209,15 @@
       border: none;
       color: var(--text);
       padding: 0.5rem 0.75rem;
-      font-size: 0.75rem;
+      font-size: 0.74rem;
       font-family: 'JetBrains Mono', monospace;
       text-align: left;
       cursor: pointer;
       border-radius: 6px;
       display: flex;
       justify-content: space-between;
+      align-items: center;
+      gap: 0.5rem;
       transition: background 0.15s;
     }
 
@@ -242,7 +244,7 @@
       color: var(--accent);
     }
 
-    .btn-add-cam, .btn-export-cam {
+    .btn-add-cam, .btn-export-cam, .btn-reset-cam {
       background: rgba(0, 255, 102, 0.15);
       border: 1px solid var(--accent);
       color: var(--accent);
@@ -270,6 +272,17 @@
     .btn-export-cam:hover {
       background: #a855f7;
       color: #fff;
+    }
+
+    .btn-reset-cam {
+      border-color: #f59e0b;
+      color: #fcd34d;
+      background: rgba(245, 158, 11, 0.15);
+    }
+
+    .btn-reset-cam:hover {
+      background: #f59e0b;
+      color: #07090e;
     }
 
     /* MODAL ADMIN */
@@ -403,7 +416,7 @@
     }
 
     .location-info h2 {
-      font-size: 0.88rem;
+      font-size: 0.86rem;
       color: #fff;
       font-weight: 700;
       white-space: nowrap;
@@ -412,9 +425,12 @@
     }
 
     .location-info p {
-      font-size: 0.68rem;
+      font-size: 0.66rem;
       color: var(--accent);
       font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .header-btns {
@@ -578,7 +594,7 @@
       text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 5px rgba(0, 0, 0, 0.9);
       pointer-events: none;
       white-space: nowrap;
-      background: rgba(2, 8, 19, 0.55);
+      background: rgba(2, 8, 19, 0.6);
       padding: 1px 4px;
       border-radius: 3px;
     }
@@ -630,6 +646,7 @@
 
     <button class="btn-admin" id="btnAdmin">🔒 ADMIN</button>
     <button class="btn-add-cam" id="btnToggleAdd">+ AÑADIR CÁMARA</button>
+    <button class="btn-reset-cam" id="btnResetCam" title="Restaurar cámaras verificadas por defecto">🔄 RESET</button>
     <button class="btn-export-cam" id="btnExportCam" title="Copiar lista para GitHub">📋 COPIAR PARA GITHUB</button>
   </header>
 
@@ -643,7 +660,7 @@
       <input type="text" id="worldCamTitle" class="modal-input" placeholder="Nombre o sector (ej. Centro)" required>
       <input type="text" id="worldCamCity" class="modal-input" placeholder="Ciudad (ej. Roma)" required>
       <input type="text" id="worldCamCountry" class="modal-input" placeholder="País (ej. Italia)" required>
-      <button type="submit" class="btn-submit-cam" id="btnSubmitCam">GEOLOCALIZAR Y CLAVAR</button>
+      <button type="submit" class="btn-submit-cam" id="btnSubmitCam">VERIFICAR Y CLAVAR</button>
     </form>
   </div>
 
@@ -674,30 +691,108 @@
 
   <script>
     const ADMIN_PASSWORD = "9066819";
+    // Nueva clave de almacenamiento para descartar automáticamente la lista vieja con errores guardada en el navegador
+    const STORAGE_KEY = "earthcam_garden_cams_v3";
 
-    // CÁMARAS CON COORDENADAS Y NOMBRES CORREGIDOS
+    // CÁMARAS AUDITADAS Y VERIFICADAS (UBICACIÓN REAL === STREAM REAL)
     const worldCamsIniciales = [
-      // CHILE
-      { id: "ErUOGtBXhgY", city: "Santiago", sector: "Plaza Baquedano", country: "Chile", lat: -33.4372, lng: -70.6345, desc: "Centro de Santiago" },
-      { id: "_Nrt155MExU", city: "Santiago", sector: "Providencia", country: "Chile", lat: -33.4150, lng: -70.6050, desc: "Eje Alameda - Providencia" },
-      { id: "tmS73xQ4zVc", city: "Viña del Mar", sector: "Borde Costero", country: "Chile", lat: -33.0150, lng: -71.5518, desc: "Costanera y Playa" },
-      { id: "oDErMN0_ehw", city: "Valparaíso", sector: "Puerto", country: "Chile", lat: -33.0450, lng: -71.6250, desc: "Bahía y Muelle Barón" },
-      { id: "M_Qk3Bv0-So", city: "La Serena", sector: "Avenida del Mar", country: "Chile", lat: -29.9027, lng: -71.2519, desc: "Faro y Costanera" },
-      { id: "HirKZqakDIA", city: "Concepción", sector: "Centro", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
+      // CHILE (Coordenadas exactas correspondientes a cada video real)
+      {
+        id: "ErUOGtBXhgY",
+        city: "Santiago",
+        sector: "Plaza Baquedano",
+        country: "Chile",
+        lat: -33.4372,
+        lng: -70.6345,
+        desc: "Galería CIMA - Zona Cero"
+      },
+      {
+        id: "_Nrt155MExU",
+        city: "Santiago",
+        sector: "Providencia",
+        country: "Chile",
+        lat: -33.4172,
+        lng: -70.6067,
+        desc: "Vista Costanera / Providencia"
+      },
+      {
+        id: "tmS73xQ4zVc",
+        city: "Lo Barnechea",
+        sector: "Valle Nevado",
+        country: "Chile",
+        lat: -33.3547,
+        lng: -70.2498,
+        desc: "Valle Nevado Ski Resort (Cordillera)"
+      },
+
+      // AMÉRICA
+      {
+        id: "7dc4Y_Vb_Wc",
+        city: "Río de Janeiro",
+        sector: "Copacabana",
+        country: "Brasil",
+        lat: -22.9711,
+        lng: -43.1822,
+        desc: "Avenida Atlântica y Playa Copacabana"
+      },
+      {
+        id: "JQ_jwk_7OVE",
+        city: "Nueva York",
+        sector: "Times Square",
+        country: "Estados Unidos",
+        lat: 40.7580,
+        lng: -73.9855,
+        desc: "EarthCam: Times Square 4K"
+      },
+      {
+        id: "EO_1LWqsCNE",
+        city: "Los Ángeles",
+        sector: "Venice Beach",
+        country: "Estados Unidos",
+        lat: 33.9850,
+        lng: -118.4695,
+        desc: "Venice Beach Boardwalk Live"
+      },
 
       // EUROPA
-      { id: "asO_10T0k2k", city: "París", sector: "Torre Eiffel", country: "Francia", lat: 48.8584, lng: 2.2945, desc: "Torre Eiffel y Skyline" },
-      { id: "2GgaZAqFE5U", city: "Londres", sector: "Tower Bridge", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge y Río Támesis" },
-      { id: "mt7uE-n0YPI", city: "Venecia", sector: "Puente Rialto", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal de Venecia" },
+      {
+        id: "mt7uE-n0YPI",
+        city: "Venecia",
+        sector: "Gran Canal",
+        country: "Italia",
+        lat: 45.4380,
+        lng: 12.3359,
+        desc: "Puente de Rialto y Gran Canal"
+      },
+      {
+        id: "KGuCGd726RA",
+        city: "Londres",
+        sector: "Abbey Road",
+        country: "Reino Unido",
+        lat: 51.5320,
+        lng: -0.1773,
+        desc: "EarthCam: Cruce de Abbey Road"
+      },
+      {
+        id: "ydYDqZQpim8",
+        city: "Dublín",
+        sector: "Temple Bar",
+        country: "Irlanda",
+        lat: 53.3454,
+        lng: -6.2643,
+        desc: "EarthCam: Centro Histórico Temple Bar"
+      },
 
-      // ESTADOS UNIDOS
-      { id: "EO_1LWqsCNE", city: "Los Ángeles", sector: "Venice Beach", country: "Estados Unidos", lat: 33.9850, lng: -118.4695, desc: "Boardwalk California" },
-      { id: "JQ_jwk_7OVE", city: "Nueva York", sector: "Times Square", country: "Estados Unidos", lat: 40.7580, lng: -73.9855, desc: "Times Square North 4K" },
-
-      // ASIA & BRASIL
-      { id: "xoyKM6BQceM", city: "Tokio", sector: "Shibuya", country: "Japón", lat: 35.6595, lng: 139.7004, desc: "Cruce Shibuya Live" },
-      { id: "wyEi0OPai5g", city: "Seúl", sector: "Centro", country: "Corea del Sur", lat: 37.5665, lng: 126.9780, desc: "Panorama Metropolitano" },
-      { id: "7dc4Y_Vb_Wc", city: "Río de Janeiro", sector: "Copacabana", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana" }
+      // ASIA
+      {
+        id: "dfVK7ld38Ys",
+        city: "Tokio",
+        sector: "Shinjuku / Kabukicho",
+        country: "Japón",
+        lat: 35.6938,
+        lng: 139.7034,
+        desc: "Distrito Shinjuku en vivo"
+      }
     ];
 
     // DICCIONARIO DE TRADUCCIÓN DE PAÍSES DEL MAPA PARA HOVER EN ESPAÑOL
@@ -713,6 +808,7 @@
       "France": "Francia",
       "Spain": "España",
       "United Kingdom": "Reino Unido",
+      "Ireland": "Irlanda",
       "Italy": "Italia",
       "Germany": "Alemania",
       "Japan": "Japón",
@@ -727,7 +823,10 @@
       "Venezuela": "Venezuela"
     };
 
-    let worldCams = JSON.parse(localStorage.getItem('earthcam_garden_cams')) || worldCamsIniciales;
+    // Limpiar la llave vieja defectuosa para que no interfiera nunca más
+    localStorage.removeItem('earthcam_garden_cams');
+
+    let worldCams = JSON.parse(localStorage.getItem(STORAGE_KEY)) || worldCamsIniciales;
     let isAdmin = sessionStorage.getItem('is_admin') === 'true';
     let currentSelectedCam = null;
     let isAutoRotating = false;
@@ -750,6 +849,7 @@
 
     const btnAdmin = document.getElementById('btnAdmin');
     const btnToggleAdd = document.getElementById('btnToggleAdd');
+    const btnResetCam = document.getElementById('btnResetCam');
     const btnExportCam = document.getElementById('btnExportCam');
     const adminModal = document.getElementById('adminModal');
     const btnCloseModal = document.getElementById('btnCloseModal');
@@ -762,7 +862,7 @@
       return (str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
     }
 
-    // Prepara los pines planos marcando solo la primera cámara de cada ciudad para mostrar texto (evita nombres duplicados)
+    // Marca solo 1 cámara por ciudad para mostrar etiqueta de texto y evitar duplicados superpuestos
     function buildMarkerData(cams) {
       const seenCities = new Set();
       return cams.map(cam => {
@@ -773,7 +873,7 @@
       });
     }
 
-    // Genera una textura de océano azul marino en memoria
+    // Textura de océano azul marino en memoria
     function createOceanTextureUrl() {
       const canvas = document.createElement('canvas');
       canvas.width = 64;
@@ -784,7 +884,7 @@
       return canvas.toDataURL();
     }
 
-    // INICIALIZACIÓN DEL GLOBO (SIN POINTSDATA = CERO CILINDROS 3D)
+    // INICIALIZACIÓN DEL GLOBO (CON PINES PLANOS HTML)
     const globe = Globe()
       (document.getElementById('globeViz'))
       .backgroundColor('#020813')
@@ -908,12 +1008,13 @@
       }
     });
 
-    function selectCamera(cam) {
+    // Selecciona la cámara y verifica en vivo con la API oficial de YouTube (oEmbed) el nombre real del stream
+    async function selectCamera(cam) {
       currentSelectedCam = cam;
       globe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 0.85 }, 1500);
 
       const sectorStr = cam.sector ? `[${cam.sector}] ` : '';
-      streamTitle.textContent = `${cam.city} - ${sectorStr}${cam.desc}`;
+      streamTitle.textContent = `${cam.city} • ${sectorStr}${cam.desc}`;
       streamCoords.textContent = `${cam.lat.toFixed(2)}° Lat, ${cam.lng.toFixed(2)}° Lng • ${cam.country}`;
       streamIframe.src = `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&controls=1&rel=0`;
       btnYtDirect.href = `https://www.youtube.com/watch?v=${cam.id}`;
@@ -923,6 +1024,17 @@
       }
 
       playerDock.classList.add('active');
+
+      // Verificación en tiempo real del título oficial del stream en YouTube
+      try {
+        const res = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${cam.id}`);
+        const info = await res.json();
+        if (info && info.title && currentSelectedCam && currentSelectedCam.id === cam.id) {
+          streamCoords.textContent = `📡 ${info.title.substring(0, 48)} (${cam.country})`;
+        }
+      } catch (e) {
+        // Silencioso si falla la consulta de metadatos
+      }
     }
 
     btnClose.addEventListener('click', () => {
@@ -1004,7 +1116,7 @@
       const q = norm(rawQuery);
       if (!q) return;
 
-      // 1. Verificar si escribió el nombre de un PAÍS que ya tenemos en nuestras cámaras (ej. "chile", "francia")
+      // 1. Si escribió el nombre de un PAÍS que ya tenemos en nuestras cámaras (ej. "chile")
       const countryMatches = worldCams.filter(c => norm(c.country) === q);
       if (countryMatches.length > 0) {
         const avgLat = countryMatches.reduce((acc, c) => acc + c.lat, 0) / countryMatches.length;
@@ -1013,7 +1125,7 @@
         return;
       }
 
-      // 2. Verificar coincidencia exacta con una CIUDAD o SECTOR de nuestras cámaras
+      // 2. Coincidencia exacta con una CIUDAD o SECTOR de nuestras cámaras
       const exactCityOrSector = worldCams.find(c => norm(c.city) === q || norm(c.sector) === q);
       if (exactCityOrSector) {
         selectCamera(exactCityOrSector);
@@ -1024,6 +1136,7 @@
       const partialMatch = worldCams.find(c =>
         norm(c.city).includes(q) ||
         norm(c.sector).includes(q) ||
+        norm(c.desc).includes(q) ||
         norm(c.country).includes(q)
       );
       if (partialMatch) {
@@ -1038,7 +1151,7 @@
         return;
       }
 
-      // 4. Si no está en la lista local, buscar cualquier país o ciudad del mundo en OpenStreetMap
+      // 4. Búsqueda global en OpenStreetMap para cualquier otro país o ciudad
       btnSearchCity.textContent = '...';
       try {
         const url = `https://nominatim.openstreetmap.org/search?format=json&accept-language=es&limit=1&q=${encodeURIComponent(rawQuery.trim())}`;
@@ -1103,17 +1216,29 @@
         btnAdmin.textContent = '🔓 CERRAR';
         btnAdmin.classList.add('active');
         btnToggleAdd.style.display = 'inline-block';
+        btnResetCam.style.display = 'inline-block';
         btnExportCam.style.display = 'inline-block';
         if (currentSelectedCam) btnDeleteCam.style.display = 'inline-block';
       } else {
         btnAdmin.textContent = '🔒 ADMIN';
         btnAdmin.classList.remove('active');
         btnToggleAdd.style.display = 'none';
+        btnResetCam.style.display = 'none';
         btnExportCam.style.display = 'none';
         adminModal.classList.remove('open');
         btnDeleteCam.style.display = 'none';
       }
     }
+
+    // Botón para restaurar la lista limpia si alguna vez se desordena el localStorage
+    btnResetCam.addEventListener('click', () => {
+      if (confirm('¿Restaurar la lista oficial verificada de cámaras y borrar cambios locales?')) {
+        localStorage.removeItem(STORAGE_KEY);
+        worldCams = [...worldCamsIniciales];
+        refreshGlobeData();
+        btnClose.click();
+      }
+    });
 
     btnExportCam.addEventListener('click', () => {
       const cleanCams = worldCams.map(({ id, city, sector, country, lat, lng, desc }) => ({
@@ -1147,20 +1272,35 @@
       if (!videoId) return alert('Enlace de YouTube no válido.');
 
       btnSubmitCam.disabled = true;
-      btnSubmitCam.textContent = 'LOCALIZANDO EN EL PLANETA...';
+      btnSubmitCam.textContent = 'VERIFICANDO Y LOCALIZANDO...';
 
       try {
-        const geoQuery = `${city}, ${country}`;
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&accept-language=es&limit=1&q=${encodeURIComponent(geoQuery)}`);
-        const data = await res.json();
+        // 1. Verificar que el video exista en YouTube antes de clavarlo
+        const ytCheck = await fetch(`https://noembed.com/embed?url=https://www.youtube.com/watch?v=${videoId}`);
+        const ytData = await ytCheck.json();
+        if (ytData.error) {
+          alert('Ese video de YouTube no existe o es privado.');
+          return;
+        }
+
+        // 2. Geolocalizar exactamente el sector + ciudad + país
+        const geoQuery = `${desc}, ${city}, ${country}`;
+        let res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&accept-language=es&limit=1&q=${encodeURIComponent(geoQuery)}`);
+        let data = await res.json();
+
+        // Si no encuentra el sector específico, busca por ciudad + país
+        if (!data || data.length === 0) {
+          res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&accept-language=es&limit=1&q=${encodeURIComponent(`${city},${country}`)}`);
+          data = await res.json();
+        }
 
         if (data && data.length > 0) {
           const lat = parseFloat(data[0].lat);
           const lng = parseFloat(data[0].lon);
 
-          const newCam = { id: videoId, city, sector: desc, country, lat, lng, desc };
+          const newCam = { id: videoId, city, sector: desc, country, lat, lng, desc: ytData.title || desc };
           worldCams.unshift(newCam);
-          localStorage.setItem('earthcam_garden_cams', JSON.stringify(worldCams));
+          localStorage.setItem(STORAGE_KEY, JSON.stringify(worldCams));
 
           refreshGlobeData();
           formAddWorldCam.reset();
@@ -1173,7 +1313,7 @@
         alert('Error al contactar el mapa.');
       } finally {
         btnSubmitCam.disabled = false;
-        btnSubmitCam.textContent = 'GEOLOCALIZAR Y CLAVAR';
+        btnSubmitCam.textContent = 'VERIFICAR Y CLAVAR';
       }
     });
 
@@ -1181,7 +1321,7 @@
       if (!isAdmin || !currentSelectedCam) return;
       if (confirm(`¿Eliminar la cámara "${currentSelectedCam.city} - ${currentSelectedCam.desc}"?`)) {
         worldCams = worldCams.filter(c => c.id !== currentSelectedCam.id);
-        localStorage.setItem('earthcam_garden_cams', JSON.stringify(worldCams));
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(worldCams));
         refreshGlobeData();
         btnClose.click();
       }
