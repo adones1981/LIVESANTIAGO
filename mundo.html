@@ -9,14 +9,15 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
 
-  <!-- Motor Globe.gl -->
+  <!-- Motor Globe.gl y Three.js -->
+  <script src="https://unpkg.com/three"></script>
   <script src="https://unpkg.com/globe.gl"></script>
 
   <style>
     :root {
-      --bg: #020617;
-      --accent: #00ff66; /* Verde radar limpio */
-      --accent-glow: rgba(0, 255, 102, 0.4);
+      --bg: #020813;
+      --accent: #00ff66;
+      --accent-glow: rgba(0, 255, 102, 0.45);
       --live-red: #ff334b;
       --card-bg: rgba(10, 17, 33, 0.95);
       --border: rgba(255, 255, 255, 0.16);
@@ -47,6 +48,11 @@
       width: 100%;
       height: 100%;
       z-index: 1;
+      cursor: grab;
+    }
+
+    #globeViz:active {
+      cursor: grabbing;
     }
 
     /* HEADER */
@@ -115,6 +121,11 @@
       border-radius: 8px;
       padding: 0.2rem 0.6rem;
       gap: 0.4rem;
+      transition: border-color 0.2s;
+    }
+
+    .search-city-box:focus-within {
+      border-color: var(--accent);
     }
 
     .search-city-box input {
@@ -124,7 +135,8 @@
       color: #fff;
       font-size: 0.8rem;
       font-family: 'Plus Jakarta Sans', sans-serif;
-      width: 150px;
+      width: 165px;
+      user-select: text;
     }
 
     .search-city-box input::placeholder {
@@ -142,6 +154,11 @@
       font-weight: 700;
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
+      transition: transform 0.1s;
+    }
+
+    .btn-search:active {
+      transform: scale(0.95);
     }
 
     .btn-control {
@@ -301,6 +318,7 @@
       font-size: 0.8rem;
       outline: none;
       width: 100%;
+      user-select: text;
     }
 
     .modal-input:focus {
@@ -336,9 +354,10 @@
       font-size: 0.75rem;
       color: var(--accent);
       letter-spacing: 0.5px;
+      white-space: nowrap;
     }
 
-    /* REPRODUCTOR */
+    /* REPRODUCTOR FLOTANTE */
     .player-dock {
       position: fixed;
       bottom: 2rem;
@@ -509,12 +528,28 @@
       background: rgba(10, 17, 33, 0.95);
       border: 1px solid var(--accent);
       color: #fff;
-      padding: 0.45rem 0.75rem;
+      padding: 0.4rem 0.65rem;
       border-radius: 6px;
-      font-size: 0.75rem;
+      font-size: 0.72rem;
       font-family: 'JetBrains Mono', monospace;
       pointer-events: none;
       box-shadow: 0 0 15px var(--accent-glow);
+    }
+
+    /* ETIQUETAS DE CIUDADES EN EL MAPA (PEQUEÑAS, ÚNICAS Y BIEN ESCRITAS) */
+    .map-city-label {
+      color: rgba(241, 245, 249, 0.88);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: 9px;
+      font-weight: 600;
+      letter-spacing: 0.2px;
+      text-shadow: 0 1px 3px rgba(0, 0, 0, 0.95), 0 0 6px rgba(0, 0, 0, 0.9);
+      pointer-events: none;
+      white-space: nowrap;
+      transform: translate(-50%, 8px);
+      background: rgba(2, 8, 19, 0.45);
+      padding: 1px 4px;
+      border-radius: 3px;
     }
   </style>
 </head>
@@ -558,7 +593,7 @@
     </form>
   </div>
 
-  <div class="hint-overlay">Haz clic en los puntos verdes circulares para abrir la transmisión</div>
+  <div class="hint-overlay">Haz clic en cualquier punto verde brillante para ver la cámara en vivo</div>
 
   <div id="globeViz"></div>
 
@@ -586,17 +621,17 @@
   <script>
     const ADMIN_PASSWORD = "9066819";
 
-    // CÁMARAS CON COORDENADAS EXACTAS
+    // CÁMARAS CON COORDENADAS Y NOMBRES CORREGIDOS
     const worldCamsIniciales = [
       // CHILE
       { id: "ErUOGtBXhgY", city: "Santiago", sector: "Plaza Baquedano", country: "Chile", lat: -33.4372, lng: -70.6345, desc: "Centro de Santiago" },
-      { id: "_Nrt155MExU", city: "Santiago", sector: "Providencia", country: "Chile", lat: -33.4290, lng: -70.6120, desc: "Eje Alameda - Providencia" },
+      { id: "_Nrt155MExU", city: "Santiago", sector: "Providencia", country: "Chile", lat: -33.4150, lng: -70.6050, desc: "Eje Alameda - Providencia" },
       { id: "tmS73xQ4zVc", city: "Viña del Mar", sector: "Borde Costero", country: "Chile", lat: -33.0150, lng: -71.5518, desc: "Costanera y Playa" },
-      { id: "oDErMN0_ehw", city: "Valparaíso", sector: "Puerto", country: "Chile", lat: -33.0420, lng: -71.6250, desc: "Bahía y Muelle Barón" },
+      { id: "oDErMN0_ehw", city: "Valparaíso", sector: "Puerto", country: "Chile", lat: -33.0450, lng: -71.6250, desc: "Bahía y Muelle Barón" },
       { id: "M_Qk3Bv0-So", city: "La Serena", sector: "Avenida del Mar", country: "Chile", lat: -29.9027, lng: -71.2519, desc: "Faro y Costanera" },
       { id: "HirKZqakDIA", city: "Concepción", sector: "Centro", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
 
-      // EUROPA (TUS ENLACES INTERNACIONALES)
+      // EUROPA
       { id: "asO_10T0k2k", city: "París", sector: "Torre Eiffel", country: "Francia", lat: 48.8584, lng: 2.2945, desc: "Torre Eiffel y Skyline" },
       { id: "2GgaZAqFE5U", city: "Londres", sector: "Tower Bridge", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge y Río Támesis" },
       { id: "mt7uE-n0YPI", city: "Venecia", sector: "Puente Rialto", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal de Venecia" },
@@ -610,6 +645,33 @@
       { id: "wyEi0OPai5g", city: "Seúl", sector: "Centro", country: "Corea del Sur", lat: 37.5665, lng: 126.9780, desc: "Panorama Metropolitano" },
       { id: "7dc4Y_Vb_Wc", city: "Río de Janeiro", sector: "Copacabana", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana" }
     ];
+
+    // DICCIONARIO DE TRADUCCIÓN DE PAÍSES DEL MAPA PARA HOVER EN ESPAÑOL
+    const traduccionPaises = {
+      "Chile": "Chile",
+      "Argentina": "Argentina",
+      "Peru": "Perú",
+      "Bolivia": "Bolivia",
+      "Brazil": "Brasil",
+      "United States of America": "Estados Unidos",
+      "Mexico": "México",
+      "Canada": "Canadá",
+      "France": "Francia",
+      "Spain": "España",
+      "United Kingdom": "Reino Unido",
+      "Italy": "Italia",
+      "Germany": "Alemania",
+      "Japan": "Japón",
+      "South Korea": "Corea del Sur",
+      "China": "China",
+      "Australia": "Australia",
+      "Russia": "Rusia",
+      "Colombia": "Colombia",
+      "Uruguay": "Uruguay",
+      "Paraguay": "Paraguay",
+      "Ecuador": "Ecuador",
+      "Venezuela": "Venezuela"
+    };
 
     let worldCams = JSON.parse(localStorage.getItem('earthcam_garden_cams')) || worldCamsIniciales;
     let isAdmin = sessionStorage.getItem('is_admin') === 'true';
@@ -641,43 +703,106 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    // MOTOR DE MAPA LIBRE OPENSTREETMAP (100% PÚBLICO Y SIN API KEY)
+    // Función para normalizar texto (quita tildes y pasa a minúsculas)
+    function norm(str) {
+      return (str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+    }
+
+    // Filtra las cámaras para generar 1 sola etiqueta por ciudad (evita nombres repetidos o superpuestos)
+    function getUniqueCityLabels(cams) {
+      const seenCities = new Set();
+      const uniqueList = [];
+      for (const cam of cams) {
+        const key = `${norm(cam.city)}_${norm(cam.country)}`;
+        if (!seenCities.has(key)) {
+          seenCities.add(key);
+          uniqueList.push(cam);
+        }
+      }
+      return uniqueList;
+    }
+
+    // MATERIAL DEL OCÉANO: AZUL MARINO VIVO
+    const oceanMaterial = new THREE.MeshPhongMaterial({
+      color: '#0b4f8a',
+      emissive: '#052340',
+      shininess: 15
+    });
+
+    // INICIALIZACIÓN DEL GLOBO
     const globe = Globe()
       (document.getElementById('globeViz'))
-      .backgroundColor('#020617')
-      .globeTileEngineUrl((x, y, l) => `https://tile.openstreetmap.org/${l}/${x}/${y}.png`)
-      .atmosphereColor('#00ff66')
-      .atmosphereAltitude(0.12)
+      .backgroundColor('#020813')
+      .showGlobe(true)
+      .globeMaterial(oceanMaterial)
+      .atmosphereColor('#38bdf8')
+      .atmosphereAltitude(0.16)
 
-      // CÍRCULOS VERDES RADAR PLANOS (SIN CILINDROS 3D SALIENTES)
-      .ringsData(worldCams)
-      .ringLat(d => d.lat)
-      .ringLng(d => d.lng)
-      .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t * 0.75})`)
-      .ringMaxRadius(1.6)
-      .ringPropagationSpeed(1.4)
-      .ringRepeatPeriod(1100)
-
-      // PUNTO VERDE CENTRAL EXACTO
-      .bubblesData(worldCams)
-      .bubbleLat(d => d.lat)
-      .bubbleLng(d => d.lng)
-      .bubbleRadius(0.35)
-      .bubbleColor(() => '#00ff66')
-      .bubbleLabel(d => `
+      // PUNTOS VERDES PLANOS
+      .pointsData(worldCams)
+      .pointLat(d => d.lat)
+      .pointLng(d => d.lng)
+      .pointAltitude(0.005)
+      .pointRadius(0.48)
+      .pointColor(() => '#00ff66')
+      .pointLabel(d => `
         <div class="custom-tooltip">
           <b>🟢 ${d.city}</b> (${d.country})<br/>
-          <span style="color:#00ff66;">${d.sector ? d.sector + ' • ' : ''}${d.desc}</span>
+          <span style="color:#00ff66;">${d.sector ? d.sector + ' • ' : ''}${d.desc}</span><br/>
+          <small style="color:#cbd5e1;">Haz clic para ver cámara</small>
         </div>
       `)
-      .onBubbleClick(d => selectCamera(d));
+      .onPointClick(d => selectCamera(d))
+      .onPointHover(hoverObj => {
+        document.getElementById('globeViz').style.cursor = hoverObj ? 'pointer' : 'grab';
+      })
 
-    // GLOBO ESTÁTICO (NO SE MUEVE SOLO)
+      // ETIQUETAS HTML DE CIUDADES (PEQUEÑAS, SIN REPETIRSE Y BIEN ESCRITAS)
+      .htmlElementsData(getUniqueCityLabels(worldCams))
+      .htmlLat(d => d.lat)
+      .htmlLng(d => d.lng)
+      .htmlAltitude(0.006)
+      .htmlElement(d => {
+        const el = document.createElement('div');
+        el.className = 'map-city-label';
+        el.textContent = d.city;
+        return el;
+      })
+
+      // ONDAS RADAR DECORATIVAS
+      .ringsData(getUniqueCityLabels(worldCams))
+      .ringLat(d => d.lat)
+      .ringLng(d => d.lng)
+      .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t * 0.8})`)
+      .ringMaxRadius(1.6)
+      .ringPropagationSpeed(1.4)
+      .ringRepeatPeriod(1200);
+
+    // CARGAR CONTINENTES Y PAÍSES EN COLOR VERDE CLARO
+    fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
+      .then(res => res.json())
+      .then(countries => {
+        globe.polygonsData(countries.features)
+          .polygonAltitude(0.002)
+          .polygonCapColor(() => '#3b8c52')
+          .polygonSideColor(() => '#286639')
+          .polygonStrokeColor(() => '#1b4727')
+          .polygonLabel(({ properties: d }) => {
+            const nombrePais = traduccionPaises[d.ADMIN] || d.NAME_ES || d.ADMIN;
+            return `
+              <div class="custom-tooltip" style="padding: 0.25rem 0.5rem; font-size: 0.68rem;">
+                <b>🌍 ${nombrePais}</b>
+              </div>
+            `;
+          });
+      });
+
+    // GLOBO QUIETO POR DEFECTO EN CHILE
     globe.controls().autoRotate = false;
     globe.controls().autoRotateSpeed = 0.4;
-    globe.pointOfView({ lat: -33.4489, lng: -70.6693, altitude: 2.2 }, 1500);
+    globe.pointOfView({ lat: -33.4489, lng: -70.6693, altitude: 2.1 }, 1500);
 
-    // CONTROL MANUAL DEL GIRO
+    // BOTÓN ACTIVAR/PAUSAR GIRO
     btnToggleRotate.addEventListener('click', () => {
       isAutoRotating = !isAutoRotating;
       globe.controls().autoRotate = isAutoRotating;
@@ -686,8 +811,10 @@
     });
 
     function refreshGlobeData() {
-      globe.ringsData(worldCams);
-      globe.bubblesData(worldCams);
+      const uniqueCities = getUniqueCityLabels(worldCams);
+      globe.pointsData(worldCams);
+      globe.htmlElementsData(uniqueCities);
+      globe.ringsData(uniqueCities);
       renderDropdownCities();
     }
 
@@ -719,7 +846,7 @@
 
     function selectCamera(cam) {
       currentSelectedCam = cam;
-      globe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 0.95 }, 1500);
+      globe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 0.85 }, 1500);
 
       const sectorStr = cam.sector ? `[${cam.sector}] ` : '';
       streamTitle.textContent = `${cam.city} - ${sectorStr}${cam.desc}`;
@@ -739,7 +866,7 @@
       streamIframe.src = '';
       currentSelectedCam = null;
       btnDeleteCam.style.display = 'none';
-      globe.pointOfView({ altitude: 2.2 }, 1500);
+      globe.pointOfView({ altitude: 2.1 }, 1500);
     });
 
     // DRAG DE LA VENTANA FLOTANTE
@@ -808,37 +935,79 @@
       isResizing = false;
     });
 
-    // BUSCADOR GEO
-    async function searchAndFlyToCity(cityName) {
-      if (!cityName.trim()) return;
+    // BUSCADOR INTELIGENTE DE PAÍS O CIUDAD
+    async function searchAndFlyToLocation(rawQuery) {
+      const q = norm(rawQuery);
+      if (!q) return;
 
-      const camExist = worldCams.find(c => c.city.toLowerCase().includes(cityName.toLowerCase()));
-      if (camExist) {
-        selectCamera(camExist);
+      // 1. Verificar si el usuario escribió el nombre de un PAÍS que ya tenemos en nuestras cámaras (ej. "chile", "francia")
+      const countryMatches = worldCams.filter(c => norm(c.country) === q);
+      if (countryMatches.length > 0) {
+        const avgLat = countryMatches.reduce((acc, c) => acc + c.lat, 0) / countryMatches.length;
+        const avgLng = countryMatches.reduce((acc, c) => acc + c.lng, 0) / countryMatches.length;
+        // Si es un país, vuela a una vista panorámica del país para ver todos sus puntos verdes
+        globe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 1.75 }, 1800);
         return;
       }
 
+      // 2. Verificar si coincide exactamente o parcialmente con una CIUDAD o SECTOR de nuestras cámaras
+      const exactCityOrSector = worldCams.find(c => norm(c.city) === q || norm(c.sector) === q);
+      if (exactCityOrSector) {
+        selectCamera(exactCityOrSector);
+        return;
+      }
+
+      const partialMatch = worldCams.find(c =>
+        norm(c.city).includes(q) ||
+        norm(c.sector).includes(q) ||
+        norm(c.country).includes(q)
+      );
+      if (partialMatch) {
+        // Si buscó parcialmente un país con varias cámaras, encuadrar el país; si es ciudad, abrir cámara
+        if (norm(partialMatch.country).includes(q)) {
+          const cMatches = worldCams.filter(c => norm(c.country) === norm(partialMatch.country));
+          const avgLat = cMatches.reduce((acc, c) => acc + c.lat, 0) / cMatches.length;
+          const avgLng = cMatches.reduce((acc, c) => acc + c.lng, 0) / cMatches.length;
+          globe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 1.75 }, 1800);
+        } else {
+          selectCamera(partialMatch);
+        }
+        return;
+      }
+
+      // 3. Si no está en la lista local, buscar cualquier país o ciudad del mundo en OpenStreetMap
       btnSearchCity.textContent = '...';
       try {
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(cityName)}`);
+        const url = `https://nominatim.openstreetmap.org/search?format=json&accept-language=es&limit=1&q=${encodeURIComponent(rawQuery.trim())}`;
+        const res = await fetch(url);
         const data = await res.json();
+
         if (data && data.length > 0) {
-          const lat = parseFloat(data[0].lat);
-          const lng = parseFloat(data[0].lon);
-          globe.pointOfView({ lat: lat, lng: lng, altitude: 1.1 }, 2000);
+          const item = data[0];
+          const lat = parseFloat(item.lat);
+          const lng = parseFloat(item.lon);
+
+          // Ajustar altura según si buscó un país completo o una ciudad específica
+          const isCountry = item.addresstype === 'country' || item.type === 'country' || item.type === 'administrative';
+          const targetAltitude = isCountry ? 1.8 : 1.05;
+
+          globe.pointOfView({ lat: lat, lng: lng, altitude: targetAltitude }, 1800);
         } else {
-          alert('No encontramos esa ciudad en el mapa.');
+          alert('No encontramos ese país o ciudad en el mapa.');
         }
       } catch (err) {
-        alert('Error al localizar la ciudad.');
+        alert('Error al conectar con el buscador geográfico.');
       } finally {
         btnSearchCity.textContent = 'IR';
       }
     }
 
-    btnSearchCity.addEventListener('click', () => searchAndFlyToCity(inputCitySearch.value));
-    inputCitySearch.addEventListener('keypress', (e) => {
-      if (e.key === 'Enter') searchAndFlyToCity(inputCitySearch.value);
+    btnSearchCity.addEventListener('click', () => searchAndFlyToLocation(inputCitySearch.value));
+    inputCitySearch.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        searchAndFlyToLocation(inputCitySearch.value);
+      }
     });
 
     function extractYouTubeID(url) {
@@ -917,7 +1086,7 @@
 
       try {
         const geoQuery = `${city}, ${country}`;
-        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(geoQuery)}`);
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&accept-language=es&limit=1&q=${encodeURIComponent(geoQuery)}`);
         const data = await res.json();
 
         if (data && data.length > 0) {
