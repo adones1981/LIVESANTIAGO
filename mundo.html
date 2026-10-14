@@ -9,9 +9,8 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
 
-  <!-- Motor Globe.gl y Three.js -->
-  <script src="https://unpkg.com/three"></script>
-  <script src="https://unpkg.com/globe.gl"></script>
+  <!-- Motor Globe.gl con versión estable (ya incluye Three.js internamente) -->
+  <script src="https://cdn.jsdelivr.net/npm/globe.gl@2.35.1/dist/globe.gl.min.js"></script>
 
   <style>
     :root {
@@ -538,7 +537,7 @@
 
     /* ETIQUETAS DE CIUDADES EN EL MAPA (PEQUEÑAS, ÚNICAS Y BIEN ESCRITAS) */
     .map-city-label {
-      color: rgba(241, 245, 249, 0.88);
+      color: rgba(241, 245, 249, 0.9);
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 9px;
       font-weight: 600;
@@ -547,7 +546,7 @@
       pointer-events: none;
       white-space: nowrap;
       transform: translate(-50%, 8px);
-      background: rgba(2, 8, 19, 0.45);
+      background: rgba(2, 8, 19, 0.5);
       padding: 1px 4px;
       border-radius: 3px;
     }
@@ -708,7 +707,7 @@
       return (str || '').normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
     }
 
-    // Filtra las cámaras para generar 1 sola etiqueta por ciudad (evita nombres repetidos o superpuestos)
+    // Filtra las cámaras para generar 1 sola etiqueta por ciudad (evita nombres repetidos)
     function getUniqueCityLabels(cams) {
       const seenCities = new Set();
       const uniqueList = [];
@@ -722,19 +721,23 @@
       return uniqueList;
     }
 
-    // MATERIAL DEL OCÉANO: AZUL MARINO VIVO
-    const oceanMaterial = new THREE.MeshPhongMaterial({
-      color: '#0b4f8a',
-      emissive: '#052340',
-      shininess: 15
-    });
+    // Genera una textura de océano azul marino en memoria sin depender de imágenes externas ni de THREE externo
+    function createOceanTextureUrl() {
+      const canvas = document.createElement('canvas');
+      canvas.width = 64;
+      canvas.height = 64;
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#0b4f8a';
+      ctx.fillRect(0, 0, 64, 64);
+      return canvas.toDataURL();
+    }
 
     // INICIALIZACIÓN DEL GLOBO
     const globe = Globe()
       (document.getElementById('globeViz'))
       .backgroundColor('#020813')
       .showGlobe(true)
-      .globeMaterial(oceanMaterial)
+      .globeImageUrl(createOceanTextureUrl())
       .atmosphereColor('#38bdf8')
       .atmosphereAltitude(0.16)
 
@@ -940,30 +943,29 @@
       const q = norm(rawQuery);
       if (!q) return;
 
-      // 1. Verificar si el usuario escribió el nombre de un PAÍS que ya tenemos en nuestras cámaras (ej. "chile", "francia")
+      // 1. Verificar si escribió el nombre de un PAÍS que ya tenemos en nuestras cámaras (ej. "chile", "francia")
       const countryMatches = worldCams.filter(c => norm(c.country) === q);
       if (countryMatches.length > 0) {
         const avgLat = countryMatches.reduce((acc, c) => acc + c.lat, 0) / countryMatches.length;
         const avgLng = countryMatches.reduce((acc, c) => acc + c.lng, 0) / countryMatches.length;
-        // Si es un país, vuela a una vista panorámica del país para ver todos sus puntos verdes
         globe.pointOfView({ lat: avgLat, lng: avgLng, altitude: 1.75 }, 1800);
         return;
       }
 
-      // 2. Verificar si coincide exactamente o parcialmente con una CIUDAD o SECTOR de nuestras cámaras
+      // 2. Verificar coincidencia exacta con una CIUDAD o SECTOR de nuestras cámaras
       const exactCityOrSector = worldCams.find(c => norm(c.city) === q || norm(c.sector) === q);
       if (exactCityOrSector) {
         selectCamera(exactCityOrSector);
         return;
       }
 
+      // 3. Coincidencia parcial en cámaras locales
       const partialMatch = worldCams.find(c =>
         norm(c.city).includes(q) ||
         norm(c.sector).includes(q) ||
         norm(c.country).includes(q)
       );
       if (partialMatch) {
-        // Si buscó parcialmente un país con varias cámaras, encuadrar el país; si es ciudad, abrir cámara
         if (norm(partialMatch.country).includes(q)) {
           const cMatches = worldCams.filter(c => norm(c.country) === norm(partialMatch.country));
           const avgLat = cMatches.reduce((acc, c) => acc + c.lat, 0) / cMatches.length;
@@ -975,7 +977,7 @@
         return;
       }
 
-      // 3. Si no está en la lista local, buscar cualquier país o ciudad del mundo en OpenStreetMap
+      // 4. Si no está en la lista local, buscar cualquier país o ciudad del mundo en OpenStreetMap
       btnSearchCity.textContent = '...';
       try {
         const url = `https://nominatim.openstreetmap.org/search?format=json&accept-language=es&limit=1&q=${encodeURIComponent(rawQuery.trim())}`;
@@ -987,7 +989,6 @@
           const lat = parseFloat(item.lat);
           const lng = parseFloat(item.lon);
 
-          // Ajustar altura según si buscó un país completo o una ciudad específica
           const isCountry = item.addresstype === 'country' || item.type === 'country' || item.type === 'administrative';
           const targetAltitude = isCountry ? 1.8 : 1.05;
 
