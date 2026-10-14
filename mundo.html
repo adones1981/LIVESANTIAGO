@@ -9,8 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
 
-  <!-- Motor 3D Globe.gl y Three.js -->
-  <script src="https://unpkg.com/three"></script>
+  <!-- Motor 3D Globe.gl -->
   <script src="https://unpkg.com/globe.gl"></script>
 
   <style>
@@ -144,30 +143,26 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* MENÚ DESPLEGABLE */
-    .dropdown-container {
-      position: relative;
-    }
-
-    .btn-dropdown {
+    .btn-control {
       background: rgba(255, 255, 255, 0.06);
       border: 1px solid var(--border);
-      color: #fff;
-      padding: 0.45rem 0.85rem;
+      color: var(--text);
+      padding: 0.45rem 0.75rem;
       border-radius: 8px;
       font-size: 0.75rem;
-      font-weight: 600;
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
-      display: flex;
-      align-items: center;
-      gap: 0.4rem;
+      font-weight: 600;
       transition: all 0.2s;
     }
 
-    .btn-dropdown:hover {
+    .btn-control:hover {
       border-color: var(--accent);
       color: var(--accent);
+    }
+
+    .dropdown-container {
+      position: relative;
     }
 
     .dropdown-menu {
@@ -532,9 +527,11 @@
     </div>
 
     <div class="dropdown-container">
-      <button class="btn-dropdown" id="btnToggleCities">📋 CÁMARAS ACTIVAS ▼</button>
+      <button class="btn-control" id="btnToggleCities">📋 CÁMARAS EN VIVO ▼</button>
       <div class="dropdown-menu" id="dropdownCities"></div>
     </div>
+
+    <button class="btn-control" id="btnToggleRotate">▶ GIRO</button>
 
     <div class="search-city-box">
       <input type="text" id="inputCitySearch" placeholder="Buscar país o ciudad...">
@@ -553,14 +550,14 @@
     </h3>
     <form id="formAddWorldCam">
       <input type="text" id="worldCamUrl" class="modal-input" placeholder="Enlace de YouTube..." required>
-      <input type="text" id="worldCamTitle" class="modal-input" placeholder="Nombre o sector (ej. Centro)" required>
-      <input type="text" id="worldCamCity" class="modal-input" placeholder="Ciudad (ej. Madrid)" required>
-      <input type="text" id="worldCamCountry" class="modal-input" placeholder="País (ej. España)" required>
+      <input type="text" id="worldCamTitle" class="modal-input" placeholder="Nombre o sector..." required>
+      <input type="text" id="worldCamCity" class="modal-input" placeholder="Ciudad (ej. Valdivia)" required>
+      <input type="text" id="worldCamCountry" class="modal-input" placeholder="País (ej. Chile)" required>
       <button type="submit" class="btn-submit-cam" id="btnSubmitCam">GEOLOCALIZAR Y CLAVAR</button>
     </form>
   </div>
 
-  <div class="hint-overlay">Rojo/Cian: Cámaras en vivo 📹 | Blanco: Ciudades mundiales</div>
+  <div class="hint-overlay">Haz clic en cualquier punto para abrir la cámara</div>
 
   <div id="globeViz"></div>
 
@@ -588,16 +585,24 @@
   <script>
     const ADMIN_PASSWORD = "9066819";
 
-    // 1. CÁMARAS CON TRANSMISIÓN ACTIVA
+    // CÁMARAS ACTIVAS (CON TUS NUEVOS ENLACES)
     const worldCamsIniciales = [
-      { id: "ErUOGtBXhgY", city: "Santiago", country: "Chile", lat: -33.4489, lng: -70.6693, desc: "Plaza Italia / Centro" },
-      { id: "_Nrt155MExU", city: "Providencia", country: "Chile", lat: -33.4260, lng: -70.6120, desc: "Eje Alameda" },
+      // CHILE
+      { id: "asO_10T0k2k", city: "Santiago", country: "Chile", lat: -33.4253, lng: -70.6335, desc: "Cerro San Cristóbal / Valle Central" },
+      { id: "ErUOGtBXhgY", city: "Santiago Centro", country: "Chile", lat: -33.4489, lng: -70.6693, desc: "Plaza Italia / Baquedano" },
+      { id: "_Nrt155MExU", city: "Providencia", country: "Chile", lat: -33.4260, lng: -70.6120, desc: "Eje Alameda - Providencia" },
       { id: "tmS73xQ4zVc", city: "Viña del Mar", country: "Chile", lat: -33.0245, lng: -71.5518, desc: "Borde Costero" },
       { id: "oDErMN0_ehw", city: "Valparaíso", country: "Chile", lat: -33.0472, lng: -71.6127, desc: "Puerto y Bahía" },
       { id: "HirKZqakDIA", city: "Concepción", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
       { id: "M_Qk3Bv0-So", city: "La Serena", country: "Chile", lat: -29.9027, lng: -71.2519, desc: "Avenida del Mar" },
+      { id: "mt7uE-n0YPI", city: "Coyhaique", country: "Chile", lat: -45.5712, lng: -72.0685, desc: "Plaza de Armas / Carretera Austral" },
+      { id: "2GgaZAqFE5U", city: "Puerto Williams", country: "Chile", lat: -54.9341, lng: -67.6111, desc: "Plaza Los Notros / Canal Beagle" },
+
+      // ESTADOS UNIDOS
       { id: "EO_1LWqsCNE", city: "Los Ángeles", country: "Estados Unidos", lat: 33.9850, lng: -118.4695, desc: "Venice Beach Boardwalk" },
       { id: "JQ_jwk_7OVE", city: "Nueva York", country: "Estados Unidos", lat: 40.7580, lng: -73.9855, desc: "Times Square North 4K" },
+
+      // ASIA & EUROPA & AMÉRICA
       { id: "xoyKM6BQceM", city: "Tokio", country: "Japón", lat: 35.6595, lng: 139.7004, desc: "Cruce Shibuya Live" },
       { id: "wyEi0OPai5g", city: "Seúl", country: "Corea del Sur", lat: 37.5665, lng: 126.9780, desc: "Panorama Urbano" },
       { id: "fTmlb_KqP8A", city: "Venecia", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal" },
@@ -605,43 +610,30 @@
       { id: "7dc4Y_Vb_Wc", city: "Río de Janeiro", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Copacabana" }
     ];
 
-    // 2. CIUDADES DEL MUNDO (Aunque no tengan cámara aún, se ven todas en el mapa)
-    const worldCitiesBase = [
+    // CIUDADES Y PAÍSES DEL MUNDO
+    const worldPlaces = [
       { name: "Madrid", country: "España", lat: 40.4168, lng: -3.7038 },
-      { name: "Barcelona", country: "España", lat: 41.3851, lng: 2.1734 },
       { name: "París", country: "Francia", lat: 48.8566, lng: 2.3522 },
       { name: "Roma", country: "Italia", lat: 41.9028, lng: 12.4964 },
       { name: "Berlín", country: "Alemania", lat: 52.5200, lng: 13.4050 },
-      { name: "Ámsterdam", country: "Países Bajos", lat: 52.3676, lng: 4.9041 },
-      { name: "Lisboa", country: "Portugal", lat: 38.7223, lng: -9.1393 },
       { name: "Moscú", country: "Rusia", lat: 55.7558, lng: 37.6173 },
       { name: "El Cairo", country: "Egipto", lat: 30.0444, lng: 31.2357 },
-      { name: "Ciudad del Cabo", country: "Sudáfrica", lat: -33.9249, lng: 18.4241 },
       { name: "Pekín", country: "China", lat: 39.9042, lng: 116.4074 },
-      { name: "Shanghái", country: "China", lat: 31.2304, lng: 121.4737 },
       { name: "Nueva Delhi", country: "India", lat: 28.6139, lng: 77.2090 },
-      { name: "Bangkok", country: "Tailandia", lat: 13.7563, lng: 100.5018 },
       { name: "Sídney", country: "Australia", lat: -33.8688, lng: 151.2093 },
-      { name: "Melbourne", country: "Australia", lat: -37.8136, lng: 144.9631 },
-      { name: "Auckland", country: "Nueva Zelanda", lat: -36.8485, lng: 174.7633 },
-      { name: "Toronto", country: "Canadá", lat: 43.6532, lng: -79.3832 },
-      { name: "Vancouver", country: "Canadá", lat: 49.2827, lng: -123.1207 },
       { name: "Ciudad de México", country: "México", lat: 19.4326, lng: -99.1332 },
       { name: "Bogotá", country: "Colombia", lat: 4.7110, lng: -74.0721 },
       { name: "Lima", country: "Perú", lat: -12.0464, lng: -77.0428 },
       { name: "Buenos Aires", country: "Argentina", lat: -34.6037, lng: -58.3816 },
       { name: "Montevideo", country: "Uruguay", lat: -34.9011, lng: -56.1645 },
       { name: "São Paulo", country: "Brasil", lat: -23.5505, lng: -46.6333 },
-      { name: "La Paz", country: "Bolivia", lat: -16.5000, lng: -68.1500 },
-      { name: "Quito", country: "Ecuador", lat: -0.1807, lng: -78.4678 },
-      { name: "Caracas", country: "Venezuela", lat: 10.4806, lng: -66.9036 },
-      { name: "Chicago", country: "Estados Unidos", lat: 41.8781, lng: -87.6298 },
-      { name: "San Francisco", country: "Estados Unidos", lat: 37.7749, lng: -122.4194 }
+      { name: "Toronto", country: "Canadá", lat: 43.6532, lng: -79.3832 }
     ];
 
     let worldCams = JSON.parse(localStorage.getItem('earthcam_garden_cams')) || worldCamsIniciales;
     let isAdmin = sessionStorage.getItem('is_admin') === 'true';
     let currentSelectedCam = null;
+    let isAutoRotating = false; // GLOBO COMPLETAMENTE QUIETO POR DEFECTO
 
     const playerDock = document.getElementById('playerDock');
     const playerDragHeader = document.getElementById('playerDragHeader');
@@ -654,6 +646,7 @@
 
     const btnToggleCities = document.getElementById('btnToggleCities');
     const dropdownCities = document.getElementById('dropdownCities');
+    const btnToggleRotate = document.getElementById('btnToggleRotate');
 
     const inputCitySearch = document.getElementById('inputCitySearch');
     const btnSearchCity = document.getElementById('btnSearchCity');
@@ -667,114 +660,115 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    // UNIFICAR LISTA DE PUNTOS (CÁMARAS + CIUDADES SIN CÁMARA)
-    function buildPointsList() {
-      const puntos = [];
+    // UNIFICAR LISTA DE ETIQUETAS Y PUNTOS PLANOS
+    function buildLabelsData() {
+      const labels = [];
 
-      // Cámaras activas
+      // Cámaras en vivo (cian brillante)
       worldCams.forEach(c => {
-        puntos.push({
+        labels.push({
           lat: c.lat,
           lng: c.lng,
-          city: c.city,
-          country: c.country,
-          desc: c.desc,
+          text: `📹 ${c.city}`,
+          subtext: `${c.country} • EN VIVO`,
+          color: '#00f2fe',
+          size: 1.1,
           hasCam: true,
-          camData: c,
-          radius: 0.9,
-          color: '#00f2fe'
+          camData: c
         });
       });
 
-      // Ciudades mundiales que no estén repetidas en las cámaras
-      worldCitiesBase.forEach(ci => {
-        const existe = worldCams.some(c => c.city.toLowerCase() === ci.name.toLowerCase());
-        if (!existe) {
-          puntos.push({
-            lat: ci.lat,
-            lng: ci.lng,
-            city: ci.name,
-            country: ci.country,
-            desc: "Ciudad mundial (Sin cámara aún)",
+      // Ciudades del mundo (blanco tenue)
+      worldPlaces.forEach(p => {
+        const yaExiste = worldCams.some(c => c.city.toLowerCase() === p.name.toLowerCase());
+        if (!yaExiste) {
+          labels.push({
+            lat: p.lat,
+            lng: p.lng,
+            text: p.name,
+            subtext: p.country,
+            color: 'rgba(255, 255, 255, 0.75)',
+            size: 0.85,
             hasCam: false,
-            radius: 0.45,
-            color: 'rgba(255, 255, 255, 0.75)'
+            placeData: p
           });
         }
       });
 
-      return puntos;
+      return labels;
     }
 
-    // INICIALIZACIÓN GLOBO (Colores sólidos garantizados + Fronteras de Países)
+    // INICIALIZACIÓN GLOBO (QUIETO, SIN CILINDROS 3D GIGANTES)
     const globe = Globe()
       (document.getElementById('globeViz'))
       .backgroundColor('#020617')
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
       .atmosphereColor('#00f2fe')
-      .atmosphereAltitude(0.2)
-      
-      // PUNTOS Y ETIQUETAS
-      .pointLat(d => d.lat)
-      .pointLng(d => d.lng)
-      .pointColor(d => d.color)
-      .pointAltitude(d => d.hasCam ? 0.05 : 0.02)
-      .pointRadius(d => d.radius)
-      .pointLabel(d => `
-        <div class="custom-tooltip">
-          <b>${d.hasCam ? '📹 ' : '📍 '}${d.city}, ${d.country}</b><br/>
-          <span style="color:${d.hasCam ? '#00f2fe' : '#94a3b8'};">${d.desc}</span>
-        </div>
-      `)
-      
-      // ONDAS RADAR SOLO EN LAS QUE TIENEN CÁMARAS
-      .ringLat(d => d.lat)
-      .ringLng(d => d.lng)
-      .ringColor(() => (t) => `rgba(0, 242, 254, ${1 - t})`)
-      .ringMaxRadius(3.5)
-      .ringPropagationSpeed(2)
-      .ringRepeatPeriod(900)
-      
-      .onPointClick(point => {
-        if (point.hasCam) {
-          selectCamera(point.camData);
+      .atmosphereAltitude(0.18)
+
+      // ETIQUETAS PLANAS DE CIUDADES Y PAÍSES
+      .labelsData(buildLabelsData())
+      .labelLat(d => d.lat)
+      .labelLng(d => d.lng)
+      .labelText(d => d.text)
+      .labelSize(d => d.size)
+      .labelDotRadius(d => d.hasCam ? 0.35 : 0.2) // Puntos pequeños y limpios
+      .labelColor(d => d.color)
+      .labelResolution(2)
+      .labelAltitude(0.01)
+      .onLabelClick(d => {
+        if (d.hasCam) {
+          selectCamera(d.camData);
         } else {
-          // Si no tiene cámara, vuela a la ciudad
-          globe.controls().autoRotate = false;
-          globe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.2 }, 1500);
+          globe.pointOfView({ lat: d.lat, lng: d.lng, altitude: 1.2 }, 1500);
           if (isAdmin) {
-            document.getElementById('worldCamCity').value = point.city;
-            document.getElementById('worldCamCountry').value = point.country;
+            document.getElementById('worldCamCity').value = d.placeData.name;
+            document.getElementById('worldCamCountry').value = d.placeData.country;
             adminModal.classList.add('open');
           }
         }
-      });
+      })
 
-    // CARGAR POLÍGONOS DE TODOS LOS PAÍSES DEL MUNDO
+      // ONDAS RADAR DISCRETAS SOLO EN CÁMARAS ACTIVAS
+      .ringsData(worldCams)
+      .ringLat(d => d.lat)
+      .ringLng(d => d.lng)
+      .ringColor(() => (t) => `rgba(0, 242, 254, ${1 - t})`)
+      .ringMaxRadius(2.2)
+      .ringPropagationSpeed(1.8)
+      .ringRepeatPeriod(1000);
+
+    // GLOBO COMPLETAMENTE QUIETO (NO SE MUEVE SOLO)
+    globe.controls().autoRotate = false;
+    globe.controls().autoRotateSpeed = 0.4;
+    globe.pointOfView({ lat: -33.4489, lng: -70.6693, altitude: 2.2 }, 1500);
+
+    // BOTÓN ACTIVAR/PAUSAR GIRO
+    btnToggleRotate.addEventListener('click', () => {
+      isAutoRotating = !isAutoRotating;
+      globe.controls().autoRotate = isAutoRotating;
+      btnToggleRotate.textContent = isAutoRotating ? '⏸ PAUSAR' : '▶ GIRO';
+      btnToggleRotate.style.borderColor = isAutoRotating ? 'var(--accent)' : 'var(--border)';
+    });
+
+    // CARGAR LÍNEAS DE PAÍSES
     fetch('https://raw.githubusercontent.com/vasturiano/globe.gl/master/example/datasets/ne_110m_admin_0_countries.geojson')
       .then(res => res.json())
       .then(countries => {
         globe.polygonsData(countries.features)
-          .polygonCapColor(() => 'rgba(20, 80, 45, 0.45)') // Continentes verde bosque semi-transparente
-          .polygonSideColor(() => 'rgba(0, 242, 254, 0.05)')
-          .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.25)') // Líneas de fronteras de países
+          .polygonCapColor(() => 'rgba(255, 255, 255, 0.0)')
+          .polygonSideColor(() => 'rgba(0, 0, 0, 0)')
+          .polygonStrokeColor(() => 'rgba(255, 255, 255, 0.22)') // Fronteras tenues
           .polygonLabel(({ properties: d }) => `
             <div class="custom-tooltip">
-              <b>🌍 ${d.ADMIN} (${d.ISO_A2 || d.SU_A3})</b>
+              <b>🌍 ${d.ADMIN}</b>
             </div>
           `);
       })
-      .catch(() => {
-        // En caso de corte de red, el globo base azul/verde sigue funcionando sin problemas
-      });
-
-    globe.controls().autoRotate = true;
-    globe.controls().autoRotateSpeed = 0.4;
-    globe.pointOfView({ lat: -33.4489, lng: -70.6693, altitude: 2.2 }, 2000);
+      .catch(() => {});
 
     function refreshGlobeData() {
-      const allPoints = buildPointsList();
-      globe.pointsData(allPoints);
+      globe.labelsData(buildLabelsData());
       globe.ringsData(worldCams);
       renderDropdownCities();
     }
@@ -806,7 +800,6 @@
 
     function selectCamera(cam) {
       currentSelectedCam = cam;
-      globe.controls().autoRotate = false;
       globe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 1.15 }, 1500);
 
       streamTitle.textContent = `${cam.city} - ${cam.desc}`;
@@ -826,7 +819,6 @@
       streamIframe.src = '';
       currentSelectedCam = null;
       btnDeleteCam.style.display = 'none';
-      globe.controls().autoRotate = true;
       globe.pointOfView({ altitude: 2.2 }, 1500);
     });
 
@@ -906,10 +898,9 @@
         return;
       }
 
-      const cityExist = worldCitiesBase.find(ci => ci.name.toLowerCase().includes(cityName.toLowerCase()));
-      if (cityExist) {
-        globe.controls().autoRotate = false;
-        globe.pointOfView({ lat: cityExist.lat, lng: cityExist.lng, altitude: 1.2 }, 1500);
+      const placeExist = worldPlaces.find(p => p.name.toLowerCase().includes(cityName.toLowerCase()));
+      if (placeExist) {
+        globe.pointOfView({ lat: placeExist.lat, lng: placeExist.lng, altitude: 1.2 }, 1500);
         return;
       }
 
@@ -920,8 +911,6 @@
         if (data && data.length > 0) {
           const lat = parseFloat(data[0].lat);
           const lng = parseFloat(data[0].lon);
-
-          globe.controls().autoRotate = false;
           globe.pointOfView({ lat: lat, lng: lng, altitude: 1.2 }, 2000);
         } else {
           alert('No encontramos esa ciudad en el mapa.');
