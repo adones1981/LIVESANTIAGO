@@ -14,11 +14,12 @@
 
   <style>
     :root {
-      --bg: #030508;
-      --accent: #00ffcc;
+      --bg: #030712;
+      --accent: #00f2fe;
+      --accent-glow: #4facfe;
       --live-red: #ff334b;
-      --card-bg: rgba(9, 14, 26, 0.95);
-      --border: rgba(255, 255, 255, 0.14);
+      --card-bg: rgba(10, 17, 33, 0.94);
+      --border: rgba(255, 255, 255, 0.16);
       --text: #f1f5f9;
       --muted: #94a3b8;
     }
@@ -86,7 +87,7 @@
     .btn-back:hover {
       background: var(--accent);
       color: #07090e;
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.4);
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.4);
     }
 
     .brand-title h1 {
@@ -143,7 +144,7 @@
       font-family: 'JetBrains Mono', monospace;
     }
 
-    /* BOTÓN CIUDADES DESPLEGABLE */
+    /* MENÚ DESPLEGABLE CIUDADES */
     .dropdown-container {
       position: relative;
     }
@@ -174,7 +175,7 @@
       position: absolute;
       top: calc(100% + 8px);
       left: 0;
-      width: 250px;
+      width: 260px;
       max-height: 50vh;
       overflow-y: auto;
       background: var(--card-bg);
@@ -182,7 +183,7 @@
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 0.4rem;
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.85);
       z-index: 50;
     }
 
@@ -207,11 +208,11 @@
     }
 
     .dropdown-item:hover {
-      background: rgba(0, 255, 204, 0.12);
+      background: rgba(0, 242, 254, 0.15);
       color: var(--accent);
     }
 
-    /* BOTONES ADMIN */
+    /* ADMIN */
     .btn-admin {
       background: rgba(255, 255, 255, 0.05);
       border: 1px solid var(--border);
@@ -230,7 +231,7 @@
     }
 
     .btn-add-cam, .btn-export-cam {
-      background: rgba(0, 255, 204, 0.15);
+      background: rgba(0, 242, 254, 0.15);
       border: 1px solid var(--accent);
       color: var(--accent);
       padding: 0.45rem 0.85rem;
@@ -271,7 +272,7 @@
       border-radius: 14px;
       padding: 1.25rem;
       width: 360px;
-      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 255, 204, 0.15);
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 242, 254, 0.15);
       backdrop-filter: blur(20px);
     }
 
@@ -354,7 +355,7 @@
       border: 1px solid var(--border);
       border-radius: 14px;
       z-index: 40;
-      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 255, 204, 0.15);
+      box-shadow: 0 15px 45px rgba(0, 0, 0, 0.85), 0 0 25px rgba(0, 242, 254, 0.15);
       display: none;
       flex-direction: column;
       touch-action: none;
@@ -426,6 +427,26 @@
       border-color: var(--accent);
     }
 
+    .btn-yt-direct {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      border-radius: 4px;
+      padding: 0.15rem 0.4rem;
+      font-size: 0.68rem;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+    }
+
+    .btn-yt-direct:hover {
+      background: var(--accent);
+      color: #07090e;
+    }
+
     .btn-del-cam {
       background: rgba(255, 51, 75, 0.15);
       border: 1px solid var(--live-red);
@@ -493,7 +514,7 @@
     }
 
     .custom-tooltip {
-      background: rgba(10, 15, 25, 0.95);
+      background: rgba(10, 17, 33, 0.95);
       border: 1px solid var(--accent);
       color: #fff;
       padding: 0.4rem 0.75rem;
@@ -501,7 +522,7 @@
       font-size: 0.75rem;
       font-family: 'JetBrains Mono', monospace;
       pointer-events: none;
-      box-shadow: 0 0 15px rgba(0, 255, 204, 0.3);
+      box-shadow: 0 0 15px rgba(0, 242, 254, 0.3);
     }
   </style>
 </head>
@@ -514,25 +535,21 @@
       <p>EXPLORADOR MUNDIAL</p>
     </div>
 
-    <!-- MENÚ DESPLEGABLE DE CIUDADES (YA NO MOLESTA EN PANTALLA) -->
     <div class="dropdown-container">
       <button class="btn-dropdown" id="btnToggleCities">📋 CIUDADES ▼</button>
       <div class="dropdown-menu" id="dropdownCities"></div>
     </div>
 
-    <!-- BUSCADOR GEO -->
     <div class="search-city-box">
       <input type="text" id="inputCitySearch" placeholder="Escribe una ciudad...">
       <button class="btn-search" id="btnSearchCity">IR</button>
     </div>
 
-    <!-- ADMIN -->
     <button class="btn-admin" id="btnAdmin">🔒 ADMIN</button>
     <button class="btn-add-cam" id="btnToggleAdd">+ AÑADIR CÁMARA</button>
     <button class="btn-export-cam" id="btnExportCam" title="Copiar lista para GitHub">📋 COPIAR PARA GITHUB</button>
   </header>
 
-  <!-- FORMULARIO ADMIN -->
   <div class="admin-modal" id="adminModal">
     <h3>
       <span>+ NUEVA CÁMARA AL GLOBO</span>
@@ -541,17 +558,17 @@
     <form id="formAddWorldCam">
       <input type="text" id="worldCamUrl" class="modal-input" placeholder="Enlace de YouTube..." required>
       <input type="text" id="worldCamTitle" class="modal-input" placeholder="Nombre o sector (ej. Centro)" required>
-      <input type="text" id="worldCamCity" class="modal-input" placeholder="Ciudad (ej. Seúl)" required>
-      <input type="text" id="worldCamCountry" class="modal-input" placeholder="País (ej. Corea del Sur)" required>
+      <input type="text" id="worldCamCity" class="modal-input" placeholder="Ciudad (ej. Madrid)" required>
+      <input type="text" id="worldCamCountry" class="modal-input" placeholder="País (ej. España)" required>
       <button type="submit" class="btn-submit-cam" id="btnSubmitCam">GEOLOCALIZAR Y CLAVAR</button>
     </form>
   </div>
 
-  <div class="hint-overlay">Escribe una ciudad arriba o haz clic en los puntos del globo</div>
+  <div class="hint-overlay">Gira el globo o busca una ciudad arriba para explorar</div>
 
   <div id="globeViz"></div>
 
-  <!-- VISOR MOVIBLE Y REDIMENSIONABLE -->
+  <!-- VISOR FLOTANTE -->
   <div class="player-dock" id="playerDock">
     <div class="player-header" id="playerDragHeader">
       <div class="location-info">
@@ -559,6 +576,7 @@
         <p id="streamCoords">--° N, --° E</p>
       </div>
       <div class="header-btns">
+        <a id="btnYtDirect" class="btn-yt-direct" href="#" target="_blank" title="Abrir directo en YouTube">↗ YT</a>
         <button class="size-btn" onclick="resizePlayer(320)">S</button>
         <button class="size-btn" onclick="resizePlayer(480)">M</button>
         <button class="size-btn" onclick="resizePlayer(660)">L</button>
@@ -575,31 +593,25 @@
   <script>
     const ADMIN_PASSWORD = "9066819";
 
-    // CÁMARAS GLOBALES SELECCIONADAS (ON-LINE Y EN VIVO)
+    // CÁMARAS EN VIVO COMPROBADAS Y ACTIVAS
     const worldCamsIniciales = [
-      // CHILE
-      { id: "ErUOGtBXhgY", city: "Santiago", country: "Chile", lat: -33.4489, lng: -70.6693, desc: "Plaza Baquedano" },
+      // CHILE (Tus cámaras verificadas)
+      { id: "ErUOGtBXhgY", city: "Santiago", country: "Chile", lat: -33.4489, lng: -70.6693, desc: "Santiago Centro / Plaza Italia" },
+      { id: "_Nrt155MExU", city: "Santiago Oriente", country: "Chile", lat: -33.4260, lng: -70.6120, desc: "Eje Alameda - Providencia" },
       { id: "tmS73xQ4zVc", city: "Viña del Mar", country: "Chile", lat: -33.0245, lng: -71.5518, desc: "Borde Costero" },
       { id: "oDErMN0_ehw", city: "Valparaíso", country: "Chile", lat: -33.0472, lng: -71.6127, desc: "Puerto y Bahía" },
       { id: "HirKZqakDIA", city: "Concepción", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
       { id: "M_Qk3Bv0-So", city: "La Serena", country: "Chile", lat: -29.9027, lng: -71.2519, desc: "Avenida del Mar" },
 
-      // ESTADOS UNIDOS
-      { id: "1-iS7LArMPA", city: "Nueva York", country: "Estados Unidos", lat: 40.7580, lng: -73.9855, desc: "Times Square Live 4K" },
-      { id: "mRe-5144GQw", city: "Miami Beach", country: "Estados Unidos", lat: 25.7617, lng: -80.1918, desc: "Ocean Drive" },
+      // NORTEAMÉRICA
+      { id: "MxY390eP4lc", city: "Nueva York", country: "Estados Unidos", lat: 40.7580, lng: -73.9855, desc: "Times Square Live 24/7" },
+      { id: "p37FciMZIc0", city: "Manhattan", country: "Estados Unidos", lat: 40.7831, lng: -73.9712, desc: "Broadway Skyline" },
 
-      // AMÉRICA LATINA
-      { id: "7dc4Y_Vb_Wc", city: "Río de Janeiro", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana" },
-      { id: "z7Si_4UjRk4", city: "Buenos Aires", country: "Argentina", lat: -34.6037, lng: -58.3816, desc: "Avenida 9 de Julio y Obelisco" },
+      // SUDAMÉRICA
+      { id: "ty_9PNJG5pw", city: "Amazonas", country: "Perú", lat: -12.5933, lng: -69.1891, desc: "Reserva Selva Madre de Dios" },
 
-      // EUROPA
-      { id: "fTmlb_KqP8A", city: "Venecia", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal y Puente Rialto" },
-      { id: "W8_rGfZq6U8", city: "Roma", country: "Italia", lat: 41.8902, lng: 12.4922, desc: "Coliseo Romano" },
-      { id: "b2wf_3A7PjQ", city: "Londres", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge y Río Támesis" },
-
-      // ASIA
-      { id: "86YLFOog4GM", city: "Tokio", country: "Japón", lat: 35.6595, lng: 139.7004, desc: "Cruce de Shibuya" },
-      { id: "4jVd8d3-T5g", city: "Seúl", country: "Corea del Sur", lat: 37.5665, lng: 126.9780, desc: "Torre Namsan y Vista Urbana" }
+      // ASIA & PACÍFICO
+      { id: "ch7NRylyPlM", city: "Tokio", country: "Japón", lat: 35.6595, lng: 139.7004, desc: "Cruce de Shibuya" }
     ];
 
     let worldCams = JSON.parse(localStorage.getItem('earthcam_garden_cams')) || worldCamsIniciales;
@@ -612,6 +624,7 @@
     const streamTitle = document.getElementById('streamTitle');
     const streamCoords = document.getElementById('streamCoords');
     const streamIframe = document.getElementById('streamIframe');
+    const btnYtDirect = document.getElementById('btnYtDirect');
     const btnClose = document.getElementById('btnClose');
 
     const btnToggleCities = document.getElementById('btnToggleCities');
@@ -629,18 +642,19 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    // INICIALIZACIÓN DEL GLOBO 3D
+    // CONFIGURACIÓN GLOBO: TEXTURA BLUE MARBLE (MAR AZUL + TIERRA VERDE CLARA / OSCURA)
     const globe = Globe()
       (document.getElementById('globeViz'))
-      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-night.jpg')
+      .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
+      .bumpImageUrl('https://unpkg.com/three-globe/example/img/earth-topology.png')
       .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
-      .atmosphereColor('#00ffcc')
-      .atmosphereAltitude(0.18)
+      .atmosphereColor('#4facfe')
+      .atmosphereAltitude(0.22)
       .pointLat(d => d.lat)
       .pointLng(d => d.lng)
-      .pointColor(() => '#00ffcc')
+      .pointColor(() => '#ff334b')
       .pointAltitude(0.06)
-      .pointRadius(0.7)
+      .pointRadius(0.8)
       .pointLabel(d => `
         <div class="custom-tooltip">
           <b>${d.city}, ${d.country}</b><br/>
@@ -649,14 +663,14 @@
       `)
       .ringLat(d => d.lat)
       .ringLng(d => d.lng)
-      .ringColor(() => (t) => `rgba(0, 255, 204, ${1 - t})`)
-      .ringMaxRadius(3.5)
-      .ringPropagationSpeed(2)
-      .ringRepeatPeriod(1000)
+      .ringColor(() => (t) => `rgba(255, 51, 75, ${1 - t})`)
+      .ringMaxRadius(3.8)
+      .ringPropagationSpeed(2.2)
+      .ringRepeatPeriod(900)
       .onPointClick(point => selectCamera(point));
 
     globe.controls().autoRotate = true;
-    globe.controls().autoRotateSpeed = 0.4;
+    globe.controls().autoRotateSpeed = 0.45;
     globe.pointOfView({ lat: -33.4489, lng: -70.6693, altitude: 2.2 }, 2000);
 
     function refreshGlobeData() {
@@ -698,6 +712,7 @@
       streamTitle.textContent = `${cam.city} - ${cam.desc}`;
       streamCoords.textContent = `${cam.lat.toFixed(2)}° Lat, ${cam.lng.toFixed(2)}° Lng • ${cam.country}`;
       streamIframe.src = `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&controls=1&rel=0`;
+      btnYtDirect.href = `https://www.youtube.com/watch?v=${cam.id}`;
 
       if (isAdmin) {
         btnDeleteCam.style.display = 'inline-block';
@@ -715,7 +730,7 @@
       globe.pointOfView({ altitude: 2.2 }, 1500);
     });
 
-    // DRAG AND DROP DEL VISOR
+    // DRAG DE LA VENTANA
     let isDragging = false;
     let dragStartX, dragStartY, initialLeft, initialTop;
 
@@ -755,7 +770,6 @@
       isDragging = false;
     });
 
-    // REDIMENSIÓN MANUAL
     window.resizePlayer = function(widthPx) {
       playerDock.style.width = `${Math.min(widthPx, window.innerWidth - 40)}px`;
     };
@@ -909,7 +923,7 @@
           adminModal.classList.remove('open');
           selectCamera(newCam);
         } else {
-          alert('No pudimos geolocalizar esa ciudad.');
+          alert('No pudimos geolocalizar esa ciudad. Revisa que esté bien escrita.');
         }
       } catch (err) {
         alert('Error al contactar el mapa.');
