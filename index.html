@@ -37,7 +37,6 @@
         radial-gradient(circle at 90% 90%, rgba(255, 51, 75, 0.03) 0%, transparent 40%);
     }
 
-    /* HEADER */
     header {
       background: rgba(10, 15, 26, 0.9);
       backdrop-filter: blur(14px);
@@ -101,6 +100,23 @@
       flex-wrap: wrap;
     }
 
+    .btn-admin {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      padding: 0.45rem 0.8rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+      transition: all 0.2s ease;
+    }
+
+    .btn-admin:hover, .btn-admin.active {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
     .btn-add {
       background: rgba(0, 229, 255, 0.12);
       border: 1px solid var(--accent);
@@ -110,11 +126,11 @@
       font-size: 0.82rem;
       font-weight: 600;
       cursor: pointer;
-      display: flex;
+      display: none;
       align-items: center;
       gap: 0.4rem;
-      transition: all 0.2s ease;
       font-family: 'JetBrains Mono', monospace;
+      transition: all 0.2s ease;
     }
 
     .btn-add:hover {
@@ -140,7 +156,6 @@
       font-weight: 700;
     }
 
-    /* CONTENEDOR Y FILTROS */
     .container {
       max-width: 1650px;
       margin: 0 auto;
@@ -149,8 +164,8 @@
       flex: 1;
     }
 
-    /* PANEL AGREGAR CÁMARA */
-    .add-panel {
+    /* FORMULARIO AGREGAR / EDITAR */
+    .admin-form-panel {
       display: none;
       background: rgba(18, 25, 42, 0.95);
       border: 1px solid var(--accent);
@@ -160,7 +175,7 @@
       box-shadow: 0 8px 30px rgba(0, 229, 255, 0.15);
     }
 
-    .add-panel.open {
+    .admin-form-panel.open {
       display: block;
       animation: fadeIn 0.2s ease;
     }
@@ -170,19 +185,19 @@
       to { opacity: 1; transform: translateY(0); }
     }
 
-    .add-panel-title {
+    .admin-panel-header {
       font-size: 0.95rem;
       font-weight: 700;
       margin-bottom: 1rem;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
       color: var(--accent);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
-    .add-form {
+    .form-grid {
       display: grid;
-      grid-template-columns: 2fr 1fr 1fr auto;
+      grid-template-columns: 2fr 1fr 1fr auto auto;
       gap: 0.75rem;
       align-items: center;
     }
@@ -211,11 +226,16 @@
       font-weight: 700;
       font-size: 0.85rem;
       cursor: pointer;
-      transition: opacity 0.2s;
     }
 
-    .btn-save:hover {
-      opacity: 0.9;
+    .btn-cancel {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text);
+      border: none;
+      padding: 0.6rem 0.9rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      cursor: pointer;
     }
 
     .filters-section {
@@ -274,10 +294,10 @@
       font-size: 0.8rem;
       font-weight: 500;
       cursor: pointer;
-      transition: all 0.2s ease;
       display: flex;
       align-items: center;
       gap: 0.4rem;
+      transition: all 0.2s ease;
     }
 
     .city-pill .pill-count {
@@ -306,7 +326,7 @@
       font-weight: 700;
     }
 
-    /* GRID DE CÁMARAS */
+    /* GRID */
     .grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
@@ -365,6 +385,33 @@
       color: #fff;
     }
 
+    .card-controls {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .btn-edit, .btn-del {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 0.25rem 0.45rem;
+      font-size: 0.72rem;
+      cursor: pointer;
+      display: none;
+      color: var(--text);
+    }
+
+    .btn-edit:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+    }
+
+    .btn-del:hover {
+      border-color: var(--live-red);
+      color: var(--live-red);
+    }
+
     .badge-live {
       display: inline-flex;
       align-items: center;
@@ -410,10 +457,10 @@
       border: 0;
     }
 
-    /* FOOTER Y CONTADOR */
+    /* FOOTER */
     footer {
       border-top: 1px solid var(--border);
-      padding: 1.5rem 1.5rem;
+      padding: 1.5rem;
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -442,7 +489,7 @@
     }
 
     @media (max-width: 768px) {
-      .add-form {
+      .form-grid {
         grid-template-columns: 1fr;
       }
       .grid {
@@ -453,7 +500,6 @@
 </head>
 <body>
 
-  <!-- ENCABEZADO -->
   <header>
     <div class="brand">
       <div class="brand-logo">
@@ -466,49 +512,49 @@
     </div>
     <div class="header-actions">
       <button class="btn-add" id="btnToggleAdd">+ AGREGAR CÁMARA</button>
+      <button class="btn-admin" id="btnAdmin">🔒 ACCESO ADMIN</button>
       <div class="clock-badge">
         HORA CHILE: <span id="reloj">--:--:--</span>
       </div>
     </div>
   </header>
 
-  <!-- CONTENIDO -->
   <div class="container">
 
-    <!-- PANEL EXPANDIBLE PARA AGREGAR NUEVAS CÁMARAS -->
-    <div class="add-panel" id="addPanel">
-      <div class="add-panel-title">
-        <span>+ AGREGAR NUEVA TRANSMISIÓN EN VIVO</span>
+    <!-- PANEL ADMIN (AGREGAR / EDITAR) -->
+    <div class="admin-form-panel" id="adminPanel">
+      <div class="admin-panel-header">
+        <span id="panelTitle">+ AGREGAR NUEVA CÁMARA</span>
+        <button class="btn-cancel" id="btnCancelEdit" type="button" style="display:none;">Cancelar edición</button>
       </div>
-      <form class="add-form" id="formAddCam">
-        <input type="text" id="newUrl" class="input-field" placeholder="Pega el enlace de YouTube aquí..." required>
-        <input type="text" id="newTitle" class="input-field" placeholder="Nombre (ej. Costanera Norte)" required>
-        <select id="newCity" class="input-field">
+      <form class="form-grid" id="formCam">
+        <input type="hidden" id="editIndex" value="-1">
+        <input type="text" id="camUrl" class="input-field" placeholder="Enlace de YouTube..." required>
+        <input type="text" id="camTitle" class="input-field" placeholder="Nombre o sector..." required>
+        <select id="camCity" class="input-field">
           <option value="Santiago">Santiago</option>
           <option value="Valparaíso / Viña">Valparaíso / Viña</option>
           <option value="Concepción">Concepción</option>
           <option value="La Serena">La Serena</option>
           <option value="Otras">Otras</option>
         </select>
-        <button type="submit" class="btn-save">AGREGAR</button>
+        <button type="submit" class="btn-save" id="btnSaveForm">GUARDAR</button>
       </form>
     </div>
 
-    <!-- BARRA DE BÚSQUEDA Y FILTROS POR CIUDAD -->
+    <!-- FILTROS -->
     <div class="filters-section">
       <div class="search-wrapper">
         <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
         <input type="text" id="filtroTexto" placeholder="Buscar por ciudad, comuna o sector...">
       </div>
-
       <div class="city-pills" id="cityPills"></div>
     </div>
 
-    <!-- GRILLA DE CÁMARAS -->
+    <!-- GRID CÁMARAS -->
     <div class="grid" id="gridCamaras"></div>
   </div>
 
-  <!-- PIE DE PÁGINA CON CONTADOR -->
   <footer>
     <div class="counter-badge">
       <span>VISITAS AL PANEL:</span>
@@ -518,7 +564,12 @@
   </footer>
 
   <script>
-    // LISTA DE CÁMARAS BASE
+    // ==========================================
+    // CONFIGURACIÓN DE CONTRASEÑA ADMIN
+    // (Cambia '1234' por la clave secreta que quieras)
+    // ==========================================
+    const ADMIN_PASSWORD = "1234";
+
     const camarasIniciales = [
       { id: "ErUOGtBXhgY", titulo: "Santiago Centro / Plaza Italia", ciudad: "Santiago" },
       { id: "_Nrt155MExU", titulo: "Eje Alameda - Providencia", ciudad: "Santiago" },
@@ -534,40 +585,80 @@
       { id: "itVGNflL6eo", titulo: "Panorámica Cordillera / Valle", ciudad: "Santiago" }
     ];
 
-    // Cargar cámaras de localStorage o usar las iniciales
     let camaras = JSON.parse(localStorage.getItem('chile_live_cams')) || camarasIniciales;
-
+    let isAdmin = sessionStorage.getItem('is_admin') === 'true';
     let ciudadActiva = 'Todas';
     let textoBusqueda = '';
 
     const grid = document.getElementById('gridCamaras');
     const cityPillsContainer = document.getElementById('cityPills');
     const inputFiltro = document.getElementById('filtroTexto');
+    const btnAdmin = document.getElementById('btnAdmin');
     const btnToggleAdd = document.getElementById('btnToggleAdd');
-    const addPanel = document.getElementById('addPanel');
-    const formAddCam = document.getElementById('formAddCam');
+    const adminPanel = document.getElementById('adminPanel');
+    const formCam = document.getElementById('formCam');
+    const editIndexInput = document.getElementById('editIndex');
+    const panelTitle = document.getElementById('panelTitle');
+    const btnCancelEdit = document.getElementById('btnCancelEdit');
 
-    // Extraer YouTube Video ID de cualquier formato de URL
     function extractYouTubeID(url) {
+      if (url.length === 11 && !url.includes('/') && !url.includes('.')) return url;
       const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
       const match = url.trim().match(regExp);
       return (match && match[2].length === 11) ? match[2] : null;
     }
 
-    // Toggle panel agregar cámara
-    btnToggleAdd.addEventListener('click', () => {
-      addPanel.classList.toggle('open');
-      if (addPanel.classList.contains('open')) {
-        document.getElementById('newUrl').focus();
+    // GESTIÓN LOGIN ADMIN
+    btnAdmin.addEventListener('click', () => {
+      if (isAdmin) {
+        if (confirm('¿Deseas cerrar la sesión de administrador?')) {
+          isAdmin = false;
+          sessionStorage.removeItem('is_admin');
+          adminPanel.classList.remove('open');
+          actualizarVistaAdmin();
+        }
+      } else {
+        const pass = prompt('Ingresa la contraseña de administrador:');
+        if (pass === ADMIN_PASSWORD) {
+          isAdmin = true;
+          sessionStorage.setItem('is_admin', 'true');
+          actualizarVistaAdmin();
+        } else if (pass !== null) {
+          alert('Contraseña incorrecta.');
+        }
       }
     });
 
-    // Agregar nueva cámara
-    formAddCam.addEventListener('submit', (e) => {
+    function actualizarVistaAdmin() {
+      if (isAdmin) {
+        btnAdmin.textContent = '🔓 CERRAR ADMIN';
+        btnAdmin.classList.add('active');
+        btnToggleAdd.style.display = 'inline-flex';
+      } else {
+        btnAdmin.textContent = '🔒 ACCESO ADMIN';
+        btnAdmin.classList.remove('active');
+        btnToggleAdd.style.display = 'none';
+        adminPanel.classList.remove('open');
+      }
+      renderCamaras();
+    }
+
+    // ABRIR / CERRAR PANEL AGREGAR
+    btnToggleAdd.addEventListener('click', () => {
+      resetForm();
+      adminPanel.classList.toggle('open');
+      if (adminPanel.classList.contains('open')) {
+        document.getElementById('camUrl').focus();
+      }
+    });
+
+    // GUARDAR O EDITAR CÁMARA
+    formCam.addEventListener('submit', (e) => {
       e.preventDefault();
-      const rawUrl = document.getElementById('newUrl').value;
-      const title = document.getElementById('newTitle').value.trim();
-      const city = document.getElementById('newCity').value;
+      const rawUrl = document.getElementById('camUrl').value;
+      const title = document.getElementById('camTitle').value.trim();
+      const city = document.getElementById('camCity').value;
+      const index = parseInt(editIndexInput.value, 10);
 
       const videoId = extractYouTubeID(rawUrl);
       if (!videoId) {
@@ -575,16 +666,60 @@
         return;
       }
 
-      camaras.unshift({ id: videoId, titulo: title, ciudad: city });
-      localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
+      if (index >= 0) {
+        // Editar existente
+        camaras[index] = { id: videoId, titulo: title, ciudad: city };
+      } else {
+        // Nueva
+        camaras.unshift({ id: videoId, titulo: title, ciudad: city });
+      }
 
-      formAddCam.reset();
-      addPanel.classList.remove('open');
+      localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
+      resetForm();
+      adminPanel.classList.remove('open');
       renderPills();
       renderCamaras();
     });
 
-    // Generar botones de filtro por ciudad con contadores
+    function resetForm() {
+      formCam.reset();
+      editIndexInput.value = "-1";
+      panelTitle.textContent = "+ AGREGAR NUEVA CÁMARA";
+      btnCancelEdit.style.display = "none";
+    }
+
+    btnCancelEdit.addEventListener('click', () => {
+      resetForm();
+      adminPanel.classList.remove('open');
+    });
+
+    // ELIMINAR CÁMARA
+    window.eliminarCamara = function(index) {
+      if (!isAdmin) return;
+      const cam = camaras[index];
+      if (confirm(`¿Seguro que deseas eliminar la cámara "${cam.titulo}"?`)) {
+        camaras.splice(index, 1);
+        localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
+        renderPills();
+        renderCamaras();
+      }
+    };
+
+    // EDITAR CÁMARA
+    window.editarCamara = function(index) {
+      if (!isAdmin) return;
+      const cam = camaras[index];
+      editIndexInput.value = index;
+      document.getElementById('camUrl').value = `https://www.youtube.com/watch?v=${cam.id}`;
+      document.getElementById('camTitle').value = cam.titulo;
+      document.getElementById('camCity').value = cam.ciudad;
+
+      panelTitle.textContent = `✏️ EDITANDO: ${cam.titulo}`;
+      btnCancelEdit.style.display = "inline-block";
+      adminPanel.classList.add('open');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
     function renderPills() {
       const ciudades = ['Todas', ...new Set(camaras.map(c => c.ciudad))];
       cityPillsContainer.innerHTML = '';
@@ -603,19 +738,20 @@
       });
     }
 
-    // Renderizar tarjetas de cámaras
     function renderCamaras() {
       grid.innerHTML = '';
 
-      const filtradas = camaras.filter(c => {
-        const coincideCiudad = (ciudadActiva === 'Todas' || c.ciudad === ciudadActiva);
-        const coincideTexto = c.titulo.toLowerCase().includes(textoBusqueda.toLowerCase()) || 
-                              c.ciudad.toLowerCase().includes(textoBusqueda.toLowerCase());
-        return coincideCiudad && coincideTexto;
-      });
+      const filtradas = camaras
+        .map((cam, originalIndex) => ({ ...cam, originalIndex }))
+        .filter(c => {
+          const matchCity = (ciudadActiva === 'Todas' || c.ciudad === ciudadActiva);
+          const matchText = c.titulo.toLowerCase().includes(textoBusqueda.toLowerCase()) || 
+                            c.ciudad.toLowerCase().includes(textoBusqueda.toLowerCase());
+          return matchCity && matchText;
+        });
 
       if (filtradas.length === 0) {
-        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 4rem;">No se encontraron cámaras que coincidan.</div>`;
+        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 4rem;">No se encontraron cámaras activas.</div>`;
         return;
       }
 
@@ -628,7 +764,11 @@
               <span class="card-city">${cam.ciudad}</span>
               <span class="card-title" title="${cam.titulo}">${cam.titulo}</span>
             </div>
-            <span class="badge-live"><span class="dot"></span>LIVE</span>
+            <div class="card-controls">
+              <button class="btn-edit" style="display:${isAdmin ? 'inline-block' : 'none'}" onclick="editarCamara(${cam.originalIndex})" title="Editar">✏️</button>
+              <button class="btn-del" style="display:${isAdmin ? 'inline-block' : 'none'}" onclick="eliminarCamara(${cam.originalIndex})" title="Eliminar">🗑️</button>
+              <span class="badge-live"><span class="dot"></span>LIVE</span>
+            </div>
           </div>
           <div class="video-wrapper">
             <iframe 
@@ -644,13 +784,11 @@
       });
     }
 
-    // Buscador
     inputFiltro.addEventListener('input', (e) => {
       textoBusqueda = e.target.value;
       renderCamaras();
     });
 
-    // Reloj hora de Chile
     function actualizarReloj() {
       const ahora = new Date();
       const opciones = { timeZone: 'America/Santiago', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -659,7 +797,6 @@
     setInterval(actualizarReloj, 1000);
     actualizarReloj();
 
-    // Contador de visitas persistente
     async function initCounter() {
       const counterEl = document.getElementById('visitCount');
       try {
@@ -669,17 +806,14 @@
           counterEl.textContent = String(data.count).padStart(5, '0');
           return;
         }
-      } catch (err) {
-        // Respaldo local
-      }
+      } catch (err) {}
       let localVisits = parseInt(localStorage.getItem('page_visits') || '0', 10) + 1;
       localStorage.setItem('page_visits', localVisits);
       counterEl.textContent = String(localVisits).padStart(5, '0');
     }
 
-    // Inicialización al cargar la página
     renderPills();
-    renderCamaras();
+    actualizarVistaAdmin();
     initCounter();
   </script>
 </body>
