@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>OrbitDial | Live Radio & Cam Global</title>
+  <title>Live Cam | Global Live Streams</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,15 +14,14 @@
 
   <style>
     :root {
-      --bg: #0b0f19;
-      --accent: #00ff66;
-      --accent-glow: rgba(0, 255, 102, 0.35);
-      --live-red: #ff334b;
-      --card-bg: rgba(13, 17, 23, 0.95);
-      --border: rgba(255, 255, 255, 0.1);
-      --text: #c9d1d9;
-      --text-bright: #f0f6fc;
-      --muted: #8b949e;
+      --bg: #0f172a;
+      --accent: #059669;
+      --accent-glow: rgba(5, 150, 105, 0.3);
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --border: rgba(0, 0, 0, 0.1);
+      --text: #1f2937;
+      --text-bright: #111827;
+      --muted: #6b7280;
     }
 
     * {
@@ -33,7 +32,7 @@
     }
 
     body {
-      background-color: var(--bg);
+      background-color: #f1f5f9;
       color: var(--text);
       font-family: 'Plus Jakarta Sans', sans-serif;
       overflow: hidden;
@@ -46,14 +45,14 @@
     aside {
       width: 320px;
       height: 100vh;
-      background: var(--bg);
+      background: #ffffff;
       border-right: 1px solid var(--border);
       padding: 1.5rem;
       display: flex;
       flex-direction: column;
       gap: 1.25rem;
       z-index: 30;
-      box-shadow: 5px 0 30px rgba(0,0,0,0.8);
+      box-shadow: 5px 0 30px rgba(0,0,0,0.05);
     }
 
     .brand-area {
@@ -81,7 +80,7 @@
 
     .select-simulated {
       width: 100%;
-      background: rgba(255, 255, 255, 0.04);
+      background: #f8fafc;
       border: 1px solid var(--border);
       color: var(--text-bright);
       padding: 0.65rem 0.85rem;
@@ -107,11 +106,11 @@
       width: 100%;
       max-height: 48vh;
       overflow-y: auto;
-      background: var(--card-bg);
+      background: #ffffff;
       border: 1px solid var(--accent);
       border-radius: 8px;
       padding: 0.3rem;
-      box-shadow: 0 10px 30px rgba(0,0,0,0.9);
+      box-shadow: 0 10px 30px rgba(0,0,0,0.15);
       z-index: 50;
     }
 
@@ -136,7 +135,7 @@
     }
 
     .dropdown-item:hover {
-      background: rgba(0, 255, 102, 0.15);
+      background: rgba(5, 150, 105, 0.1);
       color: var(--accent);
     }
 
@@ -155,7 +154,7 @@
 
     .search-box-side {
       display: flex;
-      background: rgba(255, 255, 255, 0.03);
+      background: #f8fafc;
       border: 1px solid var(--border);
       border-radius: 8px;
       padding: 0.4rem 0.75rem;
@@ -177,7 +176,7 @@
     .btn-dial {
       width: 100%;
       background: var(--accent);
-      color: #010409;
+      color: #ffffff;
       border: none;
       border-radius: 8px;
       padding: 0.75rem;
@@ -185,7 +184,7 @@
       font-size: 0.82rem;
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
-      box-shadow: 0 0 15px var(--accent-glow);
+      box-shadow: 0 4px 15px var(--accent-glow);
       transition: transform 0.1s;
     }
 
@@ -203,12 +202,12 @@
       border-top: 1px solid var(--border);
     }
 
-    /* CONTENEDOR DEL GLOBO */
+    /* CONTENEDOR DEL GLOBO (MAPA CLARO Y VISIBLE) */
     #viewerContainer {
       flex: 1;
       height: 100vh;
       position: relative;
-      background: radial-gradient(circle at center, #111b2e 0%, #050811 100%);
+      background: #e2e8f0;
     }
 
     #globeViz {
@@ -226,13 +225,13 @@
       position: absolute;
       bottom: 1.5rem;
       right: 1.5rem;
-      background: var(--card-bg);
+      background: rgba(255, 255, 255, 0.9);
       border: 1px solid var(--border);
       border-radius: 10px;
       padding: 0.85rem 1rem;
       z-index: 20;
       backdrop-filter: blur(12px);
-      box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.1);
     }
 
     .popularity-legend h4 {
@@ -240,7 +239,6 @@
       font-family: 'JetBrains Mono', monospace;
       color: var(--muted);
       margin-bottom: 0.5rem;
-      letter-spacing: 0.5px;
     }
 
     .legend-item {
@@ -267,12 +265,12 @@
       transform: translate(-50%, -50%);
       width: 440px;
       max-width: 90vw;
-      background: var(--card-bg);
+      background: #ffffff;
       backdrop-filter: blur(25px);
       border: 1px solid var(--border);
       border-radius: 16px;
       z-index: 40;
-      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.9), 0 0 35px rgba(0, 255, 102, 0.15);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25);
       display: none;
       flex-direction: column;
       overflow: hidden;
@@ -288,7 +286,7 @@
       flex-direction: column;
       gap: 0.4rem;
       border-bottom: 1px solid var(--border);
-      background: rgba(0, 0, 0, 0.4);
+      background: #f8fafc;
     }
 
     .live-badge-row {
@@ -304,6 +302,7 @@
       display: flex;
       align-items: center;
       gap: 0.3rem;
+      font-weight: 700;
     }
 
     .live-tag::before {
@@ -347,8 +346,7 @@
     }
 
     .badge-pill {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
+      background: #e2e8f0;
       border-radius: 20px;
       padding: 0.15rem 0.6rem;
       font-size: 0.65rem;
@@ -363,7 +361,7 @@
     .btn-play-big {
       width: 100%;
       background: var(--accent);
-      color: #010409;
+      color: #ffffff;
       border: none;
       border-radius: 10px;
       padding: 0.75rem;
@@ -371,12 +369,11 @@
       font-size: 0.85rem;
       cursor: pointer;
       font-family: 'JetBrains Mono', monospace;
-      box-shadow: 0 0 20px var(--accent-glow);
-      transition: box-shadow 0.2s;
+      box-shadow: 0 4px 15px var(--accent-glow);
     }
 
     .btn-play-big:hover {
-      box-shadow: 0 0 30px var(--accent);
+      background: #047857;
     }
 
     .video-container-modal {
@@ -421,7 +418,7 @@
       background: var(--accent);
       border: 2px solid #ffffff;
       border-radius: 50%;
-      box-shadow: 0 0 12px var(--accent);
+      box-shadow: 0 0 10px rgba(5, 150, 105, 0.8);
       transition: transform 0.18s ease;
     }
 
@@ -435,15 +432,15 @@
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-size: 9px;
       font-weight: 700;
-      text-shadow: 0 1px 3px rgba(0,0,0,0.9);
-      background: rgba(13, 17, 23, 0.85);
+      text-shadow: 0 1px 2px rgba(255,255,255,0.9);
+      background: rgba(255, 255, 255, 0.9);
       padding: 1px 5px;
       border-radius: 4px;
       border: 1px solid var(--border);
       white-space: nowrap;
     }
 
-    /* CONTROLES FLOTANTES SUPERIORES */
+    /* CONTROLES SUPERIORES */
     .top-controls {
       position: absolute;
       top: 1.25rem;
@@ -454,7 +451,7 @@
     }
 
     .btn-ctrl-top {
-      background: var(--card-bg);
+      background: rgba(255, 255, 255, 0.9);
       border: 1px solid var(--border);
       color: var(--text);
       padding: 0.45rem 0.85rem;
@@ -462,7 +459,7 @@
       font-size: 0.75rem;
       font-family: 'JetBrains Mono', monospace;
       cursor: pointer;
-      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.05);
     }
 
     .btn-ctrl-top:hover {
@@ -477,7 +474,7 @@
   <aside>
     <div class="brand-area">
       <div class="brand-title">
-        <h1>ORBIT<span>DIAL</span></h1>
+        <h1>LIVE <span>CAM</span></h1>
       </div>
       <a href="index.html" style="color:var(--accent); font-size:0.75rem; font-family:'JetBrains Mono',monospace; text-decoration:none;">← INICIO</a>
     </div>
@@ -496,7 +493,7 @@
     <div class="sidebar-section">
       <span class="sidebar-label">BÚSQUEDA GLOBAL</span>
       <div class="search-box-side">
-        <input type="text" id="inputCitySearch" placeholder="Ej. Paris, London, Miami...">
+        <input type="text" id="inputCitySearch" placeholder="Ej. Paris, London, Santiago...">
       </div>
     </div>
 
@@ -505,13 +502,13 @@
     <div class="sidebar-section" style="margin-top: 1rem;">
       <span class="sidebar-label">ADMINISTRACIÓN</span>
       <div style="display:flex; gap:0.4rem;">
-        <button class="btn-ctrl-top" id="btnAdmin" style="flex:1;">🔒 ADMIN</button>
-        <button class="btn-ctrl-top" id="btnResetCam" title="Restaurar" style="flex:1;">🔄 RESET</button>
+        <button class="btn-ctrl-top" id="btnAdmin" style="flex:1; background:#f8fafc;">🔒 ADMIN</button>
+        <button class="btn-ctrl-top" id="btnResetCam" title="Restaurar" style="flex:1; background:#f8fafc;">🔄 RESET</button>
       </div>
     </div>
 
     <div class="sidebar-footer-info">
-      Orbital Live Cams & Streams v5.3
+      Live Cam Global v6.0
     </div>
   </aside>
 
@@ -527,7 +524,7 @@
     <div class="popularity-legend">
       <h4>POPULARIDAD</h4>
       <div class="legend-item"><div class="legend-dot" style="background:#ff334b;"></div>Top mundial</div>
-      <div class="legend-item"><div class="legend-dot" style="background:#00ff66;"></div>Alta (+5k)</div>
+      <div class="legend-item"><div class="legend-dot" style="background:#059669;"></div>Alta (+5k)</div>
       <div class="legend-item"><div class="legend-dot" style="background:#38bdf8;"></div>Media</div>
       <div class="legend-item"><div class="legend-dot" style="background:#a855f7;"></div>Baja</div>
     </div>
@@ -561,28 +558,27 @@
 
   <script>
     const ADMIN_PASSWORD = "9066819";
-    const STORAGE_KEY = "orbitdial_garden_cams_v7";
+    const STORAGE_KEY = "livecam_garden_cams_v8";
 
-    // CÁMARAS AMPLIADAS Y VERIFICADAS EN LÍNEA
+    // CÁMARAS VERIFICADAS CON UBICACIONES EXACTAS DIFERENCIADAS EN SANTIAGO Y EL MUNDO
     const worldCamsIniciales = [
-      // CHILE
       {
         id: "ErUOGtBXhgY",
+        city: "Santiago",
+        sector: "Plaza Baquedano (Zona Cero)",
+        country: "Chile",
+        lat: -33.4372,
+        lng: -70.6345,
+        desc: "Galería CIMA - Plaza Baquedano / Centro"
+      },
+      {
+        id: "_Nrt155MExU",
         city: "Santiago",
         sector: "Tobalaba / Providencia",
         country: "Chile",
         lat: -33.4228,
         lng: -70.6053,
-        desc: "Eje Tobalaba - Av. Providencia (Galería CIMA)"
-      },
-      {
-        id: "_Nrt155MExU",
-        city: "Santiago",
-        sector: "Costanera Center",
-        country: "Chile",
-        lat: -33.4172,
-        lng: -70.6067,
-        desc: "Sector Financiero Sanhattan / Providencia"
+        desc: "Eje Tobalaba - Av. Providencia y Sector Financiero"
       },
       {
         id: "tmS73xQ4zVc",
@@ -593,7 +589,6 @@
         lng: -70.2498,
         desc: "Valle Nevado Ski Resort (Cordillera de Los Andes)"
       },
-      // AMÉRICA & CARIBE
       {
         id: "7dc4Y_Vb_Wc",
         city: "Río de Janeiro",
@@ -621,7 +616,6 @@
         lng: -118.4695,
         desc: "Venice Beach Boardwalk Live Cam"
       },
-      // EUROPA
       {
         id: "asO_10T0k2k",
         city: "París",
@@ -649,7 +643,6 @@
         lng: -0.1773,
         desc: "EarthCam: Famoso cruce peatonal de Abbey Road"
       },
-      // ASIA
       {
         id: "dfVK7ld38Ys",
         city: "Tokio",
@@ -705,13 +698,14 @@
       });
     }
 
+    // INICIALIZACIÓN DEL GLOBO (MAPA CLARO Y BRILLANTE)
     const globe = Globe()
       (document.getElementById('globeViz'))
-      .backgroundColor('#050811')
+      .backgroundColor('#e2e8f0')
       .showGlobe(true)
       .globeImageUrl('//unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
-      .atmosphereColor('#38bdf8')
-      .atmosphereAltitude(0.15)
+      .atmosphereColor('#059669')
+      .atmosphereAltitude(0.12)
 
       .htmlElementsData(buildMarkerData(worldCams))
       .htmlLat(d => d.lat)
@@ -744,7 +738,7 @@
       .ringLat(d => d.lat)
       .ringLng(d => d.lng)
       .ringAltitude(0.003)
-      .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t * 0.8})`)
+      .ringColor(() => (t) => `rgba(5, 150, 105, ${1 - t * 0.8})`)
       .ringMaxRadius(1.2)
       .ringPropagationSpeed(1.2)
       .ringRepeatPeriod(1500);
@@ -754,12 +748,12 @@
       .then(countries => {
         globe.polygonsData(countries.features)
           .polygonAltitude(0.002)
-          .polygonCapColor(() => '#1a2639')
-          .polygonSideColor(() => '#111827')
-          .polygonStrokeColor(() => '#2b3f5c')
+          .polygonCapColor(() => '#f8fafc')
+          .polygonSideColor(() => '#e2e8f0')
+          .polygonStrokeColor(() => '#cbd5e1')
           .polygonLabel(({ properties: d }) => {
             const nombrePais = traduccionPaises[d.ADMIN] || d.NAME_ES || d.ADMIN;
-            return `<div style="background:#0d1117; padding:3px 8px; border-radius:4px; font-size:11px; border:1px solid #30363d; color:#f0f6fc;"><b>🌍 ${nombrePais}</b></div>`;
+            return `<div style="background:#ffffff; padding:3px 8px; border-radius:4px; font-size:11px; border:1px solid #cbd5e1; color:#111827;"><b>🌍 ${nombrePais}</b></div>`;
           });
       });
 
