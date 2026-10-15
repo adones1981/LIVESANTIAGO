@@ -593,21 +593,16 @@
 
     // CÁMARAS CON COORDENADAS EXACTAS
     const worldCamsIniciales = [
-      // CHILE
       { id: "ErUOGtBXhgY", city: "Santiago", sector: "Plaza Baquedano", country: "Chile", lat: -33.4372, lng: -70.6345, desc: "Centro de Santiago" },
       { id: "_Nrt155MExU", city: "Santiago", sector: "Providencia", country: "Chile", lat: -33.4290, lng: -70.6120, desc: "Eje Alameda - Providencia" },
       { id: "tmS73xQ4zVc", city: "Viña del Mar", sector: "Borde Costero", country: "Chile", lat: -33.0150, lng: -71.5518, desc: "Costanera y Playa" },
       { id: "oDErMN0_ehw", city: "Valparaíso", sector: "Puerto", country: "Chile", lat: -33.0420, lng: -71.6250, desc: "Bahía y Muelle Barón" },
       { id: "M_Qk3Bv0-So", city: "La Serena", sector: "Avenida del Mar", country: "Chile", lat: -29.9027, lng: -71.2519, desc: "Faro y Costanera" },
       { id: "HirKZqakDIA", city: "Concepción", sector: "Centro", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
-
-      // INTERNACIONALES ACTUALIZADAS
       { id: "wyEi0OPai5g", city: "Río de Janeiro", sector: "Copacabana", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana" },
       { id: "xoyKM6BQceM", city: "Buenos Aires", sector: "Obelisco", country: "Argentina", lat: -34.6037, lng: -58.3816, desc: "Avenida 9 de Julio" },
       { id: "w_Dg2vC0tUE", city: "Moscú", sector: "Plaza Roja", country: "Rusia", lat: 55.7558, lng: 37.6173, desc: "Centro Histórico" },
       { id: "IRqboacDNFg", city: "Berlín", sector: "Puerta de Brandeburgo", country: "Alemania", lat: 52.5163, lng: 13.3777, desc: "Monumento Histórico" },
-
-      // ESTADOS UNIDOS & EUROPA
       { id: "EO_1LWqsCNE", city: "Los Ángeles", sector: "Venice Beach", country: "Estados Unidos", lat: 33.9850, lng: -118.4695, desc: "Boardwalk California" },
       { id: "JQ_jwk_7OVE", city: "Nueva York", sector: "Times Square", country: "Estados Unidos", lat: 40.7580, lng: -73.9855, desc: "Times Square North 4K" },
       { id: "asO_10T0k2k", city: "París", sector: "Torre Eiffel", country: "Francia", lat: 48.8584, lng: 2.2945, desc: "Torre Eiffel y Skyline" },
@@ -645,7 +640,7 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    // 100% CLICABLE: USAMOS HTML ELEMENTS INTERACTIVOS (SIN CILINDROS 3D) Y ONDAS SUTILES
+    // USAMOS PUNTOS NATIVOS DE GLOBE.GL CON ALTURA 0 Y EVENTO DE CLIC DIRECTO 100% FUNCIONAL
     const globe = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
@@ -654,52 +649,29 @@
       .atmosphereColor('#00ff66')
       .atmosphereAltitude(0.18)
       
-      // ICONOS HTML 100% CLICABLES Y NATIVOS
-      .htmlElementsData(worldCams)
-      .htmlLat(d => d.lat)
-      .htmlLng(d => d.lng)
-      .htmlAltitude(0.01)
-      .htmlElement(d => {
-        const wrapper = document.createElement('div');
-        wrapper.style.cssText = `
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          width: 24px;
-          height: 24px;
-          cursor: pointer;
-          transform: translate(-50%, -50%);
-        `;
+      .pointsData(worldCams)
+      .pointLat(d => d.lat)
+      .pointLng(d => d.lng)
+      .pointAltitude(0)
+      .pointRadius(0.7)
+      .pointColor(() => '#00ff66')
+      .pointLabel(d => `
+        <div class="custom-tooltip">
+          <b>🟢 ${d.city}</b> (${d.country})<br/>
+          <span style="color:#00ff66;">${d.sector ? d.sector + ' • ' : ''}${d.desc}</span><br/>
+          <small style="color:#cbd5e1;">Haz clic para ver la cámara</small>
+        </div>
+      `)
+      .onPointClick(d => selectCamera(d))
 
-        const dot = document.createElement('div');
-        dot.style.cssText = `
-          width: 10px;
-          height: 10px;
-          background: #00ff66;
-          border: 2px solid #ffffff;
-          border-radius: 50%;
-          box-shadow: 0 0 10px #00ff66;
-          transition: transform 0.2s ease;
-        `;
-
-        wrapper.appendChild(dot);
-        wrapper.title = `${d.city} - ${d.desc}`;
-
-        wrapper.onmouseover = () => { dot.style.transform = 'scale(1.4)'; };
-        wrapper.onmouseout = () => { dot.style.transform = 'scale(1)'; };
-        wrapper.onclick = () => selectCamera(d);
-
-        return wrapper;
-      })
-
-      // ONDAS SUTILES Y PEQUEÑAS (NO GIGANTES)
+      // ONDAS SUTILES ALREDEDOR DEL PUNTO
       .ringsData(worldCams)
       .ringLat(d => d.lat)
       .ringLng(d => d.lng)
       .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t})`)
-      .ringMaxRadius(1.2) // Onda pequeña y discreta alrededor del punto
+      .ringMaxRadius(1.5)
       .ringPropagationSpeed(1.2)
-      .ringRepeatPeriod(1400);
+      .ringRepeatPeriod(1500);
 
     globe.controls().autoRotate = false;
     globe.controls().autoRotateSpeed = 0.4;
@@ -713,7 +685,7 @@
     });
 
     function refreshGlobeData() {
-      globe.htmlElementsData(worldCams);
+      globe.pointsData(worldCams);
       globe.ringsData(worldCams);
       renderDropdownCities();
     }
