@@ -9,7 +9,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700&display=swap" rel="stylesheet">
 
-  <!-- Motor Globe.gl (Incluye su propia versión compatible de Three.js) -->
+  <!-- Motor Globe.gl -->
   <script src="https://unpkg.com/globe.gl"></script>
 
   <style>
@@ -591,7 +591,7 @@
   <script>
     const ADMIN_PASSWORD = "9066819";
 
-    // CÁMARAS CON COORDENADAS EXACTAS (INCLUYENDO LAS NUEVAS INTERNACIONALES)
+    // CÁMARAS CON COORDENADAS EXACTAS
     const worldCamsIniciales = [
       // CHILE
       { id: "ErUOGtBXhgY", city: "Santiago", sector: "Plaza Baquedano", country: "Chile", lat: -33.4372, lng: -70.6345, desc: "Centro de Santiago" },
@@ -645,7 +645,7 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    // MOTOR GLOBO ESTABLE SIN CILINDROS 3D (PUNTOS Y ANILLOS PLANOS)
+    // 100% CLICABLE: USAMOS HTML ELEMENTS INTERACTIVOS (SIN CILINDROS 3D) Y ONDAS SUTILES
     const globe = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
@@ -653,33 +653,53 @@
       .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
       .atmosphereColor('#00ff66')
       .atmosphereAltitude(0.18)
+      
+      // ICONOS HTML 100% CLICABLES Y NATIVOS
       .htmlElementsData(worldCams)
       .htmlLat(d => d.lat)
       .htmlLng(d => d.lng)
-      .htmlAltitude(0)
+      .htmlAltitude(0.01)
       .htmlElement(d => {
-        const el = document.createElement('div');
-        el.style.cssText = `
-          width: 14px;
-          height: 14px;
+        const wrapper = document.createElement('div');
+        wrapper.style.cssText = `
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 24px;
+          height: 24px;
+          cursor: pointer;
+          transform: translate(-50%, -50%);
+        `;
+
+        const dot = document.createElement('div');
+        dot.style.cssText = `
+          width: 10px;
+          height: 10px;
           background: #00ff66;
           border: 2px solid #ffffff;
           border-radius: 50%;
-          cursor: pointer;
           box-shadow: 0 0 10px #00ff66;
-          transform: translate(-50%, -50%);
+          transition: transform 0.2s ease;
         `;
-        el.title = `${d.city} - ${d.desc}`;
-        el.onclick = () => selectCamera(d);
-        return el;
+
+        wrapper.appendChild(dot);
+        wrapper.title = `${d.city} - ${d.desc}`;
+
+        wrapper.onmouseover = () => { dot.style.transform = 'scale(1.4)'; };
+        wrapper.onmouseout = () => { dot.style.transform = 'scale(1)'; };
+        wrapper.onclick = () => selectCamera(d);
+
+        return wrapper;
       })
+
+      // ONDAS SUTILES Y PEQUEÑAS (NO GIGANTES)
       .ringsData(worldCams)
       .ringLat(d => d.lat)
       .ringLng(d => d.lng)
       .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t})`)
-      .ringMaxRadius(2.5)
-      .ringPropagationSpeed(1.5)
-      .ringRepeatPeriod(1200);
+      .ringMaxRadius(1.2) // Onda pequeña y discreta alrededor del punto
+      .ringPropagationSpeed(1.2)
+      .ringRepeatPeriod(1400);
 
     globe.controls().autoRotate = false;
     globe.controls().autoRotateSpeed = 0.4;
