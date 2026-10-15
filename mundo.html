@@ -591,21 +591,26 @@
   <script>
     const ADMIN_PASSWORD = "9066819";
 
-    // CÁMARAS CON COORDENADAS EXACTAS
+    // CÁMARAS UBICADAS CON RIGOR EXACTO EN SUS PAÍSES Y CIUDADES CORRESPONDIENTES
     const worldCamsIniciales = [
-      { id: "ErUOGtBXhgY", city: "Santiago", sector: "Plaza Baquedano", country: "Chile", lat: -33.4372, lng: -70.6345, desc: "Centro de Santiago" },
-      { id: "_Nrt155MExU", city: "Santiago", sector: "Providencia", country: "Chile", lat: -33.4290, lng: -70.6120, desc: "Eje Alameda - Providencia" },
-      { id: "tmS73xQ4zVc", city: "Viña del Mar", sector: "Borde Costero", country: "Chile", lat: -33.0150, lng: -71.5518, desc: "Costanera y Playa" },
-      { id: "oDErMN0_ehw", city: "Valparaíso", sector: "Puerto", country: "Chile", lat: -33.0420, lng: -71.6250, desc: "Bahía y Muelle Barón" },
+      // CHILE (UBICACIONES NACIONALES LIMPIAS)
+      { id: "ErUOGtBXhgY", city: "Santiago", sector: "Centro", country: "Chile", lat: -33.4489, lng: -70.6693, desc: "Capital Nacional" },
+      { id: "_Nrt155MExU", city: "Santiago", sector: "Providencia", country: "Chile", lat: -33.4260, lng: -70.6120, desc: "Eje Alameda - Providencia" },
+      { id: "tmS73xQ4zVc", city: "Viña del Mar", sector: "Borde Costero", country: "Chile", lat: -33.0245, lng: -71.5518, desc: "Costanera y Playa" },
+      { id: "oDErMN0_ehw", city: "Valparaíso", sector: "Puerto", country: "Chile", lat: -33.0472, lng: -71.6127, desc: "Bahía y Muelle Barón" },
       { id: "M_Qk3Bv0-So", city: "La Serena", sector: "Avenida del Mar", country: "Chile", lat: -29.9027, lng: -71.2519, desc: "Faro y Costanera" },
       { id: "HirKZqakDIA", city: "Concepción", sector: "Centro", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
+
+      // INTERNACIONALES (CORREGIDAS Y RIGUROSAS)
       { id: "wyEi0OPai5g", city: "Río de Janeiro", sector: "Copacabana", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana" },
       { id: "xoyKM6BQceM", city: "Buenos Aires", sector: "Obelisco", country: "Argentina", lat: -34.6037, lng: -58.3816, desc: "Avenida 9 de Julio" },
       { id: "w_Dg2vC0tUE", city: "Moscú", sector: "Plaza Roja", country: "Rusia", lat: 55.7558, lng: 37.6173, desc: "Centro Histórico" },
       { id: "IRqboacDNFg", city: "Berlín", sector: "Puerta de Brandeburgo", country: "Alemania", lat: 52.5163, lng: 13.3777, desc: "Monumento Histórico" },
+
+      // ESTADOS UNIDOS & EUROPA
       { id: "EO_1LWqsCNE", city: "Los Ángeles", sector: "Venice Beach", country: "Estados Unidos", lat: 33.9850, lng: -118.4695, desc: "Boardwalk California" },
       { id: "JQ_jwk_7OVE", city: "Nueva York", sector: "Times Square", country: "Estados Unidos", lat: 40.7580, lng: -73.9855, desc: "Times Square North 4K" },
-      { id: "asO_10T0k2k", city: "París", sector: "Torre Eiffel", country: "Francia", lat: 48.8584, lng: 2.2945, desc: "Torre Eiffel y Skyline" },
+      { id: "asO_10T0k2k", city: "Cannes", sector: "Playa y Paseo", country: "Francia", lat: 43.5528, lng: 7.0174, desc: "Costa Azul / Cannes Beach" },
       { id: "2GgaZAqFE5U", city: "Londres", sector: "Tower Bridge", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge y Río Támesis" },
       { id: "mt7uE-n0YPI", city: "Venecia", sector: "Puente Rialto", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal de Venecia" }
     ];
@@ -640,7 +645,7 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    // USAMOS PUNTOS NATIVOS DE GLOBE.GL CON ALTURA 0 Y EVENTO DE CLIC DIRECTO 100% FUNCIONAL
+    // 100% CLICABLE CON PUNTOS NATIVOS Y ONDAS SUTILES (CERO CILINDROS 3D)
     const globe = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
@@ -664,12 +669,11 @@
       `)
       .onPointClick(d => selectCamera(d))
 
-      // ONDAS SUTILES ALREDEDOR DEL PUNTO
       .ringsData(worldCams)
       .ringLat(d => d.lat)
       .ringLng(d => d.lng)
       .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t})`)
-      .ringMaxRadius(1.5)
+      .ringMaxRadius(1.2)
       .ringPropagationSpeed(1.2)
       .ringRepeatPeriod(1500);
 
@@ -881,10 +885,20 @@
       }
     }
 
+    // LISTA LIMPIA PARA GITHUB (CERO BASURA TÉCNICA)
     btnExportCam.addEventListener('click', () => {
-      const codigoExport = `const worldCamsIniciales = ${JSON.stringify(worldCams, null, 2)};`;
+      const exportList = worldCams.map(c => ({
+        id: c.id,
+        city: c.city,
+        sector: c.sector,
+        country: c.country,
+        lat: c.lat,
+        lng: c.lng,
+        desc: c.desc
+      }));
+      const codigoExport = `const worldCamsIniciales = ${JSON.stringify(exportList, null, 2)};`;
       navigator.clipboard.writeText(codigoExport).then(() => {
-        alert('¡Copiado al portapapeles!\n\nAbre mundo.html en GitHub, busca la línea "const worldCamsIniciales" y reemplázala pegando lo que acabas de copiar.');
+        alert('¡Lista limpia copiada al portapapeles!\nPégala en tu archivo mundo.html de GitHub.');
       });
     });
 
