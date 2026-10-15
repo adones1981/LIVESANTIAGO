@@ -591,29 +591,28 @@
   <script>
     const ADMIN_PASSWORD = "9066819";
 
-    // CÁMARAS CON COORDENADAS EXACTAS
+    // CÁMARAS CON COORDENADAS EXACTAS (INCLUYENDO LAS NUEVAS INTERNACIONALES)
     const worldCamsIniciales = [
       // CHILE
-      { id: "ErUOGtBXhgY", city: "Santiago", sector: "tobalaba", country: "Chile", lat: -33.4372, lng: -70.6345, desc: "Centro de Santiago" },
-      { id: "_Nrt155MExU", city: "Santiago", sector: "Peñalolen", country: "Chile", lat: -33.4290, lng: -70.6120, desc: "Eje Alameda - Providencia" },
+      { id: "ErUOGtBXhgY", city: "Santiago", sector: "Plaza Baquedano", country: "Chile", lat: -33.4372, lng: -70.6345, desc: "Centro de Santiago" },
+      { id: "_Nrt155MExU", city: "Santiago", sector: "Providencia", country: "Chile", lat: -33.4290, lng: -70.6120, desc: "Eje Alameda - Providencia" },
       { id: "tmS73xQ4zVc", city: "Viña del Mar", sector: "Borde Costero", country: "Chile", lat: -33.0150, lng: -71.5518, desc: "Costanera y Playa" },
       { id: "oDErMN0_ehw", city: "Valparaíso", sector: "Puerto", country: "Chile", lat: -33.0420, lng: -71.6250, desc: "Bahía y Muelle Barón" },
       { id: "M_Qk3Bv0-So", city: "La Serena", sector: "Avenida del Mar", country: "Chile", lat: -29.9027, lng: -71.2519, desc: "Faro y Costanera" },
-      { id: "HirKZqakDIA", city: "los andes", sector: "Centro", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
+      { id: "HirKZqakDIA", city: "Concepción", sector: "Centro", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
 
-      // EUROPA
-      { id: "asO_10T0k2k", city: "París", sector: "playa", country: "Francia", lat: 48.8584, lng: 2.2945, desc: " Skyline" },
-      { id: "2GgaZAqFE5U", city: "Londres", sector: "Tower Bridge", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge y Río Támesis" },
-      { id: "mt7uE-n0YPI", city: "Venecia", sector: "Puente Rialto", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal de Venecia" },
+      // INTERNACIONALES ACTUALIZADAS
+      { id: "wyEi0OPai5g", city: "Río de Janeiro", sector: "Copacabana", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana" },
+      { id: "xoyKM6BQceM", city: "Buenos Aires", sector: "Obelisco", country: "Argentina", lat: -34.6037, lng: -58.3816, desc: "Avenida 9 de Julio" },
+      { id: "w_Dg2vC0tUE", city: "Moscú", sector: "Plaza Roja", country: "Rusia", lat: 55.7558, lng: 37.6173, desc: "Centro Histórico" },
+      { id: "IRqboacDNFg", city: "Berlín", sector: "Puerta de Brandeburgo", country: "Alemania", lat: 52.5163, lng: 13.3777, desc: "Monumento Histórico" },
 
-      // ESTADOS UNIDOS
+      // ESTADOS UNIDOS & EUROPA
       { id: "EO_1LWqsCNE", city: "Los Ángeles", sector: "Venice Beach", country: "Estados Unidos", lat: 33.9850, lng: -118.4695, desc: "Boardwalk California" },
       { id: "JQ_jwk_7OVE", city: "Nueva York", sector: "Times Square", country: "Estados Unidos", lat: 40.7580, lng: -73.9855, desc: "Times Square North 4K" },
-
-      // ASIA & BRASIL
-      { id: "xoyKM6BQceM", city: "Tokio", sector: "Shibuya", country: "Japón", lat: 35.6595, lng: 139.7004, desc: "Cruce Shibuya Live" },
-      { id: "wyEi0OPai5g", city: "Seúl", sector: "Centro", country: "Corea del Sur", lat: 37.5665, lng: 126.9780, desc: "Panorama Metropolitano" },
-      { id: "7dc4Y_Vb_Wc", city: "Río de Janeiro", sector: "Copacabana", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana" }
+      { id: "asO_10T0k2k", city: "París", sector: "Torre Eiffel", country: "Francia", lat: 48.8584, lng: 2.2945, desc: "Torre Eiffel y Skyline" },
+      { id: "2GgaZAqFE5U", city: "Londres", sector: "Tower Bridge", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge y Río Támesis" },
+      { id: "mt7uE-n0YPI", city: "Venecia", sector: "Puente Rialto", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal de Venecia" }
     ];
 
     let worldCams = JSON.parse(localStorage.getItem('earthcam_garden_cams')) || worldCamsIniciales;
@@ -646,7 +645,7 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    // INICIALIZACIÓN DEL GLOBO ESTABLE (TEXTURAS OFICIALES DE GITHUB / UNPKG)
+    // MOTOR GLOBO ESTABLE SIN CILINDROS 3D (PUNTOS Y ANILLOS PLANOS)
     const globe = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
@@ -654,26 +653,33 @@
       .backgroundImageUrl('https://unpkg.com/three-globe/example/img/night-sky.png')
       .atmosphereColor('#00ff66')
       .atmosphereAltitude(0.18)
-      .pointsData(worldCams)
-      .pointLat(d => d.lat)
-      .pointLng(d => d.lng)
-      .pointAltitude(0.01)
-      .pointRadius(0.6)
-      .pointColor(() => '#00ff66')
-      .pointLabel(d => `
-        <div class="custom-tooltip">
-          <b>🟢 ${d.city}</b> (${d.country})<br/>
-          <span style="color:#00ff66;">${d.sector ? d.sector + ' • ' : ''}${d.desc}</span>
-        </div>
-      `)
-      .onPointClick(d => selectCamera(d))
+      .htmlElementsData(worldCams)
+      .htmlLat(d => d.lat)
+      .htmlLng(d => d.lng)
+      .htmlAltitude(0)
+      .htmlElement(d => {
+        const el = document.createElement('div');
+        el.style.cssText = `
+          width: 14px;
+          height: 14px;
+          background: #00ff66;
+          border: 2px solid #ffffff;
+          border-radius: 50%;
+          cursor: pointer;
+          box-shadow: 0 0 10px #00ff66;
+          transform: translate(-50%, -50%);
+        `;
+        el.title = `${d.city} - ${d.desc}`;
+        el.onclick = () => selectCamera(d);
+        return el;
+      })
       .ringsData(worldCams)
       .ringLat(d => d.lat)
       .ringLng(d => d.lng)
       .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t})`)
-      .ringMaxRadius(2.2)
-      .ringPropagationSpeed(1.8)
-      .ringRepeatPeriod(1000);
+      .ringMaxRadius(2.5)
+      .ringPropagationSpeed(1.5)
+      .ringRepeatPeriod(1200);
 
     globe.controls().autoRotate = false;
     globe.controls().autoRotateSpeed = 0.4;
@@ -687,7 +693,7 @@
     });
 
     function refreshGlobeData() {
-      globe.pointsData(worldCams);
+      globe.htmlElementsData(worldCams);
       globe.ringsData(worldCams);
       renderDropdownCities();
     }
