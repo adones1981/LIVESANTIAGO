@@ -591,7 +591,7 @@
   <script>
     const ADMIN_PASSWORD = "9066819";
 
-    // CÁMARAS GEOLOCALIZADAS RIGUROSAMENTE CON TRANSMISIONES VIVAS
+    // LISTA AUDITADA Y EXACTA CON TRANSMISIONES VIVAS
     const worldCamsIniciales = [
       // CHILE
       { id: "ErUOGtBXhgY", city: "Santiago", sector: "Centro", country: "Chile", lat: -33.4489, lng: -70.6693, desc: "Capital Nacional" },
@@ -601,21 +601,26 @@
       { id: "M_Qk3Bv0-So", city: "La Serena", sector: "Avenida del Mar", country: "Chile", lat: -29.9027, lng: -71.2519, desc: "Faro y Costanera" },
       { id: "HirKZqakDIA", city: "Concepción", sector: "Centro", country: "Chile", lat: -36.8270, lng: -73.0503, desc: "Biobío Urbano" },
 
-      // INTERNACIONALES VERIFICADAS Y ACTIVAS
-      { id: "sZlQOm7NJK8", city: "Río de Janeiro", sector: "Copacabana", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana Posto 3" },
-      { id: "cKba5JJoxR4", city: "Buenos Aires", sector: "Obelisco", country: "Argentina", lat: -34.6037, lng: -58.3816, desc: "Avenida 9 de Julio" },
-      { id: "ZKRLgQtKTH4", city: "Moscú", sector: "Plaza Roja", country: "Rusia", lat: 55.7558, lng: 37.6173, desc: "Centro Histórico y Kremlin" },
-      { id: "1j4YuhBK3D4", city: "Berlín", sector: "Puerta de Brandeburgo", country: "Alemania", lat: 52.5163, lng: 13.3777, desc: "Pariser Platz" },
+      // SUDAMÉRICA
+      { id: "5Xl6pSgiy3A", city: "Río de Janeiro", sector: "Copacabana", country: "Brasil", lat: -22.9711, lng: -43.1822, desc: "Playa Copacabana en Vivo" },
+      { id: "NfsyRx50gAI", city: "Buenos Aires", sector: "Obelisco", country: "Argentina", lat: -34.6037, lng: -58.3816, desc: "Avenida 9 de Julio / Obelisco" },
 
-      // ESTADOS UNIDOS & EUROPA
-      { id: "EO_1LWqsCNE", city: "Los Ángeles", sector: "Venice Beach", country: "Estados Unidos", lat: 33.9850, lng: -118.4695, desc: "Boardwalk California" },
-      { id: "JQ_jwk_7OVE", city: "Nueva York", sector: "Times Square", country: "Estados Unidos", lat: 40.7580, lng: -73.9855, desc: "Times Square North 4K" },
+      // EUROPA & RUSIA
+      { id: "w_Dg2vC0tUE", city: "Moscú", sector: "Plaza Roja", country: "Rusia", lat: 55.7558, lng: 37.6173, desc: "Plaza Roja y Kremlin" },
+      { id: "IRqboacDNFg", city: "Berlín", sector: "Puerta de Brandeburgo", country: "Alemania", lat: 52.5163, lng: 13.3777, desc: "Puerta de Brandeburgo" },
       { id: "asO_10T0k2k", city: "Cannes", sector: "Playa", country: "Francia", lat: 43.5528, lng: 7.0174, desc: "Costa Azul / Boulevard de la Croisette" },
       { id: "2GgaZAqFE5U", city: "Londres", sector: "Tower Bridge", country: "Reino Unido", lat: 51.5055, lng: -0.0754, desc: "Tower Bridge y Río Támesis" },
-      { id: "mt7uE-n0YPI", city: "Venecia", sector: "Puente Rialto", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal de Venecia" }
+      { id: "mt7uE-n0YPI", city: "Venecia", sector: "Puente Rialto", country: "Italia", lat: 45.4371, lng: 12.3326, desc: "Gran Canal de Venecia" },
+
+      // ESTADOS UNIDOS
+      { id: "EO_1LWqsCNE", city: "Los Ángeles", sector: "Venice Beach", country: "Estados Unidos", lat: 33.9850, lng: -118.4695, desc: "Boardwalk California" },
+      { id: "JQ_jwk_7OVE", city: "Nueva York", sector: "Times Square", country: "Estados Unidos", lat: 40.7580, lng: -73.9855, desc: "Times Square North 4K" }
     ];
 
-    let worldCams = JSON.parse(localStorage.getItem('earthcam_garden_cams')) || worldCamsIniciales;
+    // Clave v3 para asegurar que no se hereden posiciones erróneas en el navegador
+    let worldCams = JSON.parse(localStorage.getItem('earthcam_garden_cams_v3')) || worldCamsIniciales;
+    localStorage.setItem('earthcam_garden_cams_v3', JSON.stringify(worldCams));
+
     let isAdmin = sessionStorage.getItem('is_admin') === 'true';
     let currentSelectedCam = null;
     let isAutoRotating = false;
@@ -645,7 +650,7 @@
     const btnSubmitCam = document.getElementById('btnSubmitCam');
     const btnDeleteCam = document.getElementById('btnDeleteCam');
 
-    // CONFIGURACIÓN DE PUNTOS LIMPIOS Y 100% CLICABLES (SIN CILINDROS 3D)
+    // GLOBO ESTÁTICO, SIN CILINDROS 3D Y CON RESPUESTA DIRECTA A CLICS
     const globe = Globe()
       (document.getElementById('globeViz'))
       .globeImageUrl('https://unpkg.com/three-globe/example/img/earth-blue-marble.jpg')
@@ -654,12 +659,12 @@
       .atmosphereColor('#00ff66')
       .atmosphereAltitude(0.18)
       
-      // PUNTOS VERDES PLANOS Y CON DETECCIÓN DE CLIC DIRECTA
+      // PUNTOS VERDES PLANOS (ALTURA 0) Y CLICABLES
       .pointsData(worldCams)
       .pointLat(d => d.lat)
       .pointLng(d => d.lng)
-      .pointAltitude(0) // Altura 0 para que no forme cilindros 3D
-      .pointRadius(0.8)
+      .pointAltitude(0)
+      .pointRadius(0.85)
       .pointColor(() => '#00ff66')
       .pointLabel(d => `
         <div class="custom-tooltip">
@@ -670,12 +675,12 @@
       `)
       .onPointClick(d => selectCamera(d))
 
-      // ONDA DISCRETA Y PEQUEÑA (SOLO BRILLO SOBRE EL PUNTO)
+      // ONDA SUTIL (BRILLO EN EL PUNTO)
       .ringsData(worldCams)
       .ringLat(d => d.lat)
       .ringLng(d => d.lng)
       .ringColor(() => (t) => `rgba(0, 255, 102, ${1 - t * 0.9})`)
-      .ringMaxRadius(0.9) // Radio muy pequeño: brillo centrado
+      .ringMaxRadius(0.8)
       .ringPropagationSpeed(1.2)
       .ringRepeatPeriod(1300);
 
@@ -939,7 +944,7 @@
 
           const newCam = { id: videoId, city, sector: desc, country, lat, lng, desc };
           worldCams.unshift(newCam);
-          localStorage.setItem('earthcam_garden_cams', JSON.stringify(worldCams));
+          localStorage.setItem('earthcam_garden_cams_v3', JSON.stringify(worldCams));
 
           refreshGlobeData();
           formAddWorldCam.reset();
@@ -960,7 +965,7 @@
       if (!isAdmin || !currentSelectedCam) return;
       if (confirm(`¿Eliminar la cámara "${currentSelectedCam.city} - ${currentSelectedCam.desc}"?`)) {
         worldCams = worldCams.filter(c => c !== currentSelectedCam);
-        localStorage.setItem('earthcam_garden_cams', JSON.stringify(worldCams));
+        localStorage.setItem('earthcam_garden_cams_v3', JSON.stringify(worldCams));
         refreshGlobeData();
         btnClose.click();
       }
