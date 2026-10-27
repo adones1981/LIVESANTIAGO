@@ -272,6 +272,34 @@
   width: 1px;
   height: 1px;
 }
+/* PANTALLA DIGITAL MARQUESINA RADIO DELOREAN */
+.mini-radio-screen {
+  background: #0d0d0d;
+  border: 1px solid #00ff66;
+  border-radius: 6px;
+  padding: 3px 6px;
+  width: 210px;
+  overflow: hidden;
+  white-space: nowrap;
+  box-shadow: inset 0 0 5px rgba(0, 255, 102, 0.3);
+}
+
+.mini-marquee {
+  display: inline-block;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  font-weight: 700;
+  color: #ff334b;
+  text-shadow: 0 0 6px #ff0000;
+  padding-left: 100%;
+  animation: mini-scroll-marquee 16s linear infinite;
+}
+
+@keyframes mini-scroll-marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+    
   </style>
 </head>
 <body>
@@ -284,21 +312,30 @@
         <p>Centro de Monitoreo Urbano</p>
       </div>
       <!-- MINI WIDGET RADIO DELOREAN -->
+<!-- MINI WIDGET RADIO DELOREAN CON PANTALLA DIGITAL -->
 <div class="mini-radio-bar">
   <span class="mini-radio-title">⚡ RADIO DELOREAN</span>
+
+  <!-- PANTALLA DIGITAL MARQUESINA -->
+  <div class="mini-radio-screen">
+    <div class="mini-marquee">
+      RADIO DELOREAN LA RADIO DEL FUTURO - CLASICOS DE LOS 80S Y 90S - MUSICA 24/7 - REALIZA EL VIAJE TEMPORAL CON TU MUSICA ⚡
+    </div>
+  </div>
+
   <button class="btn-radio-play" id="btnMiniRadioPlay" onclick="toggleMiniRadio()" title="Reproducir / Pausar">▶</button>
   <input type="range" class="mini-vol-slider" id="miniRadioVol" min="0" max="100" value="50" title="Volumen">
   
   <div class="mini-stations-group">
     <button class="btn-mini-station active" onclick="switchMiniStation('BuB9SaS2cWE', this)">1985</button>
     <button class="btn-mini-station" onclick="switchMiniStation('Nt27aBceerI', this)">ROCK</button>
-    <button class="btn-mini-station" onclick="switchMiniStation('UiCK7SCpSIA', this)">ROCK2</button>
+    <button class="btn-mini-station" onclick="switchMiniStation('W19rDfegcvM', this)">HEAVY</button>
     <button class="btn-mini-station" onclick="switchMiniStation('8UM7FNEbiYs', this)">1955</button>
-    <button class="btn-mini-station" onclick="switchMiniStation('34H1XIjnfKM', this)">TECHNO</button>
+    <button class="btn-mini-station" onclick="switchMiniStation('_kse217FeQ0', this)">2015</button>
     <button class="btn-mini-station" onclick="switchMiniStation('TSyjyTGoDro', this)">1885</button>
   </div>
 
-  <a href="https://radiodelorean.netlify.app/" target="_blank" class="btn-radio-link" title="Ir a Radio DeLorean">📻 RADIO ↗</a>
+  <a href="https://radiodelorean.netlify.app/" target="_blank" class="btn-radio-link" title="Abrir Radio DeLorean">📻 RADIO ↗</a>
 </div>
 
 <!-- Div oculto donde corre el audio en segundo plano -->
