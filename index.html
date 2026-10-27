@@ -174,6 +174,104 @@
 .admin-modal {
   display: none !important;
 }
+    /* --- MINI REPRODUCTOR COMPACTO RADIO DELOREAN --- */
+.mini-radio-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.65);
+  border: 1px solid var(--accent);
+  padding: 4px 10px;
+  border-radius: 20px;
+  box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
+}
+
+.mini-radio-title {
+  color: var(--accent);
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
+
+.btn-radio-play {
+  background: var(--accent);
+  color: #050811;
+  border: none;
+  border-radius: 50%;
+  width: 26px;
+  height: 26px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.15s ease;
+}
+
+.btn-radio-play:hover {
+  transform: scale(1.1);
+}
+
+.mini-vol-slider {
+  width: 55px;
+  height: 4px;
+  accent-color: var(--accent);
+  cursor: pointer;
+}
+
+.mini-stations-group {
+  display: flex;
+  gap: 3px;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding-left: 6px;
+}
+
+.btn-mini-station {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  border-radius: 4px;
+  padding: 2px 5px;
+  font-size: 0.6rem;
+  font-family: 'JetBrains Mono', monospace;
+  cursor: pointer;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.btn-mini-station:hover, .btn-mini-station.active {
+  background: var(--accent);
+  color: #050811;
+  border-color: var(--accent);
+}
+
+.btn-radio-link {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--border);
+  color: var(--muted);
+  border-radius: 6px;
+  padding: 3px 7px;
+  font-size: 0.65rem;
+  font-family: 'JetBrains Mono', monospace;
+  text-decoration: none;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.btn-radio-link:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+#radioHiddenPlayer {
+  position: absolute;
+  top: -1000px;
+  left: -1000px;
+  width: 1px;
+  height: 1px;
+}
   </style>
 </head>
 <body>
@@ -185,6 +283,26 @@
         <h1>CHILE <span>EN VIVO</span></h1>
         <p>Centro de Monitoreo Urbano</p>
       </div>
+      <!-- MINI WIDGET RADIO DELOREAN -->
+<div class="mini-radio-bar">
+  <span class="mini-radio-title">⚡ RADIO</span>
+  <button class="btn-radio-play" id="btnMiniRadioPlay" onclick="toggleMiniRadio()" title="Reproducir / Pausar">▶</button>
+  <input type="range" class="mini-vol-slider" id="miniRadioVol" min="0" max="100" value="50" title="Volumen">
+  
+  <div class="mini-stations-group">
+    <button class="btn-mini-station active" onclick="switchMiniStation('BuB9SaS2cWE', this)">1985</button>
+    <button class="btn-mini-station" onclick="switchMiniStation('Nt27aBceerI', this)">ROCK</button>
+    <button class="btn-mini-station" onclick="switchMiniStation('W19rDfegcvM', this)">HEAVY</button>
+    <button class="btn-mini-station" onclick="switchMiniStation('8UM7FNEbiYs', this)">1955</button>
+    <button class="btn-mini-station" onclick="switchMiniStation('_kse217FeQ0', this)">2015</button>
+    <button class="btn-mini-station" onclick="switchMiniStation('TSyjyTGoDro', this)">1885</button>
+  </div>
+
+  <a href="https://radiodelorean.blogspot.com" target="_blank" class="btn-radio-link" title="Ir a Radio DeLorean">📻 RADIO ↗</a>
+</div>
+
+<!-- Div oculto donde corre el audio en segundo plano -->
+<div id="radioHiddenPlayer"></div>
     </div>
     <div class="header-actions">
       <a href="mundo.html" class="btn-world">🌍 BUSCAR POR EL MUNDO</a>
@@ -193,6 +311,7 @@
            <button class="btn-admin" id="btnAdmin">🔒 ACCESO ADMIN</button>
       <div class="clock-badge">HORA CHILE: <span id="reloj">--:--:--</span></div>
     </div>
+    
   </header>
 
   <div class="container">
@@ -497,6 +616,63 @@
     renderPills();
     actualizarVistaAdmin();
     initCounter();
+    /* --- REPRODUCTOR EN SEGUNDO PLANO RADIO DELOREAN --- */
+let radioAudioPlayer = null;
+let currentStationId = 'BuB9SaS2cWE';
+
+// Inyectar API de YouTube para la radio
+(function initRadioApi() {
+  const ytScript = document.createElement('script');
+  ytScript.src = "https://www.youtube.com/iframe_api";
+  document.head.appendChild(ytScript);
+})();
+
+// Callback oficial de la API de YouTube
+window.onYouTubeIframeAPIReady = function() {
+  radioAudioPlayer = new YT.Player('radioHiddenPlayer', {
+    height: '1',
+    width: '1',
+    videoId: currentStationId,
+    playerVars: { autoplay: 0, controls: 0 },
+    events: {
+      'onReady': function() {
+        radioAudioPlayer.setVolume(50);
+      }
+    }
+  });
+};
+
+function toggleMiniRadio() {
+  if (!radioAudioPlayer || typeof radioAudioPlayer.getPlayerState !== 'function') return;
+  const btn = document.getElementById('btnMiniRadioPlay');
+  
+  if (radioAudioPlayer.getPlayerState() === 1) { // Si está reproduciendo
+    radioAudioPlayer.pauseVideo();
+    btn.textContent = '▶';
+  } else {
+    radioAudioPlayer.playVideo();
+    btn.textContent = '⏸';
+  }
+}
+
+function switchMiniStation(videoId, btnEl) {
+  currentStationId = videoId;
+  const btnPlay = document.getElementById('btnMiniRadioPlay');
+
+  if (radioAudioPlayer && typeof radioAudioPlayer.loadVideoById === 'function') {
+    radioAudioPlayer.loadVideoById(videoId);
+    btnPlay.textContent = '⏸';
+  }
+
+  document.querySelectorAll('.btn-mini-station').forEach(b => b.classList.remove('active'));
+  btnEl.classList.add('active');
+}
+
+document.getElementById('miniRadioVol').addEventListener('input', (e) => {
+  if (radioAudioPlayer && typeof radioAudioPlayer.setVolume === 'function') {
+    radioAudioPlayer.setVolume(e.target.value);
+  }
+});
   </script>
 </body>
 </html>
