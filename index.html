@@ -3,395 +3,851 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chile Live Cams | Monitoreo en Vivo</title>
+  <title>LiveChile | Cámaras en Vivo</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600;700&family=Plus+Jakarta+Sans:wght@500;700;800&display=swap" rel="stylesheet">
+
   <style>
     :root {
-      --bg: #07090e;
-      --card-bg: rgba(15, 21, 35, 0.75);
-      --border: rgba(255, 255, 255, 0.08);
-      --border-hover: rgba(0, 229, 255, 0.35);
-      --accent: #00e5ff;
+      --bg: #020813;
+      --accent: #00ff66;
+      --accent-glow: rgba(0, 255, 102, 0.45);
       --live-red: #ff334b;
+      --card-bg: rgba(10, 17, 33, 0.95);
+      --border: rgba(255, 255, 255, 0.16);
       --text: #f1f5f9;
       --muted: #94a3b8;
     }
 
-    * { box-sizing: border-box; margin: 0; padding: 0; }
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
     body {
       background-color: var(--bg);
       color: var(--text);
       font-family: 'Plus Jakarta Sans', sans-serif;
       min-height: 100vh;
-      display: flex;
-      flex-direction: column;
-      background-image: 
-        radial-gradient(circle at 10% 10%, rgba(0, 229, 255, 0.03) 0%, transparent 40%),
-        radial-gradient(circle at 90% 90%, rgba(255, 51, 75, 0.03) 0%, transparent 40%);
+      padding-bottom: 75px;
     }
 
+    /* HEADER */
     header {
-      background: rgba(10, 15, 26, 0.9);
-      backdrop-filter: blur(14px);
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
       border-bottom: 1px solid var(--border);
-      padding: 0.9rem 1.5rem;
-      position: sticky;
-      top: 0;
-      z-index: 100;
+      padding: 0.75rem 1.5rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       flex-wrap: wrap;
+      gap: 0.85rem;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+    }
+
+    .brand-group {
+      display: flex;
+      align-items: center;
       gap: 1rem;
     }
 
-    .brand { display: flex; align-items: center; gap: 0.75rem; }
-
-    .brand-logo {
-      width: 36px; height: 36px; border-radius: 8px;
-      background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent);
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
+    .btn-nav-mundo {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      padding: 0.45rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-decoration: none;
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: all 0.2s ease;
     }
 
-    .brand-logo svg { width: 18px; height: 18px; fill: var(--accent); }
-    .brand-text h1 { font-size: 1.15rem; font-weight: 700; color: #fff; line-height: 1.2; }
-    .brand-text h1 span { color: var(--accent); }
-    .brand-text p { font-size: 0.75rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; }
+    .btn-nav-mundo:hover {
+      background: var(--accent);
+      color: #07090e;
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
 
-    .header-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
+    .brand-title h1 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      line-height: 1.1;
+    }
 
-    .btn-world {
-      background: linear-gradient(135deg, rgba(0, 255, 204, 0.15), rgba(0, 229, 255, 0.25));
+    .brand-title h1 span {
+      color: var(--accent);
+    }
+
+    .brand-title p {
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    /* MINI RADIO DELOREAN */
+    .mini-radio-bar {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(0, 0, 0, 0.65);
       border: 1px solid var(--accent);
-      color: #fff; padding: 0.5rem 1rem; border-radius: 8px;
-      font-size: 0.82rem; font-weight: 700; text-decoration: none;
-      display: inline-flex; align-items: center; gap: 0.5rem;
-      font-family: 'JetBrains Mono', monospace; transition: all 0.25s ease;
+      padding: 4px 10px;
+      border-radius: 20px;
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
     }
 
-    .btn-world:hover { background: var(--accent); color: #07090e; }
-
-    .btn-admin {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
-      color: var(--muted); padding: 0.45rem 0.8rem; border-radius: 6px;
-      font-size: 0.78rem; cursor: pointer; font-family: 'JetBrains Mono', monospace;
+    .mini-radio-title {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: bold;
     }
 
-    .btn-admin.active { border-color: var(--accent); color: var(--accent); }
-
-    .btn-add, .btn-export {
-      background: rgba(0, 229, 255, 0.12); border: 1px solid var(--accent);
-      color: var(--accent); padding: 0.45rem 0.9rem; border-radius: 6px;
-      font-size: 0.82rem; font-weight: 600; cursor: pointer; display: none;
-      align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', monospace;
+    .mini-radio-screen {
+      background: #0d0d0d;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 2px 6px;
+      width: 170px;
+      overflow: hidden;
+      white-space: nowrap;
     }
 
-    .btn-export { border-color: #a855f7; color: #d8b4fe; background: rgba(168, 85, 247, 0.15); }
-    .btn-export:hover { background: #a855f7; color: #fff; }
-
-    .clock-badge {
-      font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
-      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);
-      padding: 0.45rem 0.85rem; border-radius: 6px; display: flex; align-items: center; gap: 0.5rem;
+    .mini-marquee {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      font-weight: 700;
+      color: #ff334b;
+      text-shadow: 0 0 6px #ff0000;
+      padding-left: 100%;
+      animation: mini-scroll 16s linear infinite;
     }
 
-    .clock-badge span { color: var(--accent); font-weight: 700; }
-
-    .container { max-width: 1650px; margin: 0 auto; padding: 1.5rem; width: 100%; flex: 1; }
-
-    .admin-form-panel {
-      display: none; background: rgba(18, 25, 42, 0.95); border: 1px solid var(--accent);
-      border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;
-      box-shadow: 0 8px 30px rgba(0, 229, 255, 0.15);
+    @keyframes mini-scroll {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
     }
 
-    .admin-form-panel.open { display: block; }
-    .admin-panel-header { font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; color: var(--accent); display: flex; justify-content: space-between; align-items: center; }
-    .form-grid { display: grid; grid-template-columns: 2fr 1fr 1fr auto auto; gap: 0.75rem; align-items: center; }
-
-    .input-field {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
-      border-radius: 6px; padding: 0.6rem 0.85rem; color: #fff; font-size: 0.85rem; outline: none; width: 100%;
+    .btn-radio-play {
+      background: var(--accent);
+      color: #050811;
+      border: none;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
-    .input-field:focus { border-color: var(--accent); }
-    .btn-save { background: var(--accent); color: #07090e; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
-    .btn-cancel { background: rgba(255, 255, 255, 0.1); color: var(--text); border: none; padding: 0.6rem 0.9rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; }
-
-    .filters-section { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.75rem; }
-    .search-wrapper { position: relative; max-width: 420px; width: 100%; }
-
-    .search-wrapper input {
-      width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.65rem 1rem 0.65rem 2.3rem; color: #fff; font-size: 0.88rem; outline: none;
+    .mini-vol-slider {
+      width: 48px;
+      height: 4px;
+      accent-color: var(--accent);
+      cursor: pointer;
     }
 
-    .search-wrapper input:focus { border-color: var(--accent); }
-    .search-icon { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; fill: var(--muted); }
-
-    .city-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-    .city-pill {
-      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);
-      color: var(--muted); padding: 0.4rem 0.85rem; border-radius: 20px; font-size: 0.8rem;
-      cursor: pointer; display: flex; align-items: center; gap: 0.4rem;
+    .mini-stations-group {
+      display: flex;
+      gap: 3px;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+      padding-left: 6px;
     }
 
-    .city-pill.active { background: rgba(0, 229, 255, 0.12); border-color: var(--accent); color: var(--accent); }
-    .city-pill .pill-count { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; background: rgba(255, 255, 255, 0.08); padding: 0.1rem 0.4rem; border-radius: 10px; }
-    .city-pill.active .pill-count { background: var(--accent); color: #07090e; font-weight: 700; }
+    .btn-mini-station {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: #fff;
+      border-radius: 4px;
+      padding: 2px 5px;
+      font-size: 0.6rem;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+    }
 
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.25rem; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s; }
-    .card:hover { transform: translateY(-2px); border-color: var(--border-hover); }
-    .card-header { padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.25); border-bottom: 1px solid var(--border); }
-    .card-titles { overflow: hidden; display: flex; flex-direction: column; gap: 0.15rem; }
-    .card-city { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--accent); text-transform: uppercase; font-weight: 600; }
-    .card-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-    .card-controls { display: flex; align-items: center; gap: 0.4rem; }
+    .btn-mini-station.active {
+      background: var(--accent);
+      color: #050811;
+      border-color: var(--accent);
+      font-weight: bold;
+    }
 
-    .btn-edit, .btn-del { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border); border-radius: 4px; padding: 0.25rem 0.45rem; font-size: 0.72rem; cursor: pointer; display: none; color: var(--text); }
-    .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
-    .btn-del:hover { border-color: var(--live-red); color: var(--live-red); }
+    .btn-radio-link {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      border-radius: 6px;
+      padding: 3px 7px;
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-decoration: none;
+      font-weight: 700;
+    }
 
-    .badge-live { display: inline-flex; align-items: center; gap: 0.35rem; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 700; color: var(--live-red); background: rgba(255, 51, 75, 0.12); border: 1px solid rgba(255, 51, 75, 0.3); padding: 0.2rem 0.5rem; border-radius: 4px; }
-    .dot { width: 6px; height: 6px; background: var(--live-red); border-radius: 50%; }
+    /* CONTENEDOR */
+    .layout-container {
+      max-width: 1300px;
+      margin: 1.25rem auto;
+      padding: 0 1.25rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
 
-    .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; background: #000; }
-    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+    /* CLIMA PORTADA */
+    .weather-box {
+      background: var(--card-bg);
+      border: 1px solid var(--accent);
+      border-radius: 14px;
+      padding: 1rem 1.25rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 255, 102, 0.15);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
 
-    footer { border-top: 1px solid var(--border); padding: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; font-size: 0.78rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; background: rgba(10, 15, 26, 0.5); }
-    .counter-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); padding: 0.35rem 0.85rem; border-radius: 20px; }
-    .counter-number { color: var(--accent); font-weight: 700; }
+    .weather-box-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 8px;
+    }
 
-    @media (max-width: 768px) { .form-grid, .grid { grid-template-columns: 1fr; } }
-    /* OCULTAR ACCESO ADMIN EN CHILE */
-.btn-admin,
-#btnAdmin,
-.admin-modal {
-  display: none !important;
-}
-    /* --- MINI REPRODUCTOR COMPACTO RADIO DELOREAN --- */
-.mini-radio-bar {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  background: rgba(0, 0, 0, 0.65);
-  border: 1px solid var(--accent);
-  padding: 4px 10px;
-  border-radius: 20px;
-  box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
-}
+    .weather-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fff;
+    }
 
-.mini-radio-title {
-  color: var(--accent);
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.7rem;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-}
+    .weather-title span { color: var(--accent); }
 
-.btn-radio-play {
-  background: var(--accent);
-  color: #050811;
-  border: none;
-  border-radius: 50%;
-  width: 26px;
-  height: 26px;
-  font-size: 0.75rem;
-  cursor: pointer;
-  font-weight: bold;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: transform 0.15s ease;
-}
+    .weather-search-row {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 2px 8px;
+      gap: 6px;
+    }
 
-.btn-radio-play:hover {
-  transform: scale(1.1);
-}
+    .weather-search-row input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 0.78rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      width: 170px;
+    }
 
-.mini-vol-slider {
-  width: 55px;
-  height: 4px;
-  accent-color: var(--accent);
-  cursor: pointer;
-}
+    .btn-weather-go {
+      background: var(--accent);
+      color: #07090e;
+      border: none;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 0.68rem;
+      font-weight: 800;
+      font-family: 'JetBrains Mono', monospace;
+      cursor: pointer;
+    }
 
-.mini-stations-group {
-  display: flex;
-  gap: 3px;
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
-  padding-left: 6px;
-}
+    .weather-data-grid {
+      display: grid;
+      grid-template-columns: 240px 1fr;
+      gap: 12px;
+    }
 
-.btn-mini-station {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  border-radius: 4px;
-  padding: 2px 5px;
-  font-size: 0.6rem;
-  font-family: 'JetBrains Mono', monospace;
-  cursor: pointer;
-  font-weight: 600;
-  transition: all 0.2s ease;
-}
+    @media (max-width: 800px) {
+      .weather-data-grid { grid-template-columns: 1fr; }
+    }
 
-.btn-mini-station:hover, .btn-mini-station.active {
-  background: var(--accent);
-  color: #050811;
-  border-color: var(--accent);
-}
+    .today-weather-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(0, 255, 102, 0.3);
+      border-radius: 10px;
+      padding: 10px 12px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+    }
 
-.btn-radio-link {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--border);
-  color: var(--muted);
-  border-radius: 6px;
-  padding: 3px 7px;
-  font-size: 0.65rem;
-  font-family: 'JetBrains Mono', monospace;
-  text-decoration: none;
-  font-weight: 700;
-  transition: all 0.2s;
-}
+    .today-city {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      color: var(--accent);
+      font-weight: 700;
+    }
 
-.btn-radio-link:hover {
-  border-color: var(--accent);
-  color: var(--accent);
-}
+    .today-temp {
+      font-size: 2.2rem;
+      font-weight: 800;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      line-height: 1;
+    }
 
-#radioHiddenPlayer {
-  position: absolute;
-  top: -1000px;
-  left: -1000px;
-  width: 1px;
-  height: 1px;
-}
-/* PANTALLA DIGITAL MARQUESINA RADIO DELOREAN */
-.mini-radio-screen {
-  background: #0d0d0d;
-  border: 1px solid #00ff66;
-  border-radius: 6px;
-  padding: 3px 6px;
-  width: 210px;
-  overflow: hidden;
-  white-space: nowrap;
-  box-shadow: inset 0 0 5px rgba(0, 255, 102, 0.3);
-}
+    .today-state {
+      font-size: 0.8rem;
+      color: #cbd5e1;
+      font-weight: 600;
+    }
 
-.mini-marquee {
-  display: inline-block;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.65rem;
-  font-weight: 700;
-  color: #ff334b;
-  text-shadow: 0 0 6px #ff0000;
-  padding-left: 100%;
-  animation: mini-scroll-marquee 16s linear infinite;
-}
+    .today-subdata {
+      font-size: 0.68rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      display: flex;
+      justify-content: space-between;
+    }
 
-@keyframes mini-scroll-marquee {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
-    
+    .forecast-4days {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    @media (max-width: 550px) {
+      .forecast-4days { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    .forecast-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 8px 4px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .forecast-day {
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+      font-weight: bold;
+    }
+
+    .forecast-icon { font-size: 1.25rem; margin: 2px 0; }
+
+    .forecast-temps {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.72rem;
+      display: flex;
+      justify-content: center;
+      gap: 6px;
+    }
+
+    .temp-high { color: #fff; font-weight: 700; }
+    .temp-low { color: var(--muted); }
+
+    /* GRILLAS DE CÁMARAS CON REPRODUCTOR DIRECTO */
+    .section-title {
+      font-size: 0.95rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.4rem;
+    }
+
+    .section-title span { color: var(--accent); }
+
+    .cameras-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(290px, 1fr));
+      gap: 1.25rem;
+    }
+
+    .camera-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all 0.2s ease;
+      position: relative;
+    }
+
+    .camera-card:hover {
+      border-color: var(--accent);
+      box-shadow: 0 6px 20px rgba(0, 255, 102, 0.15);
+    }
+
+    /* IFRAME DIRECTO PARA DARLE PLAY AL INICIO */
+    .cam-direct-player {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      background: #000;
+    }
+
+    .cam-direct-player iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    .camera-footer-info {
+      padding: 0.65rem 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 6px;
+      background: rgba(0, 0, 0, 0.3);
+    }
+
+    .camera-text-block {
+      overflow: hidden;
+      cursor: pointer;
+    }
+
+    .camera-name {
+      font-size: 0.82rem;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .camera-city {
+      font-size: 0.68rem;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+    }
+
+    .camera-actions {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .btn-inspect-cam {
+      background: rgba(0, 255, 102, 0.12);
+      border: 1px solid var(--accent);
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      padding: 3px 6px;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+
+    .btn-inspect-cam:hover {
+      background: var(--accent);
+      color: #07090e;
+    }
+
+    .btn-favorite {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--border);
+      color: #fff;
+      border-radius: 50%;
+      width: 26px;
+      height: 26px;
+      font-size: 0.75rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .btn-favorite.active {
+      color: #ffd700;
+      border-color: #ffd700;
+      text-shadow: 0 0 8px rgba(255, 215, 0, 0.7);
+    }
+
+    /* MODAL DE VISTA DETALLADA */
+    .detail-modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(0, 0, 0, 0.88);
+      backdrop-filter: blur(12px);
+      z-index: 200;
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+    }
+
+    .detail-modal.active {
+      display: flex;
+    }
+
+    .detail-modal-box {
+      background: var(--card-bg);
+      border: 1px solid var(--accent);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 950px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9), 0 0 25px var(--accent-glow);
+      display: flex;
+      flex-direction: column;
+      gap: 1.1rem;
+      padding: 1.25rem;
+      position: relative;
+    }
+
+    .modal-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.6rem;
+    }
+
+    .modal-head h3 {
+      font-size: 1.05rem;
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .modal-head p {
+      font-size: 0.72rem;
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .btn-close-modal {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.8rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .btn-close-modal:hover { color: #fff; }
+
+    .modal-big-player {
+      position: relative;
+      width: 100%;
+      padding-top: 56.25%;
+      background: #000;
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+    }
+
+    .modal-big-player iframe {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* TIRA HORIZONTAL DE LA MISMA CIUDAD */
+    .siblings-area h4 {
+      font-size: 0.75rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+    }
+
+    .siblings-strip {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 6px;
+    }
+
+    .siblings-strip::-webkit-scrollbar { height: 6px; }
+    .siblings-strip::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 3px; }
+
+    .sibling-item {
+      flex: 0 0 160px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .sibling-item.active, .sibling-item:hover {
+      border-color: var(--accent);
+      transform: scale(1.03);
+    }
+
+    .sibling-thumb {
+      width: 100%;
+      height: 90px;
+      object-fit: cover;
+      display: block;
+    }
+
+    .sibling-title {
+      padding: 4px 6px;
+      font-size: 0.68rem;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .modal-extras-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    @media (max-width: 700px) {
+      .modal-extras-grid { grid-template-columns: 1fr; }
+    }
+
+    .modal-weather-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 0.85rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 6px;
+    }
+
+    .modal-map-frame {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      height: 180px;
+      background: #000;
+    }
+
+    .modal-map-frame iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+    }
+
+    /* FOOTER CONTADOR FIJO */
+    .footer-counter {
+      position: fixed;
+      bottom: 12px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 50;
+      pointer-events: none;
+    }
+
+    .visits-box {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(10, 17, 33, 0.9);
+      border: 1px solid var(--accent);
+      backdrop-filter: blur(12px);
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-family: 'JetBrains Mono', monospace;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.8), 0 0 15px var(--accent-glow);
+    }
+
+    .visits-label {
+      font-size: 0.68rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .visits-number {
+      font-size: 0.85rem;
+      font-weight: 800;
+      color: var(--accent);
+      text-shadow: 0 0 8px var(--accent-glow);
+      letter-spacing: 2px;
+    }
+
+    #radioHiddenPlayer {
+      position: absolute;
+      top: -1000px;
+      left: -1000px;
+      width: 1px;
+      height: 1px;
+    }
   </style>
 </head>
 <body>
 
+  <!-- HEADER ORIGINAL CON ENLACE AL GLOBO MUNDIAL -->
   <header>
-    <div class="brand">
-      <div class="brand-logo"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg></div>
-      <div class="brand-text">
-        <h1>CHILE <span>EN VIVO</span></h1>
-        <p>Centro de Monitoreo Urbano</p>
+    <div class="brand-group">
+      <a href="mundo.html" class="btn-nav-mundo" title="Explorador 3D del Mundo">🌍 MUNDO</a>
+      <div class="brand-title">
+        <h1>LIVE<span>CHILE</span></h1>
+        <p>CÁMARAS EN VIVO Y TIEMPO REAL</p>
       </div>
-      <!-- MINI WIDGET RADIO DELOREAN -->
-<!-- MINI WIDGET RADIO DELOREAN CON PANTALLA DIGITAL -->
-<div class="mini-radio-bar">
-  <span class="mini-radio-title">⚡ RADIO DELOREAN</span>
-
-  <!-- PANTALLA DIGITAL MARQUESINA -->
-  <div class="mini-radio-screen">
-    <div class="mini-marquee">
-      RADIO DELOREAN LA RADIO DEL FUTURO - CLASICOS DE LOS 80S Y 90S - MUSICA 24/7 - REALIZA EL VIAJE TEMPORAL CON TU MUSICA ⚡
     </div>
-  </div>
 
-  <button class="btn-radio-play" id="btnMiniRadioPlay" onclick="toggleMiniRadio()" title="Reproducir / Pausar">▶</button>
-  <input type="range" class="mini-vol-slider" id="miniRadioVol" min="0" max="100" value="50" title="Volumen">
-  
-  <div class="mini-stations-group">
-    <button class="btn-mini-station active" onclick="switchMiniStation('BuB9SaS2cWE', this)">1985</button>
-    <button class="btn-mini-station" onclick="switchMiniStation('Nt27aBceerI', this)">ROCK</button>
-    <button class="btn-mini-station" onclick="switchMiniStation('34H1XIjnfKM', this)">TECHNO</button>
-    <button class="btn-mini-station" onclick="switchMiniStation('8UM7FNEbiYs', this)">1955</button>
-    <button class="btn-mini-station" onclick="switchMiniStation('3LWMFjRZQ6k', this)">METAL</button>
-    <button class="btn-mini-station" onclick="switchMiniStation('TSyjyTGoDro', this)">1885</button>
-  </div>
+    <!-- MINI RADIO DELOREAN -->
+    <div class="mini-radio-bar">
+      <span class="mini-radio-title">⚡ RADIO DELOREAN</span>
+      <div class="mini-radio-screen">
+        <div class="mini-marquee">
+          RADIO DELOREAN LA RADIO DEL FUTURO - CLASICOS DE LOS 80S Y 90S - MUSICA 24/7 - VIAJE TEMPORAL ⚡
+        </div>
+      </div>
+      <button class="btn-radio-play" id="btnMiniRadioPlay" onclick="toggleMiniRadio()" title="Play / Pausa">▶</button>
+      <input type="range" class="mini-vol-slider" id="miniRadioVol" min="0" max="100" value="50" title="Volumen">
+      
+      <div class="mini-stations-group">
+        <button class="btn-mini-station active" onclick="switchMiniStation('BuB9SaS2cWE', this)">1985</button>
+        <button class="btn-mini-station" onclick="switchMiniStation('Nt27aBceerI', this)">ROCK</button>
+        <button class="btn-mini-station" onclick="switchMiniStation('W19rDfegcvM', this)">HEAVY</button>
+        <button class="btn-mini-station" onclick="switchMiniStation('8UM7FNEbiYs', this)">1955</button>
+        <button class="btn-mini-station" onclick="switchMiniStation('_kse217FeQ0', this)">2015</button>
+        <button class="btn-mini-station" onclick="switchMiniStation('TSyjyTGoDro', this)">1885</button>
+      </div>
 
-  <a href="https://radiodelorean.netlify.app/" target="_blank" class="btn-radio-link" title="Abrir Radio DeLorean">📻 RADIO ↗</a>
-</div>
-
-<!-- Div oculto donde corre el audio en segundo plano -->
-<div id="radioHiddenPlayer"></div>
+      <a href="https://radiodelorean.netlify.app/" target="_blank" class="btn-radio-link" title="Abrir Radio DeLorean">📻 RADIO ↗</a>
     </div>
-    <div class="header-actions">
-      <a href="mundo.html" class="btn-world">🌍 BUSCAR POR EL MUNDO</a>
-      <button class="btn-add" id="btnToggleAdd">+ AGREGAR CÁMARA</button>
-      <button class="btn-export" id="btnExport" title="Copia el código para actualizar GitHub">📋 COPIAR PARA GITHUB</button>
-           <button class="btn-admin" id="btnAdmin">🔒 ACCESO ADMIN</button>
-      <div class="clock-badge">HORA CHILE: <span id="reloj">--:--:--</span></div>
-    </div>
-    
   </header>
 
-  <div class="container">
-    <div class="admin-form-panel" id="adminPanel">
-      <div class="admin-panel-header">
-        <span id="panelTitle">+ AGREGAR NUEVA CÁMARA</span>
-        <button class="btn-cancel" id="btnCancelEdit" type="button" style="display:none;">Cancelar</button>
-      </div>
-      <form class="form-grid" id="formCam">
-        <input type="hidden" id="editIndex" value="-1">
-        <input type="text" id="camUrl" class="input-field" placeholder="Enlace de YouTube..." required>
-        <input type="text" id="camTitle" class="input-field" placeholder="Nombre o sector..." required>
-        <select id="camCity" class="input-field">
-          <option value="Santiago">Santiago</option>
-          <option value="Valparaíso / Viña">Valparaíso / Viña</option>
-          <option value="Concepción">Concepción</option>
-          <option value="La Serena">La Serena</option>
-          <option value="Otras">Otras</option>
-        </select>
-        <button type="submit" class="btn-save">GUARDAR</button>
-      </form>
-    </div>
+  <div id="radioHiddenPlayer"></div>
 
-    <div class="filters-section">
-      <div class="search-wrapper">
-        <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-        <input type="text" id="filtroTexto" placeholder="Buscar por ciudad, comuna o sector...">
-      </div>
-      <div class="city-pills" id="cityPills"></div>
-    </div>
+  <main class="layout-container">
 
-    <div class="grid" id="gridCamaras"></div>
+    <!-- SECCIÓN CLIMA PRINCIPAL (SANTIAGO DEFAULT + BUSCADOR CHILENO) -->
+    <section class="weather-box">
+      <div class="weather-box-top">
+        <div class="weather-title">
+          <span>☁ METEOROLOGÍA EN VIVO</span> • SANTIAGO Y CHILE
+        </div>
+        <div class="weather-search-row">
+          <input type="text" id="weatherInput" placeholder="Buscar comuna o ciudad..." />
+          <button class="btn-weather-go" onclick="buscarClima()">IR</button>
+        </div>
+      </div>
+
+      <div class="weather-data-grid">
+        <div class="today-weather-card">
+          <div class="today-city" id="wCityLabel">SANTIAGO (HOY)</div>
+          <div style="display:flex; align-items:baseline; gap:8px;">
+            <div class="today-temp" id="wTemp">--°</div>
+            <div class="today-state" id="wState">Cargando...</div>
+          </div>
+          <div class="today-subdata">
+            <span id="wWind">Viento: -- km/h</span>
+            <span id="wApparent">Sensación: --°C</span>
+          </div>
+        </div>
+
+        <div class="forecast-4days" id="wForecastDays"></div>
+      </div>
+    </section>
+
+    <!-- SECCIÓN FAVORITOS -->
+    <section id="favsSection" style="display: none;">
+      <div class="section-title">
+        <span>⭐</span> MIS CÁMARAS FAVORITAS
+      </div>
+      <div class="cameras-grid" id="favsGrid"></div>
+    </section>
+
+    <!-- TODAS LAS CÁMARAS CON REPRODUCTOR DIRECTO PARA PLAY -->
+    <section>
+      <div class="section-title">
+        <span>🔴</span> CÁMARAS EN VIVO DE CHILE
+      </div>
+      <div class="cameras-grid" id="allCamsGrid"></div>
+    </section>
+
+  </main>
+
+  <!-- MODAL DE VISTA DETALLADA (CÁMARA GRANDE + HERMANAS + MAPA + CLIMA) -->
+  <div class="detail-modal" id="detailModal">
+    <div class="detail-modal-box">
+      <div class="modal-head">
+        <div>
+          <h3 id="modalTitle">Transmisión</h3>
+          <p id="modalSub">CIUDAD • SEÑAL EN DIRECTO</p>
+        </div>
+        <button class="btn-close-modal" onclick="cerrarDetalle()">&times;</button>
+      </div>
+
+      <div class="modal-big-player">
+        <iframe id="modalBigIframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+
+      <div class="siblings-area" id="siblingsArea" style="display: none;">
+        <h4>Otras cámaras en la misma ciudad:</h4>
+        <div class="siblings-strip" id="siblingsStrip"></div>
+      </div>
+
+      <div class="modal-extras-grid">
+        <div class="modal-weather-card">
+          <span style="font-size:0.75rem; color:var(--accent); font-family:'JetBrains Mono', monospace; font-weight:bold;">CLIMA EN LA ZONA</span>
+          <div style="display:flex; align-items:baseline; gap:8px;">
+            <span style="font-size:2rem; font-weight:800; font-family:'JetBrains Mono', monospace;" id="mWeatherTemp">--°C</span>
+            <span style="font-size:0.85rem; color:#cbd5e1;" id="mWeatherDesc">Consultando...</span>
+          </div>
+          <div style="font-size:0.72rem; color:var(--muted); font-family:'JetBrains Mono', monospace; display:flex; justify-content:space-between;">
+            <span id="mWeatherWind">Viento: -- km/h</span>
+            <span id="mWeatherRange">Máx: --° / Mín: --°</span>
+          </div>
+        </div>
+
+        <div class="modal-map-frame">
+          <iframe id="modalMapFrame" loading="lazy"></iframe>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <footer>
-    <div class="counter-badge"><span>VISITAS AL PANEL:</span> <span class="counter-number" id="visitCount">...</span></div>
-    <div>CHILE LIVE MONITOR • TRANSMISIONES EN TIEMPO REAL VÍA YOUTUBE</div>
+  <!-- FOOTER CONTADOR FIJO (BASE 77) -->
+  <footer class="footer-counter">
+    <div class="visits-box">
+      <span class="visits-label">👁 VISITAS:</span>
+      <span class="visits-number" id="visitCounter">000077</span>
+    </div>
   </footer>
 
   <script>
-    const ADMIN_PASSWORD = "9066819";
-
-    // ESTA ES LA LISTA PERMANENTE QUE SE ACTUALIZA EN GITHUB
+    /* 1. TUS CÁMARAS ACTIVAS */
     const camarasIniciales = [
       { id: "ErUOGtBXhgY", titulo: "tobalaba/ providencia", ciudad: "Santiago" },
       { id: "_Nrt155MExU", titulo: "peñalolen", ciudad: "Santiago" },
@@ -402,314 +858,332 @@
       { id: "RhdmP5017VM", titulo: " octava region ", ciudad: "concepcion" },
       { id: "tmS73xQ4zVc", titulo: "Valle nevado ", ciudad: "Santiago" },
       { id: "HirKZqakDIA", titulo: "los andes", ciudad: "los andes" },
-      { id: "5jPpMkg5daM", titulo: "valparaiso", ciudad: "Valparaiso" },
+      { id: "5jPpMkg5daM", titulo: "valparaiso", ciudad: "valparaiso" },
       { id: "U9YCYQe-VvE", titulo: "avendia chile", ciudad: "llolleo" },
-    
-      
-
- { id: "oAuX3x2ZKrc", titulo: "Faro Monumental", ciudad: "La Serena" },
-  { id: "INirmzQY8eg", titulo: "valparaiso ,", ciudad: "Valparaiso" },
-
-  { id: "bi2dPZtdKJo", titulo: "viña del mar", ciudad: "Viña del mar" },
- 
-  
-      
-     
-    
-     
-     { id: "Uyst_1Jvccc", titulo: "ñuñoa", ciudad: "Santiago" },
-      { id: "MIHl7F_0ayo", titulo: "playa las torpederas", ciudad: "Valparaiso" },
-      { id: "gW7OTeLXrI4", titulo: "playa acapulco", ciudad: "Viña del mar" },
-      { id: "ysqxSxIqiq0", titulo: "av peru", ciudad: "Viña del mar" },
+      { id: "MIHl7F_0ayo", titulo: "playa las torpederas", ciudad: "valparaiso" },
+      { id: "gW7OTeLXrI4", titulo: "playa acapulco", ciudad: "viña del mar" },
+      { id: "ysqxSxIqiq0", titulo: "av peru", ciudad: "viña del mar" },
       { id: "BVKRAzTSnB0", titulo: "observatorio ALMA", ciudad: "desierto de atacama" },
       { id: "FZnNn2VwSlc", titulo: "canal san carlos", ciudad: "Santiago" },
-
-
-      
-
+      { id: "WURM2xspdc", titulo: "Faro Monumental", ciudad: "La Serena" }
     ];
 
-    let camaras = JSON.parse(localStorage.getItem('chile_live_cams')) || camarasIniciales;
-    let isAdmin = sessionStorage.getItem('is_admin') === 'true';
-    let ciudadActiva = 'Todas';
-    let textoBusqueda = '';
-
-    const grid = document.getElementById('gridCamaras');
-    const cityPillsContainer = document.getElementById('cityPills');
-    const inputFiltro = document.getElementById('filtroTexto');
-    const btnAdmin = document.getElementById('btnAdmin');
-    const btnToggleAdd = document.getElementById('btnToggleAdd');
-    const btnExport = document.getElementById('btnExport');
-    const adminPanel = document.getElementById('adminPanel');
-    const formCam = document.getElementById('formCam');
-    const editIndexInput = document.getElementById('editIndex');
-    const panelTitle = document.getElementById('panelTitle');
-    const btnCancelEdit = document.getElementById('btnCancelEdit');
-
-    function extractYouTubeID(url) {
-      if (url.length === 11 && !url.includes('/') && !url.includes('.')) return url;
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-      const match = url.trim().match(regExp);
-      return (match && match[2].length === 11) ? match[2] : null;
-    }
-
-    btnAdmin.addEventListener('click', () => {
-      if (isAdmin) {
-        if (confirm('¿Cerrar sesión de administrador?')) {
-          isAdmin = false;
-          sessionStorage.removeItem('is_admin');
-          actualizarVistaAdmin();
-        }
-      } else {
-        const pass = prompt('Ingresa la contraseña de administrador:');
-        if (pass === ADMIN_PASSWORD) {
-          isAdmin = true;
-          sessionStorage.setItem('is_admin', 'true');
-          actualizarVistaAdmin();
-        } else if (pass !== null) {
-          alert('Contraseña incorrecta.');
-        }
-      }
-    });
-
-    function actualizarVistaAdmin() {
-      if (isAdmin) {
-        btnAdmin.textContent = '🔓 CERRAR ADMIN';
-        btnAdmin.classList.add('active');
-        btnToggleAdd.style.display = 'inline-flex';
-        btnExport.style.display = 'inline-flex';
-      } else {
-        btnAdmin.textContent = '🔒 ACCESO ADMIN';
-        btnAdmin.classList.remove('active');
-        btnToggleAdd.style.display = 'none';
-        btnExport.style.display = 'none';
-        adminPanel.classList.remove('open');
-      }
-      renderCamaras();
-    }
-
-    // BOTÓN EXPORTAR PARA PEGAR EN GITHUB
-    btnExport.addEventListener('click', () => {
-      const codigoExport = `const camarasIniciales = ${JSON.stringify(camaras, null, 2)};`;
-      navigator.clipboard.writeText(codigoExport).then(() => {
-        alert('¡Copiado al portapapeles!\n\nAhora abre index.html en GitHub, busca la línea "const camarasIniciales" y reemplázala con lo que acabas de copiar.');
-      });
-    });
-
-    btnToggleAdd.addEventListener('click', () => {
-      resetForm();
-      adminPanel.classList.toggle('open');
-      if (adminPanel.classList.contains('open')) document.getElementById('camUrl').focus();
-    });
-
-    formCam.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const rawUrl = document.getElementById('camUrl').value;
-      const title = document.getElementById('camTitle').value.trim();
-      const city = document.getElementById('camCity').value;
-      const index = parseInt(editIndexInput.value, 10);
-
-      const videoId = extractYouTubeID(rawUrl);
-      if (!videoId) return alert('Enlace de YouTube no válido.');
-
-      if (index >= 0) {
-        camaras[index] = { id: videoId, titulo: title, ciudad: city };
-      } else {
-        camaras.unshift({ id: videoId, titulo: title, ciudad: city });
-      }
-
-      localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
-      resetForm();
-      adminPanel.classList.remove('open');
-      renderPills();
-      renderCamaras();
-    });
-
-    function resetForm() {
-      formCam.reset();
-      editIndexInput.value = "-1";
-      panelTitle.textContent = "+ AGREGAR NUEVA CÁMARA";
-      btnCancelEdit.style.display = "none";
-    }
-
-    btnCancelEdit.addEventListener('click', () => {
-      resetForm();
-      adminPanel.classList.remove('open');
-    });
-
-    window.eliminarCamara = function(index) {
-      if (!isAdmin) return;
-      if (confirm(`¿Eliminar "${camaras[index].titulo}"?`)) {
-        camaras.splice(index, 1);
-        localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
-        renderPills();
-        renderCamaras();
-      }
+    const coordsChile = {
+      "santiago": { lat: -33.4489, lng: -70.6693 },
+      "san antonio": { lat: -33.5933, lng: -71.6075 },
+      "concepcion": { lat: -36.8270, lng: -73.0503 },
+      "los andes": { lat: -32.8338, lng: -70.5983 },
+      "valparaiso": { lat: -33.0472, lng: -71.6127 },
+      "llolleo": { lat: -33.6167, lng: -71.6167 },
+      "viña del mar": { lat: -33.0245, lng: -71.5518 },
+      "desierto de atacama": { lat: -23.8634, lng: -69.1328 },
+      "la serena": { lat: -29.9027, lng: -71.2519 }
     };
 
-    window.editarCamara = function(index) {
-      if (!isAdmin) return;
-      const cam = camaras[index];
-      editIndexInput.value = index;
-      document.getElementById('camUrl').value = `https://www.youtube.com/watch?v=${cam.id}`;
-      document.getElementById('camTitle').value = cam.titulo;
-      document.getElementById('camCity').value = cam.ciudad;
-      panelTitle.textContent = `✏️ EDITANDO: ${cam.titulo}`;
-      btnCancelEdit.style.display = "inline-block";
-      adminPanel.classList.add('open');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    const codigosWmo = {
+      0: { texto: "Despejado", icono: "☀️" },
+      1: { texto: "Mayormente despejado", icono: "🌤️" },
+      2: { texto: "Parcialmente nublado", icono: "⛅" },
+      3: { texto: "Nublado", icono: "☁️" },
+      45: { texto: "Niebla", icono: "🌫️" },
+      48: { texto: "Neblina", icono: "🌫️" },
+      51: { texto: "Llovizna", icono: "🌦️" },
+      61: { texto: "Lluvia ligera", icono: "🌧️" },
+      63: { texto: "Lluvia", icono: "🌧️" },
+      71: { texto: "Nieve", icono: "❄️" },
+      80: { texto: "Chubascos", icono: "🌧️" },
+      95: { texto: "Tormenta", icono: "⛈️" }
     };
 
-    function renderPills() {
-      const ciudades = ['Todas', ...new Set(camaras.map(c => c.ciudad))];
-      cityPillsContainer.innerHTML = '';
-      ciudades.forEach(c => {
-        const count = c === 'Todas' ? camaras.length : camaras.filter(cam => cam.ciudad === c).length;
-        const pill = document.createElement('button');
-        pill.className = `city-pill ${ciudadActiva === c ? 'active' : ''}`;
-        pill.innerHTML = `${c} <span class="pill-count">${count}</span>`;
-        pill.addEventListener('click', () => {
-          ciudadActiva = c;
-          renderPills();
-          renderCamaras();
-        });
-        cityPillsContainer.appendChild(pill);
-      });
+    function traducirWMO(code) {
+      return codigosWmo[code] || { texto: "Variable", icono: "🌤️" };
     }
 
-    function renderCamaras() {
-      grid.innerHTML = '';
-      const filtradas = camaras
-        .map((cam, originalIndex) => ({ ...cam, originalIndex }))
-        .filter(c => {
-          const matchCity = (ciudadActiva === 'Todas' || c.ciudad === ciudadActiva);
-          const matchText = c.titulo.toLowerCase().includes(textoBusqueda.toLowerCase()) || 
-                            c.ciudad.toLowerCase().includes(textoBusqueda.toLowerCase());
-          return matchCity && matchText;
-        });
+    /* 2. FAVORITOS */
+    let favorites = JSON.parse(localStorage.getItem('livechile_favs_v2')) || [];
 
-      if (filtradas.length === 0) {
-        grid.innerHTML = `<div style="grid-column: 1/-1; text-align: center; color: var(--muted); padding: 4rem;">No se encontraron cámaras activas.</div>`;
+    function toggleFav(camId, e) {
+      e.stopPropagation();
+      if (favorites.includes(camId)) {
+        favorites = favorites.filter(id => id !== camId);
+      } else {
+        favorites.push(camId);
+      }
+      localStorage.setItem('livechile_favs_v2', JSON.stringify(favorites));
+      renderAllCams();
+    }
+
+    /* 3. RENDERIZAR CÁMARAS CON PLAY DIRECTO */
+    const allCamsGrid = document.getElementById('allCamsGrid');
+    const favsGrid = document.getElementById('favsGrid');
+    const favsSection = document.getElementById('favsSection');
+
+    function createCard(cam) {
+      const isFav = favorites.includes(cam.id);
+      const card = document.createElement('div');
+      card.className = 'camera-card';
+      card.innerHTML = `
+        <div class="cam-direct-player">
+          <iframe src="https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=0&mute=1&rel=0" loading="lazy" allowfullscreen></iframe>
+        </div>
+        <div class="camera-footer-info">
+          <div class="camera-text-block" onclick="abrirDetalle('${cam.id}')">
+            <div class="camera-name" title="${cam.titulo}">${cam.titulo}</div>
+            <div class="camera-city">${cam.ciudad}</div>
+          </div>
+          <div class="camera-actions">
+            <button class="btn-inspect-cam" onclick="abrirDetalle('${cam.id}')" title="Ver en grande y mapa">🔍 VER</button>
+            <button class="btn-favorite ${isFav ? 'active' : ''}" onclick="toggleFav('${cam.id}', event)" title="Favorito">⭐</button>
+          </div>
+        </div>
+      `;
+      return card;
+    }
+
+    function renderAllCams() {
+      allCamsGrid.innerHTML = '';
+      favsGrid.innerHTML = '';
+
+      camarasIniciales.forEach(c => allCamsGrid.appendChild(createCard(c)));
+
+      const favs = camarasIniciales.filter(c => favorites.includes(c.id));
+      if (favs.length > 0) {
+        favsSection.style.display = 'block';
+        favs.forEach(c => favsGrid.appendChild(createCard(c)));
+      } else {
+        favsSection.style.display = 'none';
+      }
+    }
+
+    /* 4. MODAL VISTA DETALLADA */
+    const detailModal = document.getElementById('detailModal');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalSub = document.getElementById('modalSub');
+    const modalBigIframe = document.getElementById('modalBigIframe');
+    const siblingsArea = document.getElementById('siblingsArea');
+    const siblingsStrip = document.getElementById('siblingsStrip');
+    const mWeatherTemp = document.getElementById('mWeatherTemp');
+    const mWeatherDesc = document.getElementById('mWeatherDesc');
+    const mWeatherWind = document.getElementById('mWeatherWind');
+    const mWeatherRange = document.getElementById('mWeatherRange');
+    const modalMapFrame = document.getElementById('modalMapFrame');
+
+    function abrirDetalle(camId) {
+      const cam = camarasIniciales.find(c => c.id === camId);
+      if (!cam) return;
+
+      modalTitle.textContent = cam.titulo.toUpperCase();
+      modalSub.textContent = `${cam.ciudad.toUpperCase()} • EN VIVO`;
+      modalBigIframe.src = `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&rel=0`;
+
+      // Cámaras hermanas
+      const cNorm = cam.ciudad.trim().toLowerCase();
+      const hermanas = camarasIniciales.filter(c => c.ciudad.trim().toLowerCase() === cNorm);
+
+      siblingsStrip.innerHTML = '';
+      if (hermanas.length > 1) {
+        siblingsArea.style.display = 'block';
+        hermanas.forEach(h => {
+          const item = document.createElement('div');
+          item.className = `sibling-item ${h.id === cam.id ? 'active' : ''}`;
+          item.innerHTML = `
+            <img class="sibling-thumb" src="https://img.youtube.com/vi/${h.id}/mqdefault.jpg">
+            <div class="sibling-title">${h.titulo}</div>
+          `;
+          item.addEventListener('click', () => abrirDetalle(h.id));
+          siblingsStrip.appendChild(item);
+        });
+      } else {
+        siblingsArea.style.display = 'none';
+      }
+
+      // Google Maps embebido
+      modalMapFrame.src = `https://maps.google.com/maps?q=${encodeURIComponent(cam.ciudad + ', Chile')}&t=&z=12&ie=UTF8&iwloc=&output=embed`;
+
+      // Clima
+      cargarClimaModal(cam.ciudad);
+
+      detailModal.classList.add('active');
+    }
+
+    function cerrarDetalle() {
+      detailModal.classList.remove('active');
+      modalBigIframe.src = '';
+    }
+
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) cerrarDetalle();
+    });
+
+    async function cargarClimaModal(ciudad) {
+      mWeatherTemp.textContent = "--°C";
+      mWeatherDesc.textContent = "Consultando...";
+      const cNorm = ciudad.trim().toLowerCase();
+      const coords = coordsChile[cNorm] || coordsChile["santiago"];
+
+      try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${coords.lat}&longitude=${coords.lng}&current=temperature_2m,weather_code,wind_speed_10m&daily=temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=1`);
+        const data = await res.json();
+        const cur = data.current;
+        const cond = traducirWMO(cur.weather_code);
+
+        mWeatherTemp.textContent = `${Math.round(cur.temperature_2m)}°C`;
+        mWeatherDesc.textContent = `${cond.icono} ${cond.texto}`;
+        mWeatherWind.textContent = `Viento: ${Math.round(cur.wind_speed_10m)} km/h`;
+        mWeatherRange.textContent = `Máx: ${Math.round(data.daily.temperature_2m_max[0])}° / Mín: ${Math.round(data.daily.temperature_2m_min[0])}°`;
+      } catch (e) {
+        mWeatherDesc.textContent = "Error de satélite";
+      }
+    }
+
+    /* 5. CLIMA PRINCIPAL (SANTIAGO DEFAULT + 4 DÍAS) */
+    async function cargarClimaPortada(ciudad, lat, lng) {
+      const cityLabel = document.getElementById('wCityLabel');
+      const tempEl = document.getElementById('wTemp');
+      const stateEl = document.getElementById('wState');
+      const windEl = document.getElementById('wWind');
+      const apparentEl = document.getElementById('wApparent');
+      const forecastDays = document.getElementById('wForecastDays');
+
+      cityLabel.textContent = `${ciudad.toUpperCase()} (HOY)`;
+      stateEl.textContent = "Cargando...";
+
+      try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`);
+        const data = await res.json();
+
+        const cur = data.current;
+        const cond = traducirWMO(cur.weather_code);
+        tempEl.textContent = `${Math.round(cur.temperature_2m)}°`;
+        stateEl.textContent = `${cond.icono} ${cond.texto}`;
+        windEl.textContent = `Viento: ${Math.round(cur.wind_speed_10m)} km/h`;
+        apparentEl.textContent = `Sensación: ${Math.round(cur.apparent_temperature)}°C`;
+
+        forecastDays.innerHTML = '';
+        const dias = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
+
+        for (let i = 1; i <= 4; i++) {
+          const fDate = new Date(data.daily.time[i] + 'T00:00:00');
+          const dName = dias[fDate.getDay()];
+          const dCond = traducirWMO(data.daily.weather_code[i]);
+          const dMax = Math.round(data.daily.temperature_2m_max[i]);
+          const dMin = Math.round(data.daily.temperature_2m_min[i]);
+
+          const card = document.createElement('div');
+          card.className = 'forecast-card';
+          card.innerHTML = `
+            <span class="forecast-day">${dName}</span>
+            <span class="forecast-icon" title="${dCond.texto}">${dCond.icono}</span>
+            <div class="forecast-temps">
+              <span class="temp-high">${dMax}°</span>
+              <span class="temp-low">${dMin}°</span>
+            </div>
+          `;
+          forecastDays.appendChild(card);
+        }
+      } catch (err) {
+        stateEl.textContent = "Error de satélite";
+      }
+    }
+
+    async function buscarClima() {
+      const input = document.getElementById('weatherInput');
+      const q = input.value.trim();
+      if (!q) return;
+
+      const qNorm = q.toLowerCase();
+      if (coordsChile[qNorm]) {
+        cargarClimaPortada(q, coordsChile[qNorm].lat, coordsChile[qNorm].lng);
+        input.value = '';
         return;
       }
 
-      filtradas.forEach(cam => {
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.innerHTML = `
-          <div class="card-header">
-            <div class="card-titles">
-              <span class="card-city">${cam.ciudad}</span>
-              <span class="card-title" title="${cam.titulo}">${cam.titulo}</span>
-            </div>
-            <div class="card-controls">
-              <button class="btn-edit" style="display:${isAdmin ? 'inline-block' : 'none'}" onclick="editarCamara(${cam.originalIndex})" title="Editar">✏️</button>
-              <button class="btn-del" style="display:${isAdmin ? 'inline-block' : 'none'}" onclick="eliminarCamara(${cam.originalIndex})" title="Eliminar">🗑️</button>
-              <span class="badge-live"><span class="dot"></span>LIVE</span>
-            </div>
-          </div>
-          <div class="video-wrapper">
-            <iframe 
-              src="https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=0&mute=1&controls=1&rel=0" 
-              title="${cam.titulo}" 
-              loading="lazy" 
-              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-              allowfullscreen>
-            </iframe>
-          </div>
-        `;
-        grid.appendChild(card);
-      });
-    }
-
-    inputFiltro.addEventListener('input', (e) => {
-      textoBusqueda = e.target.value;
-      renderCamaras();
-    });
-
-    function actualizarReloj() {
-      const ahora = new Date();
-      const opciones = { timeZone: 'America/Santiago', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
-      document.getElementById('reloj').textContent = new Intl.DateTimeFormat('es-CL', opciones).format(ahora);
-    }
-    setInterval(actualizarReloj, 1000);
-    actualizarReloj();
-
-    async function initCounter() {
-      const counterEl = document.getElementById('visitCount');
       try {
-        const res = await fetch('https://api.counterapi.dev/v1/livesantiago-julio/visitas/up');
-        if (res.ok) {
-          const data = await res.json();
-          counterEl.textContent = String(data.count).padStart(5, '0');
-          return;
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q + ', Chile')}`);
+        const data = await res.json();
+        if (data && data.length > 0) {
+          cargarClimaPortada(q, parseFloat(data[0].lat), parseFloat(data[0].lon));
+          input.value = '';
+        } else {
+          alert("No se encontró esa comuna o ciudad en Chile.");
         }
-      } catch (err) {}
-      let localVisits = parseInt(localStorage.getItem('page_visits') || '0', 10) + 1;
-      localStorage.setItem('page_visits', localVisits);
-      counterEl.textContent = String(localVisits).padStart(5, '0');
-    }
-
-    renderPills();
-    actualizarVistaAdmin();
-    initCounter();
-    /* --- REPRODUCTOR EN SEGUNDO PLANO RADIO DELOREAN --- */
-let radioAudioPlayer = null;
-let currentStationId = 'BuB9SaS2cWE';
-
-// Inyectar API de YouTube para la radio
-(function initRadioApi() {
-  const ytScript = document.createElement('script');
-  ytScript.src = "https://www.youtube.com/iframe_api";
-  document.head.appendChild(ytScript);
-})();
-
-// Callback oficial de la API de YouTube
-window.onYouTubeIframeAPIReady = function() {
-  radioAudioPlayer = new YT.Player('radioHiddenPlayer', {
-    height: '1',
-    width: '1',
-    videoId: currentStationId,
-    playerVars: { autoplay: 0, controls: 0 },
-    events: {
-      'onReady': function() {
-        radioAudioPlayer.setVolume(50);
+      } catch (e) {
+        alert("Error al buscar ciudad.");
       }
     }
-  });
-};
 
-function toggleMiniRadio() {
-  if (!radioAudioPlayer || typeof radioAudioPlayer.getPlayerState !== 'function') return;
-  const btn = document.getElementById('btnMiniRadioPlay');
-  
-  if (radioAudioPlayer.getPlayerState() === 1) { // Si está reproduciendo
-    radioAudioPlayer.pauseVideo();
-    btn.textContent = '▶';
-  } else {
-    radioAudioPlayer.playVideo();
-    btn.textContent = '⏸';
-  }
-}
+    document.getElementById('weatherInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') buscarClima();
+    });
 
-function switchMiniStation(videoId, btnEl) {
-  currentStationId = videoId;
-  const btnPlay = document.getElementById('btnMiniRadioPlay');
+    /* 6. RADIO DELOREAN */
+    let radioAudioPlayer = null;
+    let currentStationId = 'BuB9SaS2cWE';
 
-  if (radioAudioPlayer && typeof radioAudioPlayer.loadVideoById === 'function') {
-    radioAudioPlayer.loadVideoById(videoId);
-    btnPlay.textContent = '⏸';
-  }
+    (function initRadio() {
+      const ytScript = document.createElement('script');
+      ytScript.src = "https://www.youtube.com/iframe_api";
+      document.head.appendChild(ytScript);
+    })();
 
-  document.querySelectorAll('.btn-mini-station').forEach(b => b.classList.remove('active'));
-  btnEl.classList.add('active');
-}
+    window.onYouTubeIframeAPIReady = function() {
+      radioAudioPlayer = new YT.Player('radioHiddenPlayer', {
+        height: '1', width: '1', videoId: currentStationId,
+        playerVars: { autoplay: 0, controls: 0 },
+        events: { 'onReady': () => radioAudioPlayer.setVolume(50) }
+      });
+    };
 
-document.getElementById('miniRadioVol').addEventListener('input', (e) => {
-  if (radioAudioPlayer && typeof radioAudioPlayer.setVolume === 'function') {
-    radioAudioPlayer.setVolume(e.target.value);
-  }
-});
+    function toggleMiniRadio() {
+      if (!radioAudioPlayer || typeof radioAudioPlayer.getPlayerState !== 'function') return;
+      const btn = document.getElementById('btnMiniRadioPlay');
+      if (radioAudioPlayer.getPlayerState() === 1) {
+        radioAudioPlayer.pauseVideo();
+        btn.textContent = '▶';
+      } else {
+        radioAudioPlayer.playVideo();
+        btn.textContent = '⏸';
+      }
+    }
+
+    function switchMiniStation(videoId, btnEl) {
+      currentStationId = videoId;
+      const btnPlay = document.getElementById('btnMiniRadioPlay');
+      if (radioAudioPlayer && typeof radioAudioPlayer.loadVideoById === 'function') {
+        radioAudioPlayer.loadVideoById(videoId);
+        btnPlay.textContent = '⏸';
+      }
+      document.querySelectorAll('.btn-mini-station').forEach(b => b.classList.remove('active'));
+      btnEl.classList.add('active');
+    }
+
+    document.getElementById('miniRadioVol').addEventListener('input', (e) => {
+      if (radioAudioPlayer && typeof radioAudioPlayer.setVolume === 'function') {
+        radioAudioPlayer.setVolume(e.target.value);
+      }
+    });
+
+    /* 7. CONTADOR DE VISITAS BASE 77 */
+    async function registrarVisitas() {
+      const counterEl = document.getElementById('visitCounter');
+      const BASE = 77;
+      const KEY = "livechile_main_hits";
+      try {
+        const res = await fetch(`https://countapi.mileshilliard.com/api/v1/hit/${KEY}`);
+        const data = await res.json();
+        const hits = parseInt(data.value, 10) || 0;
+        counterEl.textContent = String(BASE + hits).padStart(6, '0');
+      } catch (err) {
+        counterEl.textContent = String(BASE).padStart(6, '0');
+      }
+    }
+
+    /* INICIALIZAR */
+    document.addEventListener('DOMContentLoaded', () => {
+      renderAllCams();
+      cargarClimaPortada('Santiago', coordsChile['santiago'].lat, coordsChile['santiago'].lng);
+      registrarVisitas();
+    });
   </script>
 </body>
 </html>
