@@ -123,7 +123,7 @@
     .btn-save { background: var(--accent); color: #07090e; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
     .btn-cancel { background: rgba(255, 255, 255, 0.1); color: var(--text); border: none; padding: 0.6rem 0.9rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; }
 
-    /* FILA BUSCADOR Y CLIMA (CENTRADO HACIA EL MEDIO) */
+    /* FILA BUSCADOR Y CLIMA */
     .filters-section { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.75rem; }
     
     .search-and-weather-row {
@@ -286,7 +286,7 @@
     .counter-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); padding: 0.35rem 0.85rem; border-radius: 20px; }
     .counter-number { color: var(--accent); font-weight: 700; }
 
-    /* OCULTAR ACCESO ADMIN EN CHILE */
+    /* OCULTAR ACCESO ADMIN */
     .btn-admin, #btnAdmin, .admin-modal { display: none !important; }
 
     /* MINI REPRODUCTOR COMPACTO RADIO DELOREAN */
@@ -508,24 +508,6 @@
       border-radius: 8px; overflow: hidden; border: 1px solid var(--border); height: 170px; background: #000;
     }
     .modal-map-frame iframe { width: 100%; height: 100%; border: 0; }
-
-    /* CONTENEDOR FLOTANTE PARA MUNDO.HTML */
-    #worldIframeContainer {
-      position: fixed;
-      top: 60px;
-      left: 0;
-      width: 100vw;
-      height: calc(100vh - 60px);
-      z-index: 400;
-      background: #07090e;
-      display: none;
-    }
-
-    #worldIframeContainer iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
   </style>
 </head>
 <body>
@@ -538,7 +520,7 @@
         <p>Centro de Monitoreo Urbano</p>
       </div>
 
-      <!-- MINI WIDGET RADIO DELOREAN CON PANTALLA DIGITAL -->
+      <!-- MINI WIDGET RADIO DELOREAN (6 ESTACIONES IDÉNTICAS) -->
       <div class="mini-radio-bar">
         <span class="mini-radio-title">⚡ RADIO DELOREAN</span>
 
@@ -552,12 +534,12 @@
         <input type="range" class="mini-vol-slider" id="miniRadioVol" min="0" max="100" value="50" title="Volumen">
         
         <div class="mini-stations-group">
-          <button class="btn-mini-station active" onclick="switchMiniStation('BuB9SaS2cWE', this)">1985</button>
-          <button class="btn-mini-station" onclick="switchMiniStation('Nt27aBceerI', this)">ROCK</button>
-          <button class="btn-mini-station" onclick="switchMiniStation('34H1XIjnfKM', this)">TECHNO</button>
-          <button class="btn-mini-station" onclick="switchMiniStation('8UM7FNEbiYs', this)">1955</button>
-          <button class="btn-mini-station" onclick="switchMiniStation('3LWMFjRZQ6k', this)">METAL</button>
-          <button class="btn-mini-station" onclick="switchMiniStation('TSyjyTGoDro', this)">1885</button>
+          <button class="btn-mini-station active" id="btn_st_BuB9SaS2cWE" onclick="switchMiniStation('BuB9SaS2cWE', this)">1985</button>
+          <button class="btn-mini-station" id="btn_st_Nt27aBceerI" onclick="switchMiniStation('Nt27aBceerI', this)">ROCK</button>
+          <button class="btn-mini-station" id="btn_st_34H1XIjnfKM" onclick="switchMiniStation('34H1XIjnfKM', this)">TECHNO</button>
+          <button class="btn-mini-station" id="btn_st_8UM7FNEbiYs" onclick="switchMiniStation('8UM7FNEbiYs', this)">1955</button>
+          <button class="btn-mini-station" id="btn_st_3LWMFjRZQ6k" onclick="switchMiniStation('3LWMFjRZQ6k', this)">METAL</button>
+          <button class="btn-mini-station" id="btn_st_TSyjyTGoDro" onclick="switchMiniStation('TSyjyTGoDro', this)">1885</button>
         </div>
 
         <a href="https://radiodelorean.netlify.app/" target="_blank" class="btn-radio-link" title="Abrir Radio DeLorean">📻 RADIO ↗</a>
@@ -567,6 +549,7 @@
     </div>
 
     <div class="header-actions">
+      <!-- ENLACE NATIVO DIRECTO A MUNDO -->
       <a href="mundo.html" class="btn-world">🌍 BUSCAR POR EL MUNDO</a>
       <button class="btn-add" id="btnToggleAdd">+ AGREGAR CÁMARA</button>
       <button class="btn-export" id="btnExport" title="Copia el código para actualizar GitHub">📋 COPIAR PARA GITHUB</button>
@@ -574,10 +557,6 @@
       <div class="clock-badge">HORA CHILE: <span id="reloj">--:--:--</span></div>
     </div>
   </header>
-
-  <div id="worldIframeContainer">
-    <iframe id="worldFrame" src="about:blank"></iframe>
-  </div>
 
   <div class="container" id="mainContainer">
     <div class="admin-form-panel" id="adminPanel">
@@ -734,10 +713,8 @@
       2: { texto: "Parcialmente nublado", icono: "⛅" },
       3: { texto: "Nublado", icono: "☁️" },
       45: { texto: "Niebla", icono: "🌫️" },
-      48: { texto: "Neblina", icono: "🌫️" },
       51: { texto: "Llovizna", icono: "🌦️" },
-      61: { texto: "Lluvia ligera", icono: "🌧️" },
-      63: { texto: "Lluvia", icono: "🌧️" },
+      61: { texto: "Lluvia", icono: "🌧️" },
       71: { texto: "Nieve", icono: "❄️" },
       80: { texto: "Chubascos", icono: "🌧️" },
       95: { texto: "Tormenta", icono: "⛈️" }
@@ -778,7 +755,6 @@
       renderCamaras();
     }
 
-    /* PANTALLA COMPLETA NATIVA */
     function pantallaCompletaElemento(elem) {
       if (!elem) return;
       if (!document.fullscreenElement) {
@@ -966,7 +942,7 @@
       const favCams = camaras.filter(c => favorites.includes(c.id));
       if (favCams.length > 0) {
         favsSection.style.display = 'block';
-        favCams.forEach(cam => {
+        favs.forEach(cam => {
           const origIdx = camaras.findIndex(c => c.id === cam.id);
           favsGrid.appendChild(createCardElement(cam, origIdx));
         });
@@ -998,7 +974,7 @@
       renderCamaras();
     });
 
-    /* WIDGET DEL CLIMA CON DÍAS COMPLETOS (JUE, VIE, SÁB...) */
+    /* WIDGET CLIMA CON DÍAS COMPLETOS (JUE, VIE, SÁB, DOM) */
     async function cargarClimaFranja(ciudad, lat, lng) {
       const cityEl = document.getElementById('stripCity');
       const tempEl = document.getElementById('stripTemp');
@@ -1067,7 +1043,7 @@
       if (e.key === 'Enter') buscarClimaMini();
     });
 
-    /* MODAL DE DETALLE (HERMANAS + MAPA + CLIMA) */
+    /* MODAL DE DETALLE */
     const modalDetail = document.getElementById('modalDetail');
     const modalCamTitle = document.getElementById('modalCamTitle');
     const modalCamCity = document.getElementById('modalCamCity');
@@ -1143,25 +1119,6 @@
       }
     }
 
-    /* MANTENER LA RADIO SONANDO AL VISITAR MUNDO */
-    let mundoAbierto = false;
-    function toggleVistaMundo() {
-      const container = document.getElementById('worldIframeContainer');
-      const frame = document.getElementById('worldFrame');
-      const btn = document.getElementById('btnOpenWorld');
-
-      if (!mundoAbierto) {
-        if (frame.src === "about:blank") frame.src = "mundo.html";
-        container.style.display = "block";
-        btn.textContent = "🇨🇱 VOLVER A CHILE";
-        mundoAbierto = true;
-      } else {
-        container.style.display = "none";
-        btn.textContent = "🌍 BUSCAR POR EL MUNDO";
-        mundoAbierto = false;
-      }
-    }
-
     function actualizarReloj() {
       const ahora = new Date();
       const opciones = { timeZone: 'America/Santiago', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -1191,9 +1148,11 @@
     initCounter();
     cargarClimaFranja('Santiago', coordsChile['santiago'].lat, coordsChile['santiago'].lng);
 
-    /* RADIO DELOREAN */
+    /* --- CONTROL SINCRONIZADO DE RADIO DELOREAN --- */
     let radioAudioPlayer = null;
-    let currentStationId = 'BuB9SaS2cWE';
+    let currentStationId = localStorage.getItem('radio_delorean_station') || 'BuB9SaS2cWE';
+    let savedVol = parseInt(localStorage.getItem('radio_delorean_vol') || '50', 10);
+    let shouldAutoPlay = localStorage.getItem('radio_delorean_playing') === 'true';
 
     (function initRadioApi() {
       const ytScript = document.createElement('script');
@@ -1203,40 +1162,73 @@
 
     window.onYouTubeIframeAPIReady = function() {
       radioAudioPlayer = new YT.Player('radioHiddenPlayer', {
-        height: '1', width: '1', videoId: currentStationId,
-        playerVars: { autoplay: 0, controls: 0 },
-        events: { 'onReady': () => radioAudioPlayer.setVolume(50) }
+        height: '1',
+        width: '1',
+        videoId: currentStationId,
+        playerVars: { autoplay: shouldAutoPlay ? 1 : 0, controls: 0 },
+        events: {
+          'onReady': function() {
+            radioAudioPlayer.setVolume(savedVol);
+            const volInput = document.getElementById('miniRadioVol');
+            if (volInput) volInput.value = savedVol;
+
+            marcarEstacionActiva(currentStationId);
+
+            if (shouldAutoPlay) {
+              radioAudioPlayer.playVideo();
+              const btn = document.getElementById('btnMiniRadioPlay');
+              if (btn) btn.textContent = '⏸';
+            }
+          }
+        }
       });
     };
 
     function toggleMiniRadio() {
       if (!radioAudioPlayer || typeof radioAudioPlayer.getPlayerState !== 'function') return;
       const btn = document.getElementById('btnMiniRadioPlay');
+      
       if (radioAudioPlayer.getPlayerState() === 1) {
         radioAudioPlayer.pauseVideo();
-        btn.textContent = '▶';
+        if (btn) btn.textContent = '▶';
+        localStorage.setItem('radio_delorean_playing', 'false');
       } else {
         radioAudioPlayer.playVideo();
-        btn.textContent = '⏸';
+        if (btn) btn.textContent = '⏸';
+        localStorage.setItem('radio_delorean_playing', 'true');
       }
     }
 
     function switchMiniStation(videoId, btnEl) {
       currentStationId = videoId;
+      localStorage.setItem('radio_delorean_station', videoId);
       const btnPlay = document.getElementById('btnMiniRadioPlay');
+
       if (radioAudioPlayer && typeof radioAudioPlayer.loadVideoById === 'function') {
         radioAudioPlayer.loadVideoById(videoId);
-        btnPlay.textContent = '⏸';
+        if (btnPlay) btnPlay.textContent = '⏸';
+        localStorage.setItem('radio_delorean_playing', 'true');
       }
-      document.querySelectorAll('.btn-mini-station').forEach(b => b.classList.remove('active'));
-      btnEl.classList.add('active');
+
+      marcarEstacionActiva(videoId);
     }
 
-    document.getElementById('miniRadioVol').addEventListener('input', (e) => {
-      if (radioAudioPlayer && typeof radioAudioPlayer.setVolume === 'function') {
-        radioAudioPlayer.setVolume(e.target.value);
-      }
-    });
+    function marcarEstacionActiva(videoId) {
+      document.querySelectorAll('.btn-mini-station').forEach(b => b.classList.remove('active'));
+      const target = document.getElementById('btn_st_' + videoId);
+      if (target) target.classList.add('active');
+    }
+
+    const volSlider = document.getElementById('miniRadioVol');
+    if (volSlider) {
+      volSlider.addEventListener('input', (e) => {
+        const val = e.target.value;
+        localStorage.setItem('radio_delorean_vol', val);
+        if (radioAudioPlayer && typeof radioAudioPlayer.setVolume === 'function') {
+          radioAudioPlayer.setVolume(val);
+        }
+      });
+    }
   </script>
 </body>
 </html>
