@@ -78,7 +78,7 @@
 
     .btn-chile:hover { background: var(--accent); color: #07090e; }
 
-    /* MINI RADIO DELOREAN */
+    /* MINI RADIO DELOREAN CON ESTILO IDÉNTICO A CHILE */
     .mini-radio-bar {
       display: flex;
       align-items: center;
@@ -95,6 +95,7 @@
       font-family: 'JetBrains Mono', monospace;
       font-size: 0.7rem;
       font-weight: bold;
+      letter-spacing: 0.5px;
     }
 
     .mini-radio-screen {
@@ -102,9 +103,10 @@
       border: 1px solid var(--accent);
       border-radius: 6px;
       padding: 3px 6px;
-      width: 200px;
+      width: 210px;
       overflow: hidden;
       white-space: nowrap;
+      box-shadow: inset 0 0 5px rgba(0, 229, 255, 0.3);
     }
 
     .mini-marquee {
@@ -113,6 +115,7 @@
       font-size: 0.65rem;
       font-weight: 700;
       color: #ff334b;
+      text-shadow: 0 0 6px #ff0000;
       padding-left: 100%;
       animation: mini-scroll 16s linear infinite;
     }
@@ -135,53 +138,52 @@
       display: flex;
       align-items: center;
       justify-content: center;
+      transition: transform 0.15s ease;
     }
 
+    .btn-radio-play:hover { transform: scale(1.1); }
     .mini-vol-slider { width: 55px; height: 4px; accent-color: var(--accent); cursor: pointer; }
 
     .mini-stations-group {
-    
-  display: flex;
-  gap: 3px;
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
-  padding-left: 6px;
-  flex-wrap: nowrap;
-  scrollbar-width: none; /* Oculta la barra en Firefox */
-}
-
-/* Oculta la barra de scroll en Chrome, Edge y navegadores basados en Chromium */
-.mini-stations-group::-webkit-scrollbar {
-  display: none;
-}
+      display: flex;
+      gap: 3px;
+      border-left: 1px solid rgba(255, 255, 255, 0.2);
+      padding-left: 6px;
     }
 
     .btn-mini-station {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  color: #fff !important;
-  border-radius: 4px !important;
-  padding: 2px 5px !important;
-  font-size: 0.6rem !important;
-  font-family: 'JetBrains Mono', monospace !important;
-  cursor: pointer !important;
-  font-weight: 600 !important;
-  transition: all 0.2s ease !important;
-}
-
-.btn-mini-station:hover,
-.btn-mini-station.active {
-  background: var(--accent) !important;
-  color: #050811 !important;
-  border-color: var(--accent) !important;
-}
+      background: rgba(255, 255, 255, 0.05) !important;
+      border: 1px solid rgba(255, 255, 255, 0.2) !important;
+      color: #fff !important;
+      border-radius: 4px !important;
+      padding: 2px 5px !important;
+      font-size: 0.6rem !important;
+      font-family: 'JetBrains Mono', monospace !important;
+      cursor: pointer !important;
+      font-weight: 600 !important;
+      transition: all 0.2s ease !important;
     }
 
-    .btn-mini-station.active {
-      background: var(--accent);
-      color: #050811;
-      border-color: var(--accent);
-      font-weight: bold;
+    .btn-mini-station:hover, .btn-mini-station.active {
+      background: var(--accent) !important;
+      color: #050811 !important;
+      border-color: var(--accent) !important;
     }
+
+    .btn-radio-link {
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: var(--muted);
+      border-radius: 6px;
+      padding: 3px 7px;
+      font-size: 0.65rem;
+      font-family: 'JetBrains Mono', monospace;
+      text-decoration: none;
+      font-weight: 700;
+      transition: all 0.2s;
+    }
+
+    .btn-radio-link:hover { border-color: var(--accent); color: var(--accent); }
 
     /* GLOBO */
     #globeViz {
@@ -193,7 +195,7 @@
       z-index: 1;
     }
 
-    /* LISTA LATERAL IZQUIERDA */
+    /* BARRA LATERAL IZQUIERDA */
     .sidebar-links {
       position: absolute;
       left: 1.5rem;
@@ -295,7 +297,7 @@
       z-index: 200;
       box-shadow: 0 10px 40px rgba(0, 229, 255, 0.25);
       display: none;
-      resize: both; /* Permite redimensionar desde la esquina */
+      resize: both;
     }
 
     .modal-player-bar {
@@ -305,13 +307,11 @@
       align-items: center;
       background: rgba(0, 0, 0, 0.65);
       border-bottom: 1px solid var(--border);
-      cursor: grab; /* Indica que se puede arrastrar */
+      cursor: grab;
       user-select: none;
     }
 
-    .modal-player-bar:active {
-      cursor: grabbing;
-    }
+    .modal-player-bar:active { cursor: grabbing; }
 
     .modal-player-bar span {
       font-size: 0.75rem;
@@ -350,7 +350,7 @@
       border: 0;
     }
 
-    /* BARRA LATERAL DERECHA (METEOROLOGÍA MUNDIAL VERTICAL) */
+    /* BARRA LATERAL DERECHA (CLIMA VERTICAL) */
     .sidebar-weather {
       position: absolute;
       right: 1.5rem;
@@ -495,14 +495,16 @@
         <h1>MUNDO <span>EN VIVO</span></h1>
       </div>
 
-      <!-- MINI RADIO DELOREAN -->
+      <!-- MINI RADIO DELOREAN (6 ESTACIONES IDÉNTICAS A CHILE) -->
       <div class="mini-radio-bar">
         <span class="mini-radio-title">⚡ RADIO DELOREAN</span>
+
         <div class="mini-radio-screen">
           <div class="mini-marquee">
-            RADIO DELOREAN LA RADIO DEL FUTURO - CLASICOS DE LOS 80S Y 90S - EMISORAS GLOBALES 24/7 ⚡
+            RADIO DELOREAN LA RADIO DEL FUTURO - CLASICOS DE LOS 80S Y 90S - MUSICA 24/7 - REALIZA EL VIAJE TEMPORAL CON TU MUSICA ⚡
           </div>
         </div>
+
         <button class="btn-radio-play" id="btnMiniRadioPlay" onclick="toggleMiniRadio()" title="Reproducir / Pausar">▶</button>
         <input type="range" class="mini-vol-slider" id="miniRadioVol" min="0" max="100" value="50" title="Volumen">
         
@@ -512,23 +514,23 @@
           <button class="btn-mini-station" id="btn_st_34H1XIjnfKM" onclick="switchMiniStation('34H1XIjnfKM', this)">TECHNO</button>
           <button class="btn-mini-station" id="btn_st_8UM7FNEbiYs" onclick="switchMiniStation('8UM7FNEbiYs', this)">1955</button>
           <button class="btn-mini-station" id="btn_st_3LWMFjRZQ6k" onclick="switchMiniStation('3LWMFjRZQ6k', this)">METAL</button>
-          <button class="btn-mini-station" id="btn_st_W19rDfegcvM" onclick="switchMiniStation('W19rDfegcvM', this)">HEAVY</button>
-          <button class="btn-mini-station" id="btn_st__kse217FeQ0" onclick="switchMiniStation('_kse217FeQ0', this)">2015</button>
           <button class="btn-mini-station" id="btn_st_TSyjyTGoDro" onclick="switchMiniStation('TSyjyTGoDro', this)">1885</button>
         </div>
+
+        <a href="https://radiodelorean.netlify.app/" target="_blank" class="btn-radio-link" title="Abrir Radio DeLorean">📻 RADIO ↗</a>
       </div>
 
       <div id="radioHiddenPlayer"></div>
     </div>
 
     <!-- ENLACE NATIVO DIRECTO A CHILE -->
-    <a href="index.html" target="_top" class="btn-chile">🇨🇱 VOLVER A CHILE</a>
+    <a href="index.html" class="btn-chile">🇨🇱 VOLVER A CHILE</a>
   </header>
 
   <!-- GLOBO INTERACTIVO -->
   <div id="globeViz"></div>
 
-  <!-- BARRA LATERAL IZQUIERDA: CÁMARAS GLOBALES -->
+  <!-- BARRA LATERAL IZQUIERDA -->
   <aside class="sidebar-links">
     <div class="sidebar-header">
       <span>🌐 CÁMARAS GLOBALES</span>
@@ -548,7 +550,7 @@
     </div>
   </div>
 
-  <!-- BARRA LATERAL DERECHA: METEOROLOGÍA MUNDIAL VERTICAL + BUSCADOR -->
+  <!-- BARRA LATERAL DERECHA (CLIMA VERTICAL) -->
   <aside class="sidebar-weather">
     <div class="sidebar-weather-header">
       <div class="sidebar-weather-title">
@@ -564,11 +566,7 @@
   </aside>
 
   <script>
-    if (window.top !== window.self) {
-      window.top.location.href = window.location.href;
-    }
-
-    /* LISTA COMPLETA DE CÁMARAS INTERNACIONALES */
+    /* CÁMARAS INTERNACIONALES */
     const camarasMundo = [
       { id: "NfsyRx50gAI", city: "Buenos Aires", sector: "Obelisco", country: "Argentina", lat: -34.6037, lng: -58.3816 },
       { id: "wyEi0OPai5g", city: "Río de Janeiro", sector: "Copacabana", country: "Brasil", lat: -22.9711, lng: -43.1822 },
@@ -624,7 +622,7 @@
       return codigosWmo[code] || { texto: "Variable", icono: "🌤️" };
     }
 
-    /* GLOBO 3D CON PUNTOS PLANOS VERDES */
+    /* GLOBO 3D */
     let worldGlobe;
     function initGlobe() {
       const elem = document.getElementById('globeViz');
@@ -648,7 +646,7 @@
       worldGlobe.controls().autoRotateSpeed = 0.35;
     }
 
-    /* RENDER DE ENLACES EN EL PANEL IZQUIERDO */
+    /* RENDER DE ENLACES IZQUIERDA */
     const linksContainer = document.getElementById('worldLinksList');
     function renderLinks() {
       linksContainer.innerHTML = '';
@@ -698,7 +696,7 @@
       if (worldGlobe) worldGlobe.controls().autoRotate = true;
     }
 
-    /* LÓGICA DRAG & DROP PARA LA VENTANA FLOTANTE */
+    /* DRAG & DROP DE LA VENTANA FLOTANTE */
     (function makeDraggable() {
       const floatBox = document.getElementById('modalPlayerFloat');
       const headerBar = document.getElementById('modalPlayerBar');
@@ -726,7 +724,6 @@
         let newX = initialLeft + dx;
         let newY = initialTop + dy;
 
-        // Limitar dentro del viewport
         newX = Math.max(10, Math.min(newX, window.innerWidth - floatBox.offsetWidth - 10));
         newY = Math.max(70, Math.min(newY, window.innerHeight - floatBox.offsetHeight - 10));
 
@@ -740,7 +737,7 @@
         document.removeEventListener('mouseup', onMouseUp);
       }
 
-      // Soporte Touch para móviles
+      // Touch
       headerBar.addEventListener('touchstart', (e) => {
         if (e.target.classList.contains('btn-close-player')) return;
         isDragging = true;
@@ -850,7 +847,7 @@
       if (e.key === 'Enter') buscarClimaMundo();
     });
 
-    /* RADIO DELOREAN */
+    /* RADIO DELOREAN SINCRONIZADA */
     let radioAudioPlayer = null;
     let currentStationId = localStorage.getItem('radio_delorean_station') || 'BuB9SaS2cWE';
     let savedVol = parseInt(localStorage.getItem('radio_delorean_vol') || '50', 10);
@@ -864,18 +861,24 @@
 
     window.onYouTubeIframeAPIReady = function() {
       radioAudioPlayer = new YT.Player('radioHiddenPlayer', {
-        height: '1', width: '1', videoId: currentStationId,
+        height: '1',
+        width: '1',
+        videoId: currentStationId,
         playerVars: { autoplay: shouldAutoPlay ? 1 : 0, controls: 0 },
-        events: { 
-          'onReady': () => {
+        events: {
+          'onReady': function() {
             radioAudioPlayer.setVolume(savedVol);
-            document.getElementById('miniRadioVol').value = savedVol;
+            const volInput = document.getElementById('miniRadioVol');
+            if (volInput) volInput.value = savedVol;
+
+            marcarEstacionActiva(currentStationId);
+
             if (shouldAutoPlay) {
               radioAudioPlayer.playVideo();
-              document.getElementById('btnMiniRadioPlay').textContent = '⏸';
+              const btn = document.getElementById('btnMiniRadioPlay');
+              if (btn) btn.textContent = '⏸';
             }
-            actualizarBotonEstacion(currentStationId);
-          } 
+          }
         }
       });
     };
@@ -883,13 +886,14 @@
     function toggleMiniRadio() {
       if (!radioAudioPlayer || typeof radioAudioPlayer.getPlayerState !== 'function') return;
       const btn = document.getElementById('btnMiniRadioPlay');
+      
       if (radioAudioPlayer.getPlayerState() === 1) {
         radioAudioPlayer.pauseVideo();
-        btn.textContent = '▶';
+        if (btn) btn.textContent = '▶';
         localStorage.setItem('radio_delorean_playing', 'false');
       } else {
         radioAudioPlayer.playVideo();
-        btn.textContent = '⏸';
+        if (btn) btn.textContent = '⏸';
         localStorage.setItem('radio_delorean_playing', 'true');
       }
     }
@@ -901,25 +905,29 @@
 
       if (radioAudioPlayer && typeof radioAudioPlayer.loadVideoById === 'function') {
         radioAudioPlayer.loadVideoById(videoId);
-        btnPlay.textContent = '⏸';
+        if (btnPlay) btnPlay.textContent = '⏸';
         localStorage.setItem('radio_delorean_playing', 'true');
       }
-      actualizarBotonEstacion(videoId);
+
+      marcarEstacionActiva(videoId);
     }
 
-    function actualizarBotonEstacion(videoId) {
+    function marcarEstacionActiva(videoId) {
       document.querySelectorAll('.btn-mini-station').forEach(b => b.classList.remove('active'));
-      const activeBtn = document.getElementById('btn_st_' + videoId);
-      if (activeBtn) activeBtn.classList.add('active');
+      const target = document.getElementById('btn_st_' + videoId);
+      if (target) target.classList.add('active');
     }
 
-    document.getElementById('miniRadioVol').addEventListener('input', (e) => {
-      const vol = e.target.value;
-      localStorage.setItem('radio_delorean_vol', vol);
-      if (radioAudioPlayer && typeof radioAudioPlayer.setVolume === 'function') {
-        radioAudioPlayer.setVolume(vol);
-      }
-    });
+    const volSlider = document.getElementById('miniRadioVol');
+    if (volSlider) {
+      volSlider.addEventListener('input', (e) => {
+        const val = e.target.value;
+        localStorage.setItem('radio_delorean_vol', val);
+        if (radioAudioPlayer && typeof radioAudioPlayer.setVolume === 'function') {
+          radioAudioPlayer.setVolume(val);
+        }
+      });
+    }
 
     window.addEventListener('resize', () => {
       if (worldGlobe) worldGlobe.width(window.innerWidth).height(window.innerHeight);
