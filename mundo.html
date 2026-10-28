@@ -3,22 +3,23 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mundo Live Cams | Explorador 3D Global</title>
+  <title>Mundo Live Cams | Explorador Global</title>
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
   
-  <!-- Dependencias 3D Globe -->
+  <!-- Dependencias Globe.gl / Three.js -->
   <script src="//unpkg.com/three"></script>
   <script src="//unpkg.com/globe.gl"></script>
 
   <style>
     :root {
       --bg: #07090e;
-      --card-bg: rgba(15, 21, 35, 0.85);
+      --card-bg: rgba(15, 21, 35, 0.88);
       --border: rgba(255, 255, 255, 0.08);
-      --accent: #00e5ff;
+      --accent: #00ff66; /* Verde Neón */
+      --accent-glow: rgba(0, 255, 102, 0.4);
       --live-red: #ff334b;
       --text: #f1f5f9;
       --muted: #94a3b8;
@@ -41,10 +42,10 @@
       top: 0;
       left: 0;
       width: 100%;
-      background: rgba(10, 15, 26, 0.85);
+      background: rgba(10, 15, 26, 0.92);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
-      padding: 0.75rem 1.5rem;
+      padding: 0.85rem 1.5rem;
       z-index: 100;
       display: flex;
       justify-content: space-between;
@@ -56,27 +57,28 @@
     .brand { display: flex; align-items: center; gap: 0.75rem; }
 
     .brand-logo {
-      width: 34px; height: 34px; border-radius: 8px;
-      background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent);
+      width: 36px; height: 36px; border-radius: 8px;
+      background: rgba(0, 255, 102, 0.1); border: 1px solid var(--accent);
       display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
     }
 
     .brand-logo svg { width: 18px; height: 18px; fill: var(--accent); }
-    .brand-text h1 { font-size: 1.1rem; font-weight: 700; color: #fff; line-height: 1.2; }
+    .brand-text h1 { font-size: 1.15rem; font-weight: 700; color: #fff; line-height: 1.2; }
     .brand-text h1 span { color: var(--accent); }
 
     .btn-chile {
-      background: linear-gradient(135deg, rgba(0, 255, 204, 0.15), rgba(0, 229, 255, 0.25));
+      background: linear-gradient(135deg, rgba(0, 255, 102, 0.15), rgba(0, 255, 102, 0.25));
       border: 1px solid var(--accent);
-      color: #fff; padding: 0.45rem 0.95rem; border-radius: 8px;
-      font-size: 0.8rem; font-weight: 700; text-decoration: none;
+      color: #fff; padding: 0.5rem 1rem; border-radius: 8px;
+      font-size: 0.82rem; font-weight: 700; text-decoration: none;
       display: inline-flex; align-items: center; gap: 0.5rem;
       font-family: 'JetBrains Mono', monospace; transition: all 0.25s ease;
     }
 
     .btn-chile:hover { background: var(--accent); color: #07090e; }
 
-    /* RADIO DELOREAN */
+    /* MINI RADIO DELOREAN */
     .mini-radio-bar {
       display: flex;
       align-items: center;
@@ -85,6 +87,7 @@
       border: 1px solid var(--accent);
       padding: 4px 10px;
       border-radius: 20px;
+      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
     }
 
     .mini-radio-title {
@@ -99,7 +102,7 @@
       border: 1px solid var(--accent);
       border-radius: 6px;
       padding: 3px 6px;
-      width: 190px;
+      width: 200px;
       overflow: hidden;
       white-space: nowrap;
     }
@@ -124,9 +127,9 @@
       color: #050811;
       border: none;
       border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      font-size: 0.7rem;
+      width: 26px;
+      height: 26px;
+      font-size: 0.75rem;
       cursor: pointer;
       font-weight: bold;
       display: flex;
@@ -134,7 +137,7 @@
       justify-content: center;
     }
 
-    .mini-vol-slider { width: 50px; height: 4px; accent-color: var(--accent); cursor: pointer; }
+    .mini-vol-slider { width: 55px; height: 4px; accent-color: var(--accent); cursor: pointer; }
 
     .mini-stations-group {
       display: flex;
@@ -148,8 +151,8 @@
       border: 1px solid rgba(255, 255, 255, 0.2);
       color: #fff;
       border-radius: 4px;
-      padding: 2px 4px;
-      font-size: 0.58rem;
+      padding: 2px 5px;
+      font-size: 0.6rem;
       font-family: 'JetBrains Mono', monospace;
       cursor: pointer;
     }
@@ -161,7 +164,7 @@
       font-weight: bold;
     }
 
-    /* CONTENEDOR 3D */
+    /* GLOBO */
     #globeViz {
       width: 100vw;
       height: 100vh;
@@ -171,16 +174,16 @@
       z-index: 1;
     }
 
-    /* BARRA LATERAL DERECHA DE CÁMARAS DEL MUNDO */
-    .sidebar-cams {
+    /* LISTA LATERAL DERECHA (SOLO ENLACES PLANOS) */
+    .sidebar-links {
       position: absolute;
-      right: 1.25rem;
-      top: 5rem;
-      bottom: 2rem;
-      width: 320px;
+      right: 1.5rem;
+      top: 5.5rem;
+      width: 290px;
+      max-height: calc(100vh - 7rem);
       background: var(--card-bg);
       border: 1px solid var(--border);
-      border-radius: 14px;
+      border-radius: 12px;
       backdrop-filter: blur(12px);
       z-index: 10;
       display: flex;
@@ -189,7 +192,7 @@
       box-shadow: 0 10px 40px rgba(0,0,0,0.8);
     }
 
-    .sidebar-head {
+    .sidebar-header {
       padding: 0.85rem 1rem;
       border-bottom: 1px solid var(--border);
       font-family: 'JetBrains Mono', monospace;
@@ -201,117 +204,109 @@
       align-items: center;
     }
 
-    .sidebar-head span { color: var(--accent); }
+    .sidebar-header span { color: var(--accent); }
 
-    .sidebar-list {
+    .links-list {
       flex: 1;
       overflow-y: auto;
-      padding: 0.75rem;
+      padding: 0.5rem;
       display: flex;
       flex-direction: column;
-      gap: 0.65rem;
+      gap: 0.35rem;
     }
 
-    .sidebar-list::-webkit-scrollbar { width: 5px; }
-    .sidebar-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .links-list::-webkit-scrollbar { width: 4px; }
+    .links-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
 
-    .world-cam-card {
-      background: rgba(255, 255, 255, 0.03);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      overflow: hidden;
-      cursor: pointer;
+    .world-cam-link {
       display: flex;
-      gap: 8px;
       align-items: center;
-      padding: 6px;
+      justify-content: space-between;
+      padding: 0.6rem 0.85rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid transparent;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.8rem;
+      cursor: pointer;
       transition: all 0.2s ease;
     }
 
-    .world-cam-card:hover, .world-cam-card.active {
+    .world-cam-link:hover, .world-cam-link.active {
+      background: rgba(0, 255, 102, 0.1);
       border-color: var(--accent);
-      background: rgba(0, 229, 255, 0.08);
-      transform: translateX(-2px);
-    }
-
-    .world-thumb {
-      width: 75px;
-      height: 48px;
-      border-radius: 5px;
-      object-fit: cover;
-    }
-
-    .world-info {
-      overflow: hidden;
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-
-    .world-title {
-      font-size: 0.75rem;
-      font-weight: 600;
       color: #fff;
+      transform: translateX(-3px);
+    }
+
+    .link-city-title {
+      font-weight: 600;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }
 
-    .world-location {
+    .link-country-badge {
+      font-family: 'JetBrains Mono', monospace;
       font-size: 0.65rem;
       color: var(--accent);
-      font-family: 'JetBrains Mono', monospace;
+      text-transform: uppercase;
+      background: rgba(0, 255, 102, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
     }
 
-    /* REPRODUCTOR FLOTANTE PARA TRANSMISIÓN MUNDIAL */
-    .floating-player-box {
+    /* REPRODUCTOR FLOTANTE COMPACTO */
+    .modal-player-float {
       position: absolute;
       bottom: 2rem;
       left: 1.5rem;
-      width: 380px;
+      width: 400px;
       background: var(--card-bg);
       border: 1px solid var(--accent);
       border-radius: 12px;
       overflow: hidden;
       z-index: 20;
-      box-shadow: 0 10px 40px rgba(0, 229, 255, 0.25);
+      box-shadow: 0 10px 40px rgba(0, 255, 102, 0.25);
       display: none;
     }
 
-    .floating-player-header {
+    .modal-player-bar {
       padding: 0.5rem 0.85rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(0, 0, 0, 0.4);
+      background: rgba(0, 0, 0, 0.5);
       border-bottom: 1px solid var(--border);
     }
 
-    .floating-player-header span {
+    .modal-player-bar span {
       font-size: 0.75rem;
       font-weight: 700;
       color: #fff;
       font-family: 'JetBrains Mono', monospace;
     }
 
-    .btn-close-float {
+    .btn-close-player {
       background: none;
       border: none;
       color: var(--muted);
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       cursor: pointer;
       line-height: 1;
     }
-    .btn-close-float:hover { color: #fff; }
 
-    .floating-iframe-wrap {
+    .btn-close-player:hover { color: #fff; }
+
+    .video-frame-box {
       position: relative;
       width: 100%;
       padding-top: 56.25%;
       background: #000;
     }
 
-    .floating-iframe-wrap iframe {
+    .video-frame-box iframe {
       position: absolute;
       top: 0; left: 0;
       width: 100%; height: 100%;
@@ -327,13 +322,14 @@
     }
 
     @media (max-width: 768px) {
-      .sidebar-cams { width: calc(100% - 2.5rem); height: 220px; top: auto; bottom: 1rem; }
-      .floating-player-box { width: calc(100% - 3rem); left: 1.5rem; bottom: 240px; }
+      .sidebar-links { width: calc(100% - 3rem); height: 210px; top: auto; bottom: 1rem; }
+      .modal-player-float { width: calc(100% - 3rem); left: 1.5rem; bottom: 230px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- HEADER -->
   <header>
     <div class="brand">
       <div class="brand-logo"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg></div>
@@ -365,47 +361,47 @@
       <div id="radioHiddenPlayer"></div>
     </div>
 
-    <!-- BOTÓN VOLVER A CHILE -->
+    <!-- BOTÓN VOLVER A CHILE (ENLACE LIMPIO A INDEX) -->
     <a href="index.html" class="btn-chile">🇨🇱 VOLVER A CHILE</a>
   </header>
 
-  <!-- CONTENEDOR 3D DEL GLOBO -->
+  <!-- GLOBO INTERACTIVO -->
   <div id="globeViz"></div>
 
-  <!-- LISTA LATERAL DE CÁMARAS DEL MUNDO -->
-  <aside class="sidebar-cams">
-    <div class="sidebar-head">
-      <span>🌍 CÁMARAS MUNDIALES</span>
-      <small style="color:var(--muted); font-size:0.65rem;">EN VIVO</small>
+  <!-- LISTA LATERAL (SOLO ENLACES) -->
+  <aside class="sidebar-links">
+    <div class="sidebar-header">
+      <span>🌐 CÁMARAS GLOBALES</span>
+      <small style="color:var(--muted); font-size:0.65rem;">DIRECTORIO</small>
     </div>
-    <div class="sidebar-list" id="worldCamsList"></div>
+    <div class="links-list" id="worldLinksList"></div>
   </aside>
 
   <!-- REPRODUCTOR FLOTANTE -->
-  <div class="floating-player-box" id="floatingPlayerBox">
-    <div class="floating-player-header">
-      <span id="floatCamTitle">Transmisión</span>
-      <button class="btn-close-float" onclick="cerrarReproductorFlotante()">&times;</button>
+  <div class="modal-player-float" id="modalPlayerFloat">
+    <div class="modal-player-bar">
+      <span id="playerCamTitle">Cámara en Vivo</span>
+      <button class="btn-close-player" onclick="cerrarReproductor()">&times;</button>
     </div>
-    <div class="floating-iframe-wrap">
-      <iframe id="floatCamIframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+    <div class="video-frame-box">
+      <iframe id="playerIframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>
     </div>
   </div>
 
   <script>
-    /* CÁMARAS INTERNACIONALES (COORDENADAS LAT / LNG) */
+    /* LISTA DE CÁMARAS DEL MUNDO */
     const camarasMundo = [
       { id: "1-iS7_G1978", titulo: "Times Square", ciudad: "Nueva York", pais: "EE.UU.", lat: 40.7580, lng: -73.9855 },
-      { id: "DDU-rZs-Ic4", titulo: "Torre Eiffel Panorámica", ciudad: "París", pais: "Francia", lat: 48.8584, lng: 2.2945 },
-      { id: "w_MsnGffp0U", titulo: "Cruce de Shibuya", ciudad: "Tokio", pais: "Japón", lat: 35.6595, lng: 139.7005 },
-      { id: "49936C_mD18", titulo: "Venecia Gran Canal", ciudad: "Venecia", pais: "Italia", lat: 45.4408, lng: 12.3155 },
-      { id: "51O_5zP0eXo", titulo: "Playa de Copacabana", ciudad: "Río de Janeiro", pais: "Brasil", lat: -22.9711, lng: -43.1822 },
-      { id: "mRe-5144c4g", titulo: "Coliseo Romano", ciudad: "Roma", pais: "Italia", lat: 41.8902, lng: 12.4922 },
+      { id: "DDU-rZs-Ic4", titulo: "Torre Eiffel", ciudad: "París", pais: "Francia", lat: 48.8584, lng: 2.2945 },
+      { id: "w_MsnGffp0U", titulo: "Cruce Shibuya", ciudad: "Tokio", pais: "Japón", lat: 35.6595, lng: 139.7005 },
+      { id: "49936C_mD18", titulo: "Gran Canal", ciudad: "Venecia", pais: "Italia", lat: 45.4408, lng: 12.3155 },
+      { id: "51O_5zP0eXo", titulo: "Copacabana", ciudad: "Río de Janeiro", pais: "Brasil", lat: -22.9711, lng: -43.1822 },
+      { id: "mRe-5144c4g", titulo: "Coliseo", ciudad: "Roma", pais: "Italia", lat: 41.8902, lng: 12.4922 },
       { id: "gK6A0K2zQz4", titulo: "Plaza Mayor", ciudad: "Madrid", pais: "España", lat: 40.4154, lng: -3.7074 },
       { id: "vXKn4qUQFMA", titulo: "Santiago Providencia", ciudad: "Santiago", pais: "Chile", lat: -33.4489, lng: -70.6693 }
     ];
 
-    /* INICIALIZAR EL GLOBO 3D (GLOBE.GL) */
+    /* INICIALIZAR GLOBO CON ICONOS PLANOS Y VERDES */
     let worldGlobe;
     function initGlobe() {
       const elem = document.getElementById('globeViz');
@@ -413,63 +409,70 @@
         .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
         .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
         .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+        // PUNTOS PLANOS VERDES 2D (Sin cilindros 3D)
         .pointsData(camarasMundo)
         .pointLat('lat')
         .pointLng('lng')
-        .pointColor(() => '#00e5ff')
-        .pointAltitude(0.06)
-        .pointRadius(0.8)
-        .pointLabel(d => `<b>${d.titulo}</b> (${d.ciudad}, ${d.pais})`)
+        .pointColor(() => '#00ff66')
+        .pointAltitude(0.01)
+        .pointRadius(0.9)
+        .pointLabel(d => `<div style="background:#0a1121;border:1px solid #00ff66;padding:4px 8px;border-radius:4px;color:#fff;font-family:monospace;font-size:11px;">🟢 ${d.titulo} - ${d.ciudad}</div>`)
         .onPointClick(point => {
-          abrirCamaraMundo(point);
-          worldGlobe.pointOfView({ lat: point.lat, lng: point.lng, altitude: 1.5 }, 1200);
+          seleccionarCamara(point);
         });
 
-      // Configuración de cámara inicial apuntando a América
-      worldGlobe.pointOfView({ lat: 10, lng: -60, altitude: 2.2 });
+      // Vista inicial
+      worldGlobe.pointOfView({ lat: 15, lng: -60, altitude: 2.2 });
       worldGlobe.controls().autoRotate = true;
-      worldGlobe.controls().autoRotateSpeed = 0.4;
+      worldGlobe.controls().autoRotateSpeed = 0.35;
     }
 
-    /* RENDER DE LA LISTA LATERAL */
-    const listEl = document.getElementById('worldCamsList');
-    function renderWorldList() {
-      listEl.innerHTML = '';
+    /* RENDER DE ENLACES PLANOS EN LA BARRA */
+    const linksContainer = document.getElementById('worldLinksList');
+    function renderLinks() {
+      linksContainer.innerHTML = '';
       camarasMundo.forEach(cam => {
-        const item = document.createElement('div');
-        item.className = 'world-cam-card';
-        item.innerHTML = `
-          <img class="world-thumb" src="https://img.youtube.com/vi/${cam.id}/mqdefault.jpg">
-          <div class="world-info">
-            <span class="world-title" title="${cam.titulo}">${cam.titulo}</span>
-            <span class="world-location">${cam.ciudad}, ${cam.pais}</span>
-          </div>
+        const link = document.createElement('div');
+        link.className = 'world-cam-link';
+        link.id = `link_${cam.id}`;
+        link.innerHTML = `
+          <span class="link-city-title">📍 ${cam.ciudad} - ${cam.titulo}</span>
+          <span class="link-country-badge">${cam.pais}</span>
         `;
-        item.addEventListener('click', () => {
-          abrirCamaraMundo(cam);
-          if (worldGlobe) {
-            worldGlobe.controls().autoRotate = false;
-            worldGlobe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 1.5 }, 1200);
-          }
+        link.addEventListener('click', () => {
+          seleccionarCamara(cam);
         });
-        listEl.appendChild(item);
+        linksContainer.appendChild(link);
       });
     }
 
-    /* REPRODUCTOR FLOTANTE */
-    const floatBox = document.getElementById('floatingPlayerBox');
-    const floatTitle = document.getElementById('floatCamTitle');
-    const floatIframe = document.getElementById('floatCamIframe');
+    /* SELECCIONAR CÁMARA (ZOOM PLANO + REPRODUCTOR) */
+    const playerBox = document.getElementById('modalPlayerFloat');
+    const playerTitle = document.getElementById('playerCamTitle');
+    const playerIframe = document.getElementById('playerIframe');
 
-    function abrirCamaraMundo(cam) {
-      floatTitle.textContent = `${cam.titulo.toUpperCase()} (${cam.ciudad})`;
-      floatIframe.src = `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&rel=0`;
-      floatBox.style.display = 'block';
+    function seleccionarCamara(cam) {
+      // Resaltar enlace en la barra
+      document.querySelectorAll('.world-cam-link').forEach(l => l.classList.remove('active'));
+      const activeLink = document.getElementById(`link_${cam.id}`);
+      if (activeLink) activeLink.classList.add('active');
+
+      // Centrar globo suavemente
+      if (worldGlobe) {
+        worldGlobe.controls().autoRotate = false;
+        worldGlobe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 1.4 }, 1200);
+      }
+
+      // Abrir reproductor
+      playerTitle.textContent = `${cam.titulo.toUpperCase()} (${cam.ciudad}, ${cam.pais})`;
+      playerIframe.src = `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&rel=0`;
+      playerBox.style.display = 'block';
     }
 
-    function cerrarReproductorFlotante() {
-      floatBox.style.display = 'none';
-      floatIframe.src = '';
+    function cerrarReproductor() {
+      playerBox.style.display = 'none';
+      playerIframe.src = '';
+      document.querySelectorAll('.world-cam-link').forEach(l => l.classList.remove('active'));
       if (worldGlobe) worldGlobe.controls().autoRotate = true;
     }
 
@@ -545,14 +548,12 @@
     });
 
     window.addEventListener('resize', () => {
-      if (worldGlobe) {
-        worldGlobe.width(window.innerWidth).height(window.innerHeight);
-      }
+      if (worldGlobe) worldGlobe.width(window.innerWidth).height(window.innerHeight);
     });
 
     document.addEventListener('DOMContentLoaded', () => {
       initGlobe();
-      renderWorldList();
+      renderLinks();
     });
   </script>
 </body>
