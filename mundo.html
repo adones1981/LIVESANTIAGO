@@ -71,7 +71,6 @@
       font-size: 0.82rem; font-weight: 700; text-decoration: none;
       display: inline-flex; align-items: center; gap: 0.5rem;
       font-family: 'JetBrains Mono', monospace; transition: all 0.25s ease;
-      cursor: pointer;
     }
 
     .btn-world:hover { background: var(--accent); color: #07090e; }
@@ -123,7 +122,7 @@
     .btn-save { background: var(--accent); color: #07090e; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
     .btn-cancel { background: rgba(255, 255, 255, 0.1); color: var(--text); border: none; padding: 0.6rem 0.9rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; }
 
-    /* FILA BUSCADOR Y CLIMA */
+    /* FILA BUSCADOR Y CLIMA CENTRADO */
     .filters-section { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.75rem; }
     
     .search-and-weather-row {
@@ -508,47 +507,6 @@
       border-radius: 8px; overflow: hidden; border: 1px solid var(--border); height: 170px; background: #000;
     }
     .modal-map-frame iframe { width: 100%; height: 100%; border: 0; }
-
-    /* CONTENEDOR FLOTANTE PARA MUNDO A PANTALLA COMPLETA */
-    #worldIframeContainer {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100vw;
-      height: 100vh;
-      z-index: 999;
-      background: #07090e;
-      display: none;
-    }
-
-    #worldIframeContainer iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-
-    /* BOTÓN FLOTANTE PARA VOLVER A CHILE DESDE MUNDO */
-    .btn-back-chile-float {
-      position: fixed;
-      top: 1.25rem;
-      left: 1.5rem;
-      z-index: 1001;
-      background: rgba(10, 17, 33, 0.95);
-      border: 1px solid var(--accent);
-      color: var(--accent);
-      padding: 0.5rem 1rem;
-      border-radius: 8px;
-      font-size: 0.8rem;
-      font-weight: 700;
-      cursor: pointer;
-      font-family: 'JetBrains Mono', monospace;
-      box-shadow: 0 0 15px rgba(0, 229, 255, 0.3);
-      display: none;
-    }
-    .btn-back-chile-float:hover {
-      background: var(--accent);
-      color: #07090e;
-    }
   </style>
 </head>
 <body>
@@ -590,19 +548,14 @@
     </div>
 
     <div class="header-actions">
-      <button class="btn-world" id="btnOpenWorld" onclick="abrirVistaMundo()">🌍 BUSCAR POR EL MUNDO</button>
+      <!-- ENLACE NATIVO DIRECTO AL MUNDO (SIN DUPLICACIÓN NI ERRORES DE WEBGL) -->
+      <a href="mundo.html" class="btn-world">🌍 BUSCAR POR EL MUNDO</a>
       <button class="btn-add" id="btnToggleAdd">+ AGREGAR CÁMARA</button>
       <button class="btn-export" id="btnExport" title="Copia el código para actualizar GitHub">📋 COPIAR PARA GITHUB</button>
       <button class="btn-admin" id="btnAdmin">🔒 ACCESO ADMIN</button>
       <div class="clock-badge">HORA CHILE: <span id="reloj">--:--:--</span></div>
     </div>
   </header>
-
-  <!-- BOTÓN FLOTANTE Y CONTENEDOR DE MUNDO.HTML -->
-  <button class="btn-back-chile-float" id="btnBackChile" onclick="cerrarVistaMundo()">🇨🇱 VOLVER A CHILE</button>
-  <div id="worldIframeContainer">
-    <iframe id="worldFrame" src="about:blank"></iframe>
-  </div>
 
   <div class="container" id="mainContainer">
     <div class="admin-form-panel" id="adminPanel">
@@ -1165,26 +1118,6 @@
       } catch (e) {
         mWeatherDesc.textContent = "Error de satélite";
       }
-    }
-
-    /* MANTENER RADIO CONTINUA Y PANTALLA COMPLETA DE MUNDO */
-    function abrirVistaMundo() {
-      const container = document.getElementById('worldIframeContainer');
-      const frame = document.getElementById('worldFrame');
-      const btnBack = document.getElementById('btnBackChile');
-
-      if (frame.src === "about:blank" || !frame.src.includes("mundo.html")) {
-        frame.src = "mundo.html";
-      }
-      container.style.display = "block";
-      btnBack.style.display = "inline-flex";
-    }
-
-    function cerrarVistaMundo() {
-      const container = document.getElementById('worldIframeContainer');
-      const btnBack = document.getElementById('btnBackChile');
-      container.style.display = "none";
-      btnBack.style.display = "none";
     }
 
     function actualizarReloj() {
