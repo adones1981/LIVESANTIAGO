@@ -140,12 +140,19 @@
     .mini-vol-slider { width: 55px; height: 4px; accent-color: var(--accent); cursor: pointer; }
 
     .mini-stations-group {
-      display: flex;
-      gap: 3px;
-      border-left: 1px solid rgba(255, 255, 255, 0.2);
-      padding-left: 6px;
-      overflow-x: auto;
-      max-width: 320px;
+    
+  display: flex;
+  gap: 3px;
+  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  padding-left: 6px;
+  flex-wrap: nowrap;
+  scrollbar-width: none; /* Oculta la barra en Firefox */
+}
+
+/* Oculta la barra de scroll en Chrome, Edge y navegadores basados en Chromium */
+.mini-stations-group::-webkit-scrollbar {
+  display: none;
+}
     }
 
     .btn-mini-station {
