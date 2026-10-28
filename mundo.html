@@ -71,6 +71,7 @@
       font-size: 0.82rem; font-weight: 700; text-decoration: none;
       display: inline-flex; align-items: center; gap: 0.5rem;
       font-family: 'JetBrains Mono', monospace; transition: all 0.25s ease;
+      cursor: pointer;
     }
 
     .btn-world:hover { background: var(--accent); color: #07090e; }
@@ -285,7 +286,7 @@
     .counter-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); padding: 0.35rem 0.85rem; border-radius: 20px; }
     .counter-number { color: var(--accent); font-weight: 700; }
 
-    /* OCULTAR ACCESO ADMIN EN CHILE */
+    /* OCULTAR ACCESO ADMIN */
     .btn-admin, #btnAdmin, .admin-modal { display: none !important; }
 
     /* MINI REPRODUCTOR COMPACTO RADIO DELOREAN */
@@ -548,7 +549,7 @@
     </div>
 
     <div class="header-actions">
-      <!-- ENLACE NATIVO DIRECTO A MUNDO (LIMPIO Y SIN DUPLICACIÓN) -->
+      <!-- ENLACE NATIVO DIRECTO A MUNDO (HTML PURO) -->
       <a href="mundo.html" class="btn-world">🌍 BUSCAR POR EL MUNDO</a>
       <button class="btn-add" id="btnToggleAdd">+ AGREGAR CÁMARA</button>
       <button class="btn-export" id="btnExport" title="Copia el código para actualizar GitHub">📋 COPIAR PARA GITHUB</button>
@@ -1149,11 +1150,9 @@
     initCounter();
     cargarClimaFranja('Santiago', coordsChile['santiago'].lat, coordsChile['santiago'].lng);
 
-    /* RADIO DELOREAN CON PERSISTENCIA DE ESTADO */
+    /* RADIO DELOREAN */
     let radioAudioPlayer = null;
-    let currentStationId = localStorage.getItem('radio_delorean_station') || 'BuB9SaS2cWE';
-    let savedVol = parseInt(localStorage.getItem('radio_delorean_vol') || '50', 10);
-    let shouldAutoPlay = localStorage.getItem('radio_delorean_playing') === 'true';
+    let currentStationId = 'BuB9SaS2cWE';
 
     (function initRadioApi() {
       const ytScript = document.createElement('script');
@@ -1164,18 +1163,8 @@
     window.onYouTubeIframeAPIReady = function() {
       radioAudioPlayer = new YT.Player('radioHiddenPlayer', {
         height: '1', width: '1', videoId: currentStationId,
-        playerVars: { autoplay: shouldAutoPlay ? 1 : 0, controls: 0 },
-        events: { 
-          'onReady': () => {
-            radioAudioPlayer.setVolume(savedVol);
-            document.getElementById('miniRadioVol').value = savedVol;
-            if (shouldAutoPlay) {
-              radioAudioPlayer.playVideo();
-              document.getElementById('btnMiniRadioPlay').textContent = '⏸';
-            }
-            actualizarBotonEstacion(currentStationId);
-          } 
-        }
+        playerVars: { autoplay: 0, controls: 0 },
+        events: { 'onReady': () => radioAudioPlayer.setVolume(50) }
       });
     };
 
@@ -1185,38 +1174,26 @@
       if (radioAudioPlayer.getPlayerState() === 1) {
         radioAudioPlayer.pauseVideo();
         btn.textContent = '▶';
-        localStorage.setItem('radio_delorean_playing', 'false');
       } else {
         radioAudioPlayer.playVideo();
         btn.textContent = '⏸';
-        localStorage.setItem('radio_delorean_playing', 'true');
       }
     }
 
     function switchMiniStation(videoId, btnEl) {
       currentStationId = videoId;
-      localStorage.setItem('radio_delorean_station', videoId);
       const btnPlay = document.getElementById('btnMiniRadioPlay');
-
       if (radioAudioPlayer && typeof radioAudioPlayer.loadVideoById === 'function') {
         radioAudioPlayer.loadVideoById(videoId);
         btnPlay.textContent = '⏸';
-        localStorage.setItem('radio_delorean_playing', 'true');
       }
-      actualizarBotonEstacion(videoId);
-    }
-
-    function actualizarBotonEstacion(videoId) {
       document.querySelectorAll('.btn-mini-station').forEach(b => b.classList.remove('active'));
-      const activeBtn = document.getElementById('btn_st_' + videoId);
-      if (activeBtn) activeBtn.classList.add('active');
+      btnEl.classList.add('active');
     }
 
     document.getElementById('miniRadioVol').addEventListener('input', (e) => {
-      const vol = e.target.value;
-      localStorage.setItem('radio_delorean_vol', vol);
       if (radioAudioPlayer && typeof radioAudioPlayer.setVolume === 'function') {
-        radioAudioPlayer.setVolume(vol);
+        radioAudioPlayer.setVolume(e.target.value);
       }
     });
   </script>
