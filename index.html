@@ -3,10 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chile Live Cams | Monitoreo en Vivo</title>
+  <title>Chile y Mundo Live Cams | Monitoreo Global</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+  
+  <!-- Dependencias 3D Globe -->
+  <script src="//unpkg.com/three"></script>
+  <script src="//unpkg.com/globe.gl"></script>
+
   <style>
     :root {
       --bg: #07090e;
@@ -14,6 +19,7 @@
       --border: rgba(255, 255, 255, 0.08);
       --border-hover: rgba(0, 229, 255, 0.35);
       --accent: #00e5ff;
+      --accent-glow: rgba(0, 229, 255, 0.35);
       --live-red: #ff334b;
       --text: #f1f5f9;
       --muted: #94a3b8;
@@ -28,16 +34,18 @@
       min-height: 100vh;
       display: flex;
       flex-direction: column;
+      overflow-x: hidden;
       background-image: 
         radial-gradient(circle at 10% 10%, rgba(0, 229, 255, 0.03) 0%, transparent 40%),
         radial-gradient(circle at 90% 90%, rgba(255, 51, 75, 0.03) 0%, transparent 40%);
     }
 
+    /* HEADER RAÍZ (NUNCA SE RECARGA) */
     header {
-      background: rgba(10, 15, 26, 0.9);
+      background: rgba(10, 15, 26, 0.92);
       backdrop-filter: blur(14px);
       border-bottom: 1px solid var(--border);
-      padding: 0.9rem 1.5rem;
+      padding: 0.85rem 1.5rem;
       position: sticky;
       top: 0;
       z-index: 100;
@@ -64,7 +72,7 @@
 
     .header-actions { display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap; }
 
-    .btn-world {
+    .btn-nav-view {
       background: linear-gradient(135deg, rgba(0, 255, 204, 0.15), rgba(0, 229, 255, 0.25));
       border: 1px solid var(--accent);
       color: #fff; padding: 0.5rem 1rem; border-radius: 8px;
@@ -74,25 +82,7 @@
       cursor: pointer;
     }
 
-    .btn-world:hover { background: var(--accent); color: #07090e; }
-
-    .btn-admin {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
-      color: var(--muted); padding: 0.45rem 0.8rem; border-radius: 6px;
-      font-size: 0.78rem; cursor: pointer; font-family: 'JetBrains Mono', monospace;
-    }
-
-    .btn-admin.active { border-color: var(--accent); color: var(--accent); }
-
-    .btn-add, .btn-export {
-      background: rgba(0, 229, 255, 0.12); border: 1px solid var(--accent);
-      color: var(--accent); padding: 0.45rem 0.9rem; border-radius: 6px;
-      font-size: 0.82rem; font-weight: 600; cursor: pointer; display: none;
-      align-items: center; gap: 0.4rem; font-family: 'JetBrains Mono', monospace;
-    }
-
-    .btn-export { border-color: #a855f7; color: #d8b4fe; background: rgba(168, 85, 247, 0.15); }
-    .btn-export:hover { background: #a855f7; color: #fff; }
+    .btn-nav-view:hover { background: var(--accent); color: #07090e; }
 
     .clock-badge {
       font-family: 'JetBrains Mono', monospace; font-size: 0.85rem;
@@ -102,194 +92,7 @@
 
     .clock-badge span { color: var(--accent); font-weight: 700; }
 
-    .container { max-width: 1650px; margin: 0 auto; padding: 1.5rem; width: 100%; flex: 1; }
-
-    .admin-form-panel {
-      display: none; background: rgba(18, 25, 42, 0.95); border: 1px solid var(--accent);
-      border-radius: 12px; padding: 1.25rem; margin-bottom: 1.5rem;
-      box-shadow: 0 8px 30px rgba(0, 229, 255, 0.15);
-    }
-
-    .admin-form-panel.open { display: block; }
-    .admin-panel-header { font-size: 0.95rem; font-weight: 700; margin-bottom: 1rem; color: var(--accent); display: flex; justify-content: space-between; align-items: center; }
-    .form-grid { display: grid; grid-template-columns: 2fr 1fr 1fr auto auto; gap: 0.75rem; align-items: center; }
-
-    .input-field {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
-      border-radius: 6px; padding: 0.6rem 0.85rem; color: #fff; font-size: 0.85rem; outline: none; width: 100%;
-    }
-
-    .input-field:focus { border-color: var(--accent); }
-    .btn-save { background: var(--accent); color: #07090e; border: none; padding: 0.6rem 1.2rem; border-radius: 6px; font-weight: 700; font-size: 0.85rem; cursor: pointer; }
-    .btn-cancel { background: rgba(255, 255, 255, 0.1); color: var(--text); border: none; padding: 0.6rem 0.9rem; border-radius: 6px; font-size: 0.85rem; cursor: pointer; }
-
-    /* FILA BUSCADOR Y CLIMA */
-    .filters-section { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.75rem; }
-    
-    .search-and-weather-row {
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      gap: 1.5rem;
-      flex-wrap: wrap;
-    }
-
-    .search-wrapper { position: relative; max-width: 420px; width: 100%; }
-
-    .search-wrapper input {
-      width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);
-      border-radius: 8px; padding: 0.65rem 1rem 0.65rem 2.3rem; color: #fff; font-size: 0.88rem; outline: none;
-    }
-
-    .search-wrapper input:focus { border-color: var(--accent); }
-    .search-icon { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; fill: var(--muted); }
-
-    /* WIDGET DEL CLIMA CON DÍAS COMPLETOS */
-    .weather-strip-box {
-      background: rgba(15, 21, 35, 0.85);
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      padding: 0.4rem 0.85rem;
-      display: flex;
-      align-items: center;
-      gap: 0.85rem;
-      flex-wrap: wrap;
-    }
-
-    .weather-today-compact {
-      display: flex;
-      align-items: center;
-      gap: 0.45rem;
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.82rem;
-    }
-
-    .weather-today-city {
-      color: var(--accent);
-      font-weight: 700;
-      text-transform: uppercase;
-    }
-
-    .weather-today-temp {
-      color: #fff;
-      font-weight: 700;
-    }
-
-    .weather-days-compact {
-      display: flex;
-      align-items: center;
-      gap: 0.75rem;
-      border-left: 1px solid var(--border);
-      padding-left: 0.75rem;
-    }
-
-    .w-day-mini {
-      display: flex;
-      align-items: center;
-      gap: 3px;
-      font-size: 0.75rem;
-      font-family: 'JetBrains Mono', monospace;
-      color: var(--muted);
-      letter-spacing: 0.3px;
-    }
-
-    .w-day-mini strong { color: #fff; font-weight: 700; }
-
-    .weather-search-mini {
-      display: flex;
-      align-items: center;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid var(--border);
-      border-radius: 4px;
-      padding: 2px 4px;
-      gap: 3px;
-    }
-
-    .weather-search-mini input {
-      background: transparent;
-      border: none;
-      outline: none;
-      color: #fff;
-      font-size: 0.75rem;
-      width: 100px;
-      font-family: 'Plus Jakarta Sans', sans-serif;
-    }
-
-    .weather-search-mini button {
-      background: var(--accent);
-      color: #07090e;
-      border: none;
-      border-radius: 3px;
-      padding: 2px 6px;
-      font-size: 0.65rem;
-      font-weight: bold;
-      cursor: pointer;
-      font-family: 'JetBrains Mono', monospace;
-    }
-
-    /* PÍLDORAS */
-    .city-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
-    .city-pill {
-      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);
-      color: var(--muted); padding: 0.4rem 0.85rem; border-radius: 20px; font-size: 0.8rem;
-      cursor: pointer; display: flex; align-items: center; gap: 0.4rem;
-    }
-
-    .city-pill.active { background: rgba(0, 229, 255, 0.12); border-color: var(--accent); color: var(--accent); }
-    .city-pill .pill-count { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; background: rgba(255, 255, 255, 0.08); padding: 0.1rem 0.4rem; border-radius: 10px; }
-    .city-pill.active .pill-count { background: var(--accent); color: #07090e; font-weight: 700; }
-
-    /* GRILLA */
-    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.25rem; }
-    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s; }
-    .card:hover { transform: translateY(-2px); border-color: var(--border-hover); }
-    .card-header { padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.25); border-bottom: 1px solid var(--border); }
-    .card-titles { overflow: hidden; display: flex; flex-direction: column; gap: 0.15rem; cursor: pointer; }
-    .card-city { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--accent); text-transform: uppercase; font-weight: 600; }
-    .card-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
-    .card-controls { display: flex; align-items: center; gap: 0.4rem; }
-
-    .btn-fullscreen {
-      background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border);
-      color: var(--text); border-radius: 4px; padding: 0.2rem 0.45rem;
-      font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
-    }
-    .btn-fullscreen:hover { border-color: var(--accent); color: var(--accent); }
-
-    .btn-inspect {
-      background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent);
-      color: var(--accent); border-radius: 4px; padding: 0.2rem 0.45rem;
-      font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; font-weight: 700;
-      cursor: pointer; transition: all 0.2s;
-    }
-    .btn-inspect:hover { background: var(--accent); color: #07090e; }
-
-    .btn-fav-star {
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
-      color: var(--muted); border-radius: 4px; padding: 0.2rem 0.35rem;
-      font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
-    }
-    .btn-fav-star.active { color: #ffd700; border-color: #ffd700; }
-
-    .btn-edit, .btn-del { background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border); border-radius: 4px; padding: 0.25rem 0.45rem; font-size: 0.72rem; cursor: pointer; display: none; color: var(--text); }
-    .btn-edit:hover { border-color: var(--accent); color: var(--accent); }
-    .btn-del:hover { border-color: var(--live-red); color: var(--live-red); }
-
-    .badge-live { display: inline-flex; align-items: center; gap: 0.35rem; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 700; color: var(--live-red); background: rgba(255, 51, 75, 0.12); border: 1px solid rgba(255, 51, 75, 0.3); padding: 0.2rem 0.5rem; border-radius: 4px; }
-    .dot { width: 6px; height: 6px; background: var(--live-red); border-radius: 50%; }
-
-    .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; background: #000; }
-    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
-
-    /* FOOTER */
-    footer { border-top: 1px solid var(--border); padding: 1.5rem; display: flex; flex-direction: column; align-items: center; gap: 0.6rem; font-size: 0.78rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; background: rgba(10, 15, 26, 0.5); }
-    .counter-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); padding: 0.35rem 0.85rem; border-radius: 20px; }
-    .counter-number { color: var(--accent); font-weight: 700; }
-
-    /* OCULTAR ACCESO ADMIN */
-    .btn-admin, #btnAdmin, .admin-modal { display: none !important; }
-
-    /* MINI REPRODUCTOR COMPACTO RADIO DELOREAN */
+    /* MINI RADIO DELOREAN (ESTILO EXACTO Y TRANSLÚCIDO) */
     .mini-radio-bar {
       display: flex;
       align-items: center;
@@ -307,6 +110,33 @@
       font-size: 0.7rem;
       font-weight: bold;
       letter-spacing: 0.5px;
+    }
+
+    .mini-radio-screen {
+      background: #0d0d0d;
+      border: 1px solid var(--accent);
+      border-radius: 6px;
+      padding: 3px 6px;
+      width: 210px;
+      overflow: hidden;
+      white-space: nowrap;
+      box-shadow: inset 0 0 5px rgba(0, 229, 255, 0.3);
+    }
+
+    .mini-marquee {
+      display: inline-block;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.65rem;
+      font-weight: 700;
+      color: #ff334b;
+      text-shadow: 0 0 6px #ff0000;
+      padding-left: 100%;
+      animation: mini-scroll-marquee 16s linear infinite;
+    }
+
+    @keyframes mini-scroll-marquee {
+      0% { transform: translateX(0); }
+      100% { transform: translateX(-100%); }
     }
 
     .btn-radio-play {
@@ -377,34 +207,155 @@
       height: 1px;
     }
 
-    .mini-radio-screen {
-      background: #0d0d0d;
-      border: 1px solid var(--accent);
-      border-radius: 6px;
-      padding: 3px 6px;
-      width: 210px;
-      overflow: hidden;
-      white-space: nowrap;
-      box-shadow: inset 0 0 5px rgba(0, 229, 255, 0.3);
+    /* CONTENEDORES DE VISTAS (SPA) */
+    #vistaChile { display: block; flex: 1; }
+    #vistaMundo { display: none; position: relative; width: 100vw; height: calc(100vh - 65px); overflow: hidden; }
+
+    /* ESTILOS ESPECÍFICOS DE CHILE */
+    .container { max-width: 1650px; margin: 0 auto; padding: 1.5rem; width: 100%; flex: 1; }
+    .filters-section { display: flex; flex-direction: column; gap: 1rem; margin-bottom: 1.75rem; }
+    
+    .search-and-weather-row {
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 1.5rem;
+      flex-wrap: wrap;
     }
 
-    .mini-marquee {
-      display: inline-block;
+    .search-wrapper { position: relative; max-width: 420px; width: 100%; }
+
+    .search-wrapper input {
+      width: 100%; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);
+      border-radius: 8px; padding: 0.65rem 1rem 0.65rem 2.3rem; color: #fff; font-size: 0.88rem; outline: none;
+    }
+
+    .search-wrapper input:focus { border-color: var(--accent); }
+    .search-icon { position: absolute; left: 0.8rem; top: 50%; transform: translateY(-50%); width: 15px; height: 15px; fill: var(--muted); }
+
+    .weather-strip-box {
+      background: rgba(15, 21, 35, 0.85);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.4rem 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    .weather-today-compact {
+      display: flex;
+      align-items: center;
+      gap: 0.45rem;
       font-family: 'JetBrains Mono', monospace;
+      font-size: 0.82rem;
+    }
+
+    .weather-today-city { color: var(--accent); font-weight: 700; text-transform: uppercase; }
+    .weather-today-temp { color: #fff; font-weight: 700; }
+
+    .weather-days-compact {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      border-left: 1px solid var(--border);
+      padding-left: 0.75rem;
+    }
+
+    .w-day-mini {
+      display: flex;
+      align-items: center;
+      gap: 3px;
+      font-size: 0.75rem;
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--muted);
+      letter-spacing: 0.3px;
+    }
+
+    .w-day-mini strong { color: #fff; font-weight: 700; }
+
+    .weather-search-mini {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 4px;
+      padding: 2px 4px;
+      gap: 3px;
+    }
+
+    .weather-search-mini input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 0.75rem;
+      width: 100px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    .weather-search-mini button {
+      background: var(--accent);
+      color: #07090e;
+      border: none;
+      border-radius: 3px;
+      padding: 2px 6px;
       font-size: 0.65rem;
-      font-weight: 700;
-      color: #ff334b;
-      text-shadow: 0 0 6px #ff0000;
-      padding-left: 100%;
-      animation: mini-scroll-marquee 16s linear infinite;
+      font-weight: bold;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
     }
 
-    @keyframes mini-scroll-marquee {
-      0% { transform: translateX(0); }
-      100% { transform: translateX(-100%); }
+    .city-pills { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .city-pill {
+      background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border);
+      color: var(--muted); padding: 0.4rem 0.85rem; border-radius: 20px; font-size: 0.8rem;
+      cursor: pointer; display: flex; align-items: center; gap: 0.4rem;
     }
 
-    /* MODAL DE VISTA DETALLADA */
+    .city-pill.active { background: rgba(0, 229, 255, 0.12); border-color: var(--accent); color: var(--accent); }
+    .city-pill .pill-count { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; background: rgba(255, 255, 255, 0.08); padding: 0.1rem 0.4rem; border-radius: 10px; }
+    .city-pill.active .pill-count { background: var(--accent); color: #07090e; font-weight: 700; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(360px, 1fr)); gap: 1.25rem; }
+    .card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; transition: transform 0.2s, border-color 0.2s; }
+    .card:hover { transform: translateY(-2px); border-color: var(--border-hover); }
+    .card-header { padding: 0.75rem 1rem; display: flex; justify-content: space-between; align-items: center; background: rgba(0, 0, 0, 0.25); border-bottom: 1px solid var(--border); }
+    .card-titles { overflow: hidden; display: flex; flex-direction: column; gap: 0.15rem; cursor: pointer; }
+    .card-city { font-family: 'JetBrains Mono', monospace; font-size: 0.68rem; color: var(--accent); text-transform: uppercase; font-weight: 600; }
+    .card-title { font-size: 0.85rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+    .card-controls { display: flex; align-items: center; gap: 0.4rem; }
+
+    .btn-fullscreen {
+      background: rgba(255, 255, 255, 0.06); border: 1px solid var(--border);
+      color: var(--text); border-radius: 4px; padding: 0.2rem 0.45rem;
+      font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-fullscreen:hover { border-color: var(--accent); color: var(--accent); }
+
+    .btn-inspect {
+      background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent);
+      color: var(--accent); border-radius: 4px; padding: 0.2rem 0.45rem;
+      font-size: 0.68rem; font-family: 'JetBrains Mono', monospace; font-weight: 700;
+      cursor: pointer; transition: all 0.2s;
+    }
+    .btn-inspect:hover { background: var(--accent); color: #07090e; }
+
+    .btn-fav-star {
+      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
+      color: var(--muted); border-radius: 4px; padding: 0.2rem 0.35rem;
+      font-size: 0.75rem; cursor: pointer; transition: all 0.2s;
+    }
+    .btn-fav-star.active { color: #ffd700; border-color: #ffd700; }
+
+    .badge-live { display: inline-flex; align-items: center; gap: 0.35rem; font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; font-weight: 700; color: var(--live-red); background: rgba(255, 51, 75, 0.12); border: 1px solid rgba(255, 51, 75, 0.3); padding: 0.2rem 0.5rem; border-radius: 4px; }
+    .dot { width: 6px; height: 6px; background: var(--live-red); border-radius: 50%; }
+
+    .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; background: #000; }
+    .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
+
+    /* MODAL CHILE */
     .modal-detail-overlay {
       position: fixed;
       top: 0; left: 0;
@@ -446,11 +397,7 @@
     .modal-detail-title h2 { font-size: 1.05rem; color: #fff; font-weight: 700; }
     .modal-detail-title p { font-size: 0.72rem; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
 
-    .modal-head-actions {
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-    }
+    .modal-head-actions { display: flex; align-items: center; gap: 0.5rem; }
 
     .btn-close-modal {
       background: none; border: none; color: var(--muted);
@@ -468,9 +415,7 @@
       font-size: 0.72rem; color: var(--muted); font-family: 'JetBrains Mono', monospace; margin-bottom: 0.4rem; text-transform: uppercase;
     }
 
-    .modal-siblings-strip {
-      display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px;
-    }
+    .modal-siblings-strip { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; }
     .modal-siblings-strip::-webkit-scrollbar { height: 5px; }
     .modal-siblings-strip::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
@@ -487,10 +432,7 @@
     .sibling-chip img { width: 100%; height: 90px; object-fit: cover; display: block; }
     .sibling-chip div { padding: 4px; font-size: 0.68rem; color: #fff; font-family: 'JetBrains Mono', monospace; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-    .modal-bottom-grid {
-      display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-    }
-
+    .modal-bottom-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
     @media (max-width: 720px) { .modal-bottom-grid { grid-template-columns: 1fr; } }
 
     .modal-weather-card {
@@ -508,19 +450,316 @@
       border-radius: 8px; overflow: hidden; border: 1px solid var(--border); height: 170px; background: #000;
     }
     .modal-map-frame iframe { width: 100%; height: 100%; border: 0; }
+
+    /* ESTILOS ESPECÍFICOS DE MUNDO */
+    #globeViz {
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 1;
+    }
+
+    .sidebar-links {
+      position: absolute;
+      left: 1.5rem;
+      top: 1.5rem;
+      width: 290px;
+      max-height: 48vh;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      backdrop-filter: blur(12px);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+
+    .sidebar-header {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sidebar-header span { color: var(--accent); }
+
+    .links-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .links-list::-webkit-scrollbar { width: 4px; }
+    .links-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .world-cam-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid transparent;
+      color: #cbd5e1;
+      text-decoration: none;
+      font-size: 0.76rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .world-cam-link:hover, .world-cam-link.active {
+      background: rgba(0, 229, 255, 0.1);
+      border-color: var(--accent);
+      color: #fff;
+      transform: translateX(3px);
+    }
+
+    .link-city-title {
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 175px;
+    }
+
+    .link-country-badge {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.62rem;
+      color: var(--accent);
+      text-transform: uppercase;
+      background: rgba(0, 229, 255, 0.08);
+      padding: 2px 6px;
+      border-radius: 4px;
+      white-space: nowrap;
+    }
+
+    /* VENTANA FLOTANTE ARRASTRABLE Y REDIMENSIONABLE */
+    .modal-player-float {
+      position: absolute;
+      top: 55%;
+      left: 1.5rem;
+      width: 420px;
+      min-width: 280px;
+      min-height: 200px;
+      max-width: 90vw;
+      max-height: 85vh;
+      background: var(--card-bg);
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      overflow: hidden;
+      z-index: 200;
+      box-shadow: 0 10px 40px rgba(0, 229, 255, 0.25);
+      display: none;
+      resize: both;
+    }
+
+    .modal-player-bar {
+      padding: 0.5rem 0.85rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(0, 0, 0, 0.65);
+      border-bottom: 1px solid var(--border);
+      cursor: grab;
+      user-select: none;
+    }
+
+    .modal-player-bar:active { cursor: grabbing; }
+
+    .modal-player-bar span {
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      font-family: 'JetBrains Mono', monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 80%;
+      pointer-events: none;
+    }
+
+    .btn-close-player {
+      background: none;
+      border: none;
+      color: var(--muted);
+      font-size: 1.3rem;
+      cursor: pointer;
+      line-height: 1;
+    }
+
+    .btn-close-player:hover { color: #fff; }
+
+    .video-frame-box {
+      width: 100%;
+      height: calc(100% - 35px);
+      background: #000;
+      position: relative;
+    }
+
+    .video-frame-box iframe {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      border: 0;
+    }
+
+    /* CLIMA MUNDIAL DERECHO */
+    .sidebar-weather {
+      position: absolute;
+      right: 1.5rem;
+      top: 1.5rem;
+      width: 290px;
+      max-height: calc(100% - 3rem);
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      backdrop-filter: blur(12px);
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    }
+
+    .sidebar-weather-header {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .sidebar-weather-title {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: #fff;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sidebar-weather-title span { color: var(--accent); }
+
+    .world-weather-search {
+      display: flex;
+      align-items: center;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 3px 6px;
+      gap: 4px;
+    }
+
+    .world-weather-search input {
+      background: transparent;
+      border: none;
+      outline: none;
+      color: #fff;
+      font-size: 0.75rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      width: 100%;
+    }
+
+    .world-weather-search button {
+      background: var(--accent);
+      color: #07090e;
+      border: none;
+      border-radius: 4px;
+      padding: 2px 7px;
+      font-size: 0.65rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .weather-list-vertical {
+      flex: 1;
+      overflow-y: auto;
+      padding: 0.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .weather-list-vertical::-webkit-scrollbar { width: 4px; }
+    .weather-list-vertical::-webkit-scrollbar-thumb { background: var(--border); border-radius: 2px; }
+
+    .weather-city-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.5rem 0.75rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      font-family: 'JetBrains Mono', monospace;
+    }
+
+    .weather-city-card:hover {
+      background: rgba(255, 255, 255, 0.05);
+      border-color: rgba(0, 229, 255, 0.3);
+    }
+
+    .weather-city-name { font-size: 0.75rem; color: #f1f5f9; font-weight: 600; }
+    .weather-city-country { font-size: 0.62rem; color: var(--muted); margin-left: 4px; }
+    .weather-city-temp {
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--accent);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    footer {
+      border-top: 1px solid var(--border);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.6rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-family: 'JetBrains Mono', monospace;
+      background: rgba(10, 15, 26, 0.5);
+    }
+
+    .counter-badge { display: inline-flex; align-items: center; gap: 0.5rem; background: rgba(255, 255, 255, 0.04); border: 1px solid var(--border); padding: 0.35rem 0.85rem; border-radius: 20px; }
+    .counter-number { color: var(--accent); font-weight: 700; }
+
+    @media (max-width: 900px) {
+      .sidebar-links { width: calc(100% - 3rem); height: 180px; top: 1rem; left: 1.5rem; }
+      .sidebar-weather { width: calc(100% - 3rem); height: 180px; top: auto; bottom: 1rem; right: 1.5rem; }
+      .modal-player-float { width: calc(100% - 3rem); left: 1.5rem; bottom: 200px; }
+    }
   </style>
 </head>
 <body>
 
+  <!-- HEADER GLOBAL ÚNICO -->
   <header>
     <div class="brand">
       <div class="brand-logo"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z"/></svg></div>
       <div class="brand-text">
-        <h1>CHILE <span>EN VIVO</span></h1>
-        <p>Centro de Monitoreo Urbano</p>
+        <h1 id="brandTitle">CHILE <span>EN VIVO</span></h1>
+        <p id="brandSubtitle">Centro de Monitoreo Urbano</p>
       </div>
 
-      <!-- MINI WIDGET RADIO DELOREAN (6 ESTACIONES IDÉNTICAS) -->
+      <!-- REPRODUCTOR PERMANENTE RADIO DELOREAN (NUNCA SE APAGA) -->
       <div class="mini-radio-bar">
         <span class="mini-radio-title">⚡ RADIO DELOREAN</span>
 
@@ -549,79 +788,93 @@
     </div>
 
     <div class="header-actions">
-      <!-- ENLACE NATIVO DIRECTO A MUNDO -->
-      <a href="mundo.html" class="btn-world">🌍 BUSCAR POR EL MUNDO</a>
-      <button class="btn-add" id="btnToggleAdd">+ AGREGAR CÁMARA</button>
-      <button class="btn-export" id="btnExport" title="Copia el código para actualizar GitHub">📋 COPIAR PARA GITHUB</button>
-      <button class="btn-admin" id="btnAdmin">🔒 ACCESO ADMIN</button>
+      <!-- BOTÓN SPA NATIVO: ALTERNA SIN RECARGAR PÁGINA -->
+      <button class="btn-nav-view" id="btnCambiarVista" onclick="alternarVista()">🌍 BUSCAR POR EL MUNDO</button>
       <div class="clock-badge">HORA CHILE: <span id="reloj">--:--:--</span></div>
     </div>
   </header>
 
-  <div class="container" id="mainContainer">
-    <div class="admin-form-panel" id="adminPanel">
-      <div class="admin-panel-header">
-        <span id="panelTitle">+ AGREGAR NUEVA CÁMARA</span>
-        <button class="btn-cancel" id="btnCancelEdit" type="button" style="display:none;">Cancelar</button>
-      </div>
-      <form class="form-grid" id="formCam">
-        <input type="hidden" id="editIndex" value="-1">
-        <input type="text" id="camUrl" class="input-field" placeholder="Enlace de YouTube..." required>
-        <input type="text" id="camTitle" class="input-field" placeholder="Nombre o sector..." required>
-        <select id="camCity" class="input-field">
-          <option value="Santiago">Santiago</option>
-          <option value="Valparaíso / Viña">Valparaíso / Viña</option>
-          <option value="Concepción">Concepción</option>
-          <option value="La Serena">La Serena</option>
-          <option value="Otras">Otras</option>
-        </select>
-        <button type="submit" class="btn-save">GUARDAR</button>
-      </form>
-    </div>
-
-    <!-- FILA CON BUSCADOR Y EL WIDGET DE CLIMA CENTRADO -->
-    <div class="filters-section">
-      <div class="search-and-weather-row">
-        
-        <div class="search-wrapper">
-          <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-          <input type="text" id="filtroTexto" placeholder="Buscar por ciudad, comuna o sector...">
-        </div>
-
-        <!-- WIDGET DEL CLIMA CON DÍAS COMPLETOS (JUE, VIE, SÁB, DOM...) -->
-        <div class="weather-strip-box">
-          <div class="weather-today-compact">
-            <span class="weather-today-city" id="stripCity">Santiago</span>
-            <span class="weather-today-temp" id="stripTemp">--°C</span>
-            <span id="stripIcon">☀️</span>
+  <!-- ================= CAPA 1: VISTA CHILE ================= -->
+  <main id="vistaChile">
+    <div class="container">
+      <div class="filters-section">
+        <div class="search-and-weather-row">
+          <div class="search-wrapper">
+            <svg class="search-icon" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 14z"/></svg>
+            <input type="text" id="filtroTexto" placeholder="Buscar por ciudad, comuna o sector...">
           </div>
 
-          <div class="weather-days-compact" id="stripForecastDays"></div>
-
-          <div class="weather-search-mini">
-            <input type="text" id="stripSearchInput" placeholder="Comuna..." />
-            <button onclick="buscarClimaMini()">IR</button>
+          <div class="weather-strip-box">
+            <div class="weather-today-compact">
+              <span class="weather-today-city" id="stripCity">Santiago</span>
+              <span class="weather-today-temp" id="stripTemp">--°C</span>
+              <span id="stripIcon">☀️</span>
+            </div>
+            <div class="weather-days-compact" id="stripForecastDays"></div>
+            <div class="weather-search-mini">
+              <input type="text" id="stripSearchInput" placeholder="Comuna..." />
+              <button onclick="buscarClimaMini()">IR</button>
+            </div>
           </div>
         </div>
 
+        <div class="city-pills" id="cityPills"></div>
       </div>
 
-      <div class="city-pills" id="cityPills"></div>
-    </div>
-
-    <!-- SECCIÓN FAVORITOS (⭐) -->
-    <div id="favsSection" style="display: none; margin-bottom: 1.5rem;">
-      <div style="font-family:'JetBrains Mono', monospace; font-size:0.85rem; color:#ffd700; margin-bottom: 0.75rem; display:flex; align-items:center; gap:6px;">
-        <span>⭐ MIS CÁMARAS FAVORITAS</span>
+      <!-- SECCIÓN FAVORITOS -->
+      <div id="favsSection" style="display: none; margin-bottom: 1.5rem;">
+        <div style="font-family:'JetBrains Mono', monospace; font-size:0.85rem; color:#ffd700; margin-bottom: 0.75rem; display:flex; align-items:center; gap:6px;">
+          <span>⭐ MIS CÁMARAS FAVORITAS</span>
+        </div>
+        <div class="grid" id="gridFavoritas" style="margin-bottom: 1.5rem;"></div>
+        <hr style="border:0; border-top:1px solid var(--border); margin-bottom: 1.5rem;">
       </div>
-      <div class="grid" id="gridFavoritas" style="margin-bottom: 1.5rem;"></div>
-      <hr style="border:0; border-top:1px solid var(--border); margin-bottom: 1.5rem;">
+
+      <div class="grid" id="gridCamaras"></div>
+    </div>
+  </main>
+
+  <!-- ================= CAPA 2: VISTA MUNDO ================= -->
+  <main id="vistaMundo">
+    <div id="globeViz"></div>
+
+    <!-- BARRA LATERAL IZQUIERDA -->
+    <aside class="sidebar-links">
+      <div class="sidebar-header">
+        <span>🌐 CÁMARAS GLOBALES</span>
+        <small style="color:var(--muted); font-size:0.65rem;" id="camsCount">21 CAMS</small>
+      </div>
+      <div class="links-list" id="worldLinksList"></div>
+    </aside>
+
+    <!-- VENTANA FLOTANTE ARRASTRABLE Y REDIMENSIONABLE -->
+    <div class="modal-player-float" id="modalPlayerFloat">
+      <div class="modal-player-bar" id="modalPlayerBar">
+        <span id="playerCamTitle">Cámara en Vivo</span>
+        <button class="btn-close-player" onclick="cerrarReproductor()">&times;</button>
+      </div>
+      <div class="video-frame-box">
+        <iframe id="playerIframe" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" allowfullscreen></iframe>
+      </div>
     </div>
 
-    <div class="grid" id="gridCamaras"></div>
-  </div>
+    <!-- BARRA LATERAL DERECHA (CLIMA VERTICAL) -->
+    <aside class="sidebar-weather">
+      <div class="sidebar-weather-header">
+        <div class="sidebar-weather-title">
+          <span>☁ CLIMA MUNDIAL</span>
+          <small style="color:var(--muted); font-size:0.65rem;">EN VIVO</small>
+        </div>
+        <div class="world-weather-search">
+          <input type="text" id="worldWeatherInput" placeholder="Buscar ciudad del mundo..." />
+          <button onclick="buscarClimaMundo()">IR</button>
+        </div>
+      </div>
+      <div class="weather-list-vertical" id="worldWeatherList"></div>
+    </aside>
+  </main>
 
-  <!-- MODAL DE VISTA DETALLADA -->
+  <!-- MODAL DETALLE DE CHILE -->
   <div class="modal-detail-overlay" id="modalDetail">
     <div class="modal-detail-box">
       <div class="modal-detail-header">
@@ -664,14 +917,51 @@
     </div>
   </div>
 
-  <footer>
+  <footer id="footerApp">
     <div class="counter-badge"><span>VISITAS AL PANEL:</span> <span class="counter-number" id="visitCount">...</span></div>
     <div>CHILE LIVE MONITOR • TRANSMISIONES EN TIEMPO REAL VÍA YOUTUBE</div>
   </footer>
 
   <script>
-    const ADMIN_PASSWORD = "9066819";
+    /* ALTERNAR VISTAS SPA SIN TOCAR LA RADIO */
+    let vistaActual = 'chile';
+    function alternarVista() {
+      const vChile = document.getElementById('vistaChile');
+      const vMundo = document.getElementById('vistaMundo');
+      const btn = document.getElementById('btnCambiarVista');
+      const bTitle = document.getElementById('brandTitle');
+      const bSub = document.getElementById('brandSubtitle');
+      const foot = document.getElementById('footerApp');
 
+      if (vistaActual === 'chile') {
+        vistaActual = 'mundo';
+        vChile.style.display = 'none';
+        vMundo.style.display = 'block';
+        foot.style.display = 'none';
+        btn.textContent = '🇨🇱 VOLVER A CHILE';
+        bTitle.innerHTML = 'MUNDO <span>EN VIVO</span>';
+        bSub.textContent = 'Explorador Global 3D';
+
+        if (!worldGlobe) {
+          initGlobe();
+          renderLinks();
+          renderWeatherSidebar();
+        } else {
+          worldGlobe.width(window.innerWidth).height(window.innerHeight - 65);
+        }
+      } else {
+        vistaActual = 'chile';
+        vChile.style.display = 'block';
+        vMundo.style.display = 'none';
+        foot.style.display = 'flex';
+        btn.textContent = '🌍 BUSCAR POR EL MUNDO';
+        bTitle.innerHTML = 'CHILE <span>EN VIVO</span>';
+        bSub.textContent = 'Centro de Monitoreo Urbano';
+        cerrarReproductor();
+      }
+    }
+
+    /* ---------------- DATOS DE CHILE ---------------- */
     const camarasIniciales = [
       { id: "ErUOGtBXhgY", titulo: "tobalaba/ providencia", ciudad: "Santiago" },
       { id: "_Nrt155MExU", titulo: "peñalolen", ciudad: "Santiago" },
@@ -707,26 +997,8 @@
       "la serena": { lat: -29.9027, lng: -71.2519 }
     };
 
-    const codigosWmo = {
-      0: { texto: "Despejado", icono: "☀️" },
-      1: { texto: "Mayormente despejado", icono: "🌤️" },
-      2: { texto: "Parcialmente nublado", icono: "⛅" },
-      3: { texto: "Nublado", icono: "☁️" },
-      45: { texto: "Niebla", icono: "🌫️" },
-      51: { texto: "Llovizna", icono: "🌦️" },
-      61: { texto: "Lluvia", icono: "🌧️" },
-      71: { texto: "Nieve", icono: "❄️" },
-      80: { texto: "Chubascos", icono: "🌧️" },
-      95: { texto: "Tormenta", icono: "⛈️" }
-    };
-
-    function traducirWMO(code) {
-      return codigosWmo[code] || { texto: "Variable", icono: "🌤️" };
-    }
-
     let camaras = JSON.parse(localStorage.getItem('chile_live_cams')) || camarasIniciales;
     let favorites = JSON.parse(localStorage.getItem('chile_live_favs')) || [];
-    let isAdmin = sessionStorage.getItem('is_admin') === 'true';
     let ciudadActiva = 'Todas';
     let textoBusqueda = '';
 
@@ -735,14 +1007,6 @@
     const favsSection = document.getElementById('favsSection');
     const cityPillsContainer = document.getElementById('cityPills');
     const inputFiltro = document.getElementById('filtroTexto');
-    const btnAdmin = document.getElementById('btnAdmin');
-    const btnToggleAdd = document.getElementById('btnToggleAdd');
-    const btnExport = document.getElementById('btnExport');
-    const adminPanel = document.getElementById('adminPanel');
-    const formCam = document.getElementById('formCam');
-    const editIndexInput = document.getElementById('editIndex');
-    const panelTitle = document.getElementById('panelTitle');
-    const btnCancelEdit = document.getElementById('btnCancelEdit');
 
     function toggleFavorite(camId, e) {
       e.stopPropagation();
@@ -758,132 +1022,12 @@
     function pantallaCompletaElemento(elem) {
       if (!elem) return;
       if (!document.fullscreenElement) {
-        if (elem.requestFullscreen) {
-          elem.requestFullscreen();
-        } else if (elem.webkitRequestFullscreen) {
-          elem.webkitRequestFullscreen();
-        } else if (elem.msRequestFullscreen) {
-          elem.msRequestFullscreen();
-        }
+        if (elem.requestFullscreen) elem.requestFullscreen();
+        else if (elem.webkitRequestFullscreen) elem.webkitRequestFullscreen();
       } else {
-        if (document.exitFullscreen) {
-          document.exitFullscreen();
-        }
+        if (document.exitFullscreen) document.exitFullscreen();
       }
     }
-
-    function extractYouTubeID(url) {
-      if (url.length === 11 && !url.includes('/') && !url.includes('.')) return url;
-      const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|&v=)([^#&?]*).*/;
-      const match = url.trim().match(regExp);
-      return (match && match[2].length === 11) ? match[2] : null;
-    }
-
-    btnAdmin.addEventListener('click', () => {
-      if (isAdmin) {
-        if (confirm('¿Cerrar sesión de administrador?')) {
-          isAdmin = false;
-          sessionStorage.removeItem('is_admin');
-          actualizarVistaAdmin();
-        }
-      } else {
-        const pass = prompt('Ingresa la contraseña de administrador:');
-        if (pass === ADMIN_PASSWORD) {
-          isAdmin = true;
-          sessionStorage.setItem('is_admin', 'true');
-          actualizarVistaAdmin();
-        } else if (pass !== null) {
-          alert('Contraseña incorrecta.');
-        }
-      }
-    });
-
-    function actualizarVistaAdmin() {
-      if (isAdmin) {
-        btnAdmin.textContent = '🔓 CERRAR ADMIN';
-        btnAdmin.classList.add('active');
-        btnToggleAdd.style.display = 'inline-flex';
-        btnExport.style.display = 'inline-flex';
-      } else {
-        btnAdmin.textContent = '🔒 ACCESO ADMIN';
-        btnAdmin.classList.remove('active');
-        btnToggleAdd.style.display = 'none';
-        btnExport.style.display = 'none';
-        adminPanel.classList.remove('open');
-      }
-      renderCamaras();
-    }
-
-    btnExport.addEventListener('click', () => {
-      const codigoExport = `const camarasIniciales = ${JSON.stringify(camaras, null, 2)};`;
-      navigator.clipboard.writeText(codigoExport).then(() => {
-        alert('¡Copiado al portapapeles!\n\nAhora abre index.html en GitHub, busca la línea "const camarasIniciales" y reemplázala con lo que acabas de copiar.');
-      });
-    });
-
-    btnToggleAdd.addEventListener('click', () => {
-      resetForm();
-      adminPanel.classList.toggle('open');
-      if (adminPanel.classList.contains('open')) document.getElementById('camUrl').focus();
-    });
-
-    formCam.addEventListener('submit', (e) => {
-      e.preventDefault();
-      const rawUrl = document.getElementById('camUrl').value;
-      const title = document.getElementById('camTitle').value.trim();
-      const city = document.getElementById('camCity').value;
-      const index = parseInt(editIndexInput.value, 10);
-
-      const videoId = extractYouTubeID(rawUrl);
-      if (!videoId) return alert('Enlace de YouTube no válido.');
-
-      if (index >= 0) {
-        camaras[index] = { id: videoId, titulo: title, ciudad: city };
-      } else {
-        camaras.unshift({ id: videoId, titulo: title, ciudad: city });
-      }
-
-      localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
-      resetForm();
-      adminPanel.classList.remove('open');
-      renderPills();
-      renderCamaras();
-    });
-
-    function resetForm() {
-      formCam.reset();
-      editIndexInput.value = "-1";
-      panelTitle.textContent = "+ AGREGAR NUEVA CÁMARA";
-      btnCancelEdit.style.display = "none";
-    }
-
-    btnCancelEdit.addEventListener('click', () => {
-      resetForm();
-      adminPanel.classList.remove('open');
-    });
-
-    window.eliminarCamara = function(index) {
-      if (!isAdmin) return;
-      if (confirm(`¿Eliminar "${camaras[index].titulo}"?`)) {
-        camaras.splice(index, 1);
-        localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
-        renderPills();
-        renderCamaras();
-      }
-    };
-
-    window.editarCamara = function(index) {
-      if (!isAdmin) return;
-      const cam = camaras[index];
-      editIndexInput.value = index;
-      document.getElementById('camUrl').value = `https://www.youtube.com/watch?v=${cam.id}`;
-      document.getElementById('camTitle').value = cam.titulo;
-      document.getElementById('camCity').value = cam.ciudad;
-      panelTitle.textContent = `✏️ EDITANDO: ${cam.titulo}`;
-      btnCancelEdit.style.display = "inline-block";
-      adminPanel.classList.add('open');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    };
 
     function renderPills() {
       const ciudades = ['Todas', ...new Set(camaras.map(c => c.ciudad))];
@@ -917,8 +1061,6 @@
             <button class="btn-fullscreen" onclick="pantallaCompletaElemento(document.getElementById('${wrapperId}'))" title="Pantalla Completa">⛶</button>
             <button class="btn-inspect" onclick="abrirModalDetalle('${cam.id}')" title="Ver en grande">🔍 VER</button>
             <button class="btn-fav-star ${isFav ? 'active' : ''}" onclick="toggleFavorite('${cam.id}', event)" title="Favorito">⭐</button>
-            <button class="btn-edit" style="display:${isAdmin ? 'inline-block' : 'none'}" onclick="editarCamara(${originalIndex})" title="Editar">✏️</button>
-            <button class="btn-del" style="display:${isAdmin ? 'inline-block' : 'none'}" onclick="eliminarCamara(${originalIndex})" title="Eliminar">🗑️</button>
             <span class="badge-live"><span class="dot"></span>LIVE</span>
           </div>
         </div>
@@ -974,7 +1116,24 @@
       renderCamaras();
     });
 
-    /* WIDGET CLIMA CON DÍAS COMPLETOS (JUE, VIE, SÁB, DOM) */
+    /* CLIMA DE CHILE */
+    const codigosWmo = {
+      0: { texto: "Despejado", icono: "☀️" },
+      1: { texto: "Mayormente despejado", icono: "🌤️" },
+      2: { texto: "Parcialmente nublado", icono: "⛅" },
+      3: { texto: "Nublado", icono: "☁️" },
+      45: { texto: "Niebla", icono: "🌫️" },
+      51: { texto: "Llovizna", icono: "🌦️" },
+      61: { texto: "Lluvia", icono: "🌧️" },
+      71: { texto: "Nieve", icono: "❄️" },
+      80: { texto: "Chubascos", icono: "🌧️" },
+      95: { texto: "Tormenta", icono: "⛈️" }
+    };
+
+    function traducirWMO(code) {
+      return codigosWmo[code] || { texto: "Variable", icono: "🌤️" };
+    }
+
     async function cargarClimaFranja(ciudad, lat, lng) {
       const cityEl = document.getElementById('stripCity');
       const tempEl = document.getElementById('stripTemp');
@@ -987,7 +1146,6 @@
       try {
         const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lng}&current=temperature_2m,weather_code&daily=weather_code,temperature_2m_max,temperature_2m_min&timezone=auto&forecast_days=5`);
         const data = await res.json();
-
         const cur = data.current;
         const cond = traducirWMO(cur.weather_code);
         tempEl.textContent = `${Math.round(cur.temperature_2m)}°C`;
@@ -995,7 +1153,6 @@
 
         daysWrap.innerHTML = '';
         const diasNombres = ["DOM", "LUN", "MAR", "MIÉ", "JUE", "VIE", "SÁB"];
-
         for (let i = 1; i <= 4; i++) {
           const fDate = new Date(data.daily.time[i] + 'T00:00:00');
           const dName = diasNombres[fDate.getDay()];
@@ -1032,7 +1189,7 @@
           cargarClimaFranja(q, parseFloat(data[0].lat), parseFloat(data[0].lon));
           input.value = '';
         } else {
-          alert("No se encontró esa comuna o ciudad en Chile.");
+          alert("No se encontró esa comuna en Chile.");
         }
       } catch (e) {
         alert("Error de conexión al buscar clima.");
@@ -1043,7 +1200,7 @@
       if (e.key === 'Enter') buscarClimaMini();
     });
 
-    /* MODAL DE DETALLE */
+    /* MODAL DETALLE CHILE */
     const modalDetail = document.getElementById('modalDetail');
     const modalCamTitle = document.getElementById('modalCamTitle');
     const modalCamCity = document.getElementById('modalCamCity');
@@ -1119,6 +1276,265 @@
       }
     }
 
+    /* ---------------- DATOS DE MUNDO ---------------- */
+    const camarasMundo = [
+      { id: "NfsyRx50gAI", city: "Buenos Aires", sector: "Obelisco", country: "Argentina", lat: -34.6037, lng: -58.3816 },
+      { id: "wyEi0OPai5g", city: "Río de Janeiro", sector: "Copacabana", country: "Brasil", lat: -22.9711, lng: -43.1822 },
+      { id: "Ncc6yK42PGo", city: "São Paulo", sector: "Avenida Paulista", country: "Brasil", lat: -23.5615, lng: -46.6559 },
+      { id: "oOsoFwMPbOg", city: "Ciudad de México", sector: "Zócalo", country: "México", lat: 19.4326, lng: -99.1332 },
+      { id: "fQJRrJkDKo8", city: "Cancún", sector: "Zona Hotelera", country: "México", lat: 21.1619, lng: -86.8515 },
+      { id: "VGnFLdQW39A", city: "Nueva York", sector: "Times Square", country: "Estados Unidos", lat: 40.758, lng: -73.9855 },
+      { id: "gDcfh-Wm0xE", city: "Las Vegas", sector: "The Strip", country: "Estados Unidos", lat: 36.1147, lng: -115.1728 },
+      { id: "EO_1LWqsCNE", city: "Los Ángeles", sector: "Venice Beach", country: "Estados Unidos", lat: 33.985, lng: -118.4695 },
+      { id: "HongS1sx4pY", city: "Toronto", sector: "CN Tower / Downtown", country: "Canadá", lat: 43.6532, lng: -79.3832 },
+      { id: "uFJmF-3yMPk", city: "Barcelona", sector: "Sagrada Familia", country: "España", lat: 41.4036, lng: 2.1744 },
+      { id: "YkKGantlWH0", city: "París", sector: "Torre Eiffel", country: "Francia", lat: 48.8584, lng: 2.2945 },
+      { id: "z6BNMoj9Pyo", city: "Cannes", sector: "Playa de la Croisette", country: "Francia", lat: 43.5528, lng: 7.0174 },
+      { id: "MXmzsjABC-U", city: "Londres", sector: "Tower Bridge", country: "Reino Unido", lat: 51.5055, lng: -0.0754 },
+      { id: "nviU2HYj-Jc", city: "Venecia", sector: "Puente Rialto", country: "Italia", lat: 45.4371, lng: 12.3326 },
+      { id: "IRqboacDNFg", city: "Berlín", sector: "Puerta de Brandeburgo", country: "Alemania", lat: 52.5163, lng: 13.3777 },
+      { id: "VhGdKCs5KIA", city: "Moscú", sector: "Plaza Roja", country: "Rusia", lat: 55.7558, lng: 37.6173 },
+      { id: "dfVK7ld38Ys", city: "Tokio", sector: "Cruce Shibuya", country: "Japón", lat: 35.6595, lng: 139.7004 },
+      { id: "5gVrWGRZo9s", city: "Seúl", sector: "Centro de Seúl", country: "Corea del Sur", lat: 37.5665, lng: 126.978 },
+      { id: "UemFRPrl1hk", city: "Bangkok", sector: "Sukhumvit / Centro", country: "Tailandia", lat: 13.7563, lng: 100.5018 },
+      { id: "5uZa3-RMFos", city: "Sídney", sector: "Opera House / Bahía", country: "Australia", lat: -33.8688, lng: 151.2093 },
+      { id: "jOqASqt3vVI", city: "Ciudad del Cabo", sector: "Table Mountain", country: "Sudáfrica", lat: -33.9249, lng: 18.4241 }
+    ];
+
+    const ciudadesClimaMundo = [
+      { nombre: "Nueva York", pais: "EE.UU.", lat: 40.7128, lng: -74.0060 },
+      { nombre: "Londres", pais: "Reino Unido", lat: 51.5074, lng: -0.1278 },
+      { nombre: "París", pais: "Francia", lat: 48.8566, lng: 2.3522 },
+      { nombre: "Madrid", pais: "España", lat: 40.4168, lng: -3.7038 },
+      { nombre: "Roma", pais: "Italia", lat: 41.9028, lng: 12.4964 },
+      { nombre: "Tokio", pais: "Japón", lat: 35.6762, lng: 139.6503 },
+      { nombre: "Buenos Aires", pais: "Argentina", lat: -34.6037, lng: -58.3816 },
+      { nombre: "Río de Janeiro", pais: "Brasil", lat: -22.9068, lng: -43.1729 },
+      { nombre: "Ciudad de México", pais: "México", lat: 19.4326, lng: -99.1332 },
+      { nombre: "Sídney", pais: "Australia", lat: -33.8688, lng: 151.2093 }
+    ];
+
+    let worldGlobe = null;
+    function initGlobe() {
+      const elem = document.getElementById('globeViz');
+      worldGlobe = Globe()(elem)
+        .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
+        .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
+        .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
+        .pointsData(camarasMundo)
+        .pointLat('lat')
+        .pointLng('lng')
+        .pointColor(() => '#00ff66')
+        .pointAltitude(0.01)
+        .pointRadius(0.85)
+        .pointLabel(d => `<div style="background:#0a1121;border:1px solid #00ff66;padding:4px 8px;border-radius:4px;color:#fff;font-family:monospace;font-size:11px;">🟢 ${d.city} - ${d.sector} (${d.country})</div>`)
+        .onPointClick(point => {
+          seleccionarCamara(point);
+        });
+
+      worldGlobe.pointOfView({ lat: 15, lng: -50, altitude: 2.2 });
+      worldGlobe.controls().autoRotate = true;
+      worldGlobe.controls().autoRotateSpeed = 0.35;
+    }
+
+    const linksContainer = document.getElementById('worldLinksList');
+    function renderLinks() {
+      linksContainer.innerHTML = '';
+      document.getElementById('camsCount').textContent = `${camarasMundo.length} CAMS`;
+      camarasMundo.forEach(cam => {
+        const link = document.createElement('div');
+        link.className = 'world-cam-link';
+        link.id = `link_${cam.id}`;
+        link.innerHTML = `
+          <span class="link-city-title">📍 ${cam.city} - ${cam.sector}</span>
+          <span class="link-country-badge">${cam.country}</span>
+        `;
+        link.addEventListener('click', () => {
+          seleccionarCamara(cam);
+        });
+        linksContainer.appendChild(link);
+      });
+    }
+
+    const playerBox = document.getElementById('modalPlayerFloat');
+    const playerTitle = document.getElementById('playerCamTitle');
+    const playerIframe = document.getElementById('playerIframe');
+
+    function seleccionarCamara(cam) {
+      document.querySelectorAll('.world-cam-link').forEach(l => l.classList.remove('active'));
+      const activeLink = document.getElementById(`link_${cam.id}`);
+      if (activeLink) {
+        activeLink.classList.add('active');
+        activeLink.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+      }
+
+      if (worldGlobe) {
+        worldGlobe.controls().autoRotate = false;
+        worldGlobe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 1.4 }, 1200);
+      }
+
+      playerTitle.textContent = `${cam.city.toUpperCase()} - ${cam.sector.toUpperCase()} (${cam.country})`;
+      playerIframe.src = `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&rel=0`;
+      playerBox.style.display = 'block';
+    }
+
+    function cerrarReproductor() {
+      playerBox.style.display = 'none';
+      playerIframe.src = '';
+      document.querySelectorAll('.world-cam-link').forEach(l => l.classList.remove('active'));
+      if (worldGlobe) worldGlobe.controls().autoRotate = true;
+    }
+
+    /* DRAG & DROP VENTANA FLOTANTE MUNDO */
+    (function makeDraggable() {
+      const floatBox = document.getElementById('modalPlayerFloat');
+      const headerBar = document.getElementById('modalPlayerBar');
+      let isDragging = false;
+      let startX, startY, initialLeft, initialTop;
+
+      headerBar.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('btn-close-player')) return;
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        const rect = floatBox.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      });
+
+      function onMouseMove(e) {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        let newX = initialLeft + dx;
+        let newY = initialTop + dy;
+
+        newX = Math.max(10, Math.min(newX, window.innerWidth - floatBox.offsetWidth - 10));
+        newY = Math.max(70, Math.min(newY, window.innerHeight - floatBox.offsetHeight - 10));
+
+        floatBox.style.left = `${newX}px`;
+        floatBox.style.top = `${newY}px`;
+      }
+
+      function onMouseUp() {
+        isDragging = false;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      }
+
+      // Touch móvil
+      headerBar.addEventListener('touchstart', (e) => {
+        if (e.target.classList.contains('btn-close-player')) return;
+        isDragging = true;
+        const touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        const rect = floatBox.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+      });
+
+      headerBar.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        const dx = touch.clientX - startX;
+        const dy = touch.clientY - startY;
+        let newX = initialLeft + dx;
+        let newY = initialTop + dy;
+
+        newX = Math.max(10, Math.min(newX, window.innerWidth - floatBox.offsetWidth - 10));
+        newY = Math.max(70, Math.min(newY, window.innerHeight - floatBox.offsetHeight - 10));
+
+        floatBox.style.left = `${newX}px`;
+        floatBox.style.top = `${newY}px`;
+      });
+
+      headerBar.addEventListener('touchend', () => { isDragging = false; });
+    })();
+
+    /* CLIMA MUNDIAL DERECHO */
+    const weatherContainer = document.getElementById('worldWeatherList');
+
+    async function cargarClimaCiudadMundo(item, contenedor, prepend = false) {
+      const card = document.createElement('div');
+      card.className = 'weather-city-card';
+      card.innerHTML = `
+        <div>
+          <span class="weather-city-name">${item.nombre}</span>
+          <span class="weather-city-country">${item.pais}</span>
+        </div>
+        <div class="weather-city-temp" id="temp_${item.nombre.replace(/\s+/g, '')}">
+          <span>--°C</span>
+        </div>
+      `;
+
+      if (prepend) {
+        contenedor.insertBefore(card, contenedor.firstChild);
+      } else {
+        contenedor.appendChild(card);
+      }
+
+      try {
+        const res = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${item.lat}&longitude=${item.lng}&current=temperature_2m,weather_code&timezone=auto`);
+        const data = await res.json();
+        const cur = data.current;
+        const cond = traducirWMO(cur.weather_code);
+        const tempEl = document.getElementById(`temp_${item.nombre.replace(/\s+/g, '')}`);
+        if (tempEl) {
+          tempEl.innerHTML = `<span>${Math.round(cur.temperature_2m)}°C</span> <span>${cond.icono}</span>`;
+          tempEl.title = cond.texto;
+        }
+      } catch (e) {
+        const tempEl = document.getElementById(`temp_${item.nombre.replace(/\s+/g, '')}`);
+        if (tempEl) tempEl.innerHTML = `<span>--</span>`;
+      }
+    }
+
+    function renderWeatherSidebar() {
+      weatherContainer.innerHTML = '';
+      ciudadesClimaMundo.forEach(ciudad => {
+        cargarClimaCiudadMundo(ciudad, weatherContainer);
+      });
+    }
+
+    async function buscarClimaMundo() {
+      const input = document.getElementById('worldWeatherInput');
+      const q = input.value.trim();
+      if (!q) return;
+
+      try {
+        const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(q)}&limit=1`);
+        const data = await res.json();
+        if (data && data.length > 0) {
+          const lat = parseFloat(data[0].lat);
+          const lng = parseFloat(data[0].lon);
+          const nombreParts = data[0].display_name.split(',');
+          const ciudadNombre = nombreParts[0];
+          const paisNombre = nombreParts[nombreParts.length - 1].trim();
+
+          cargarClimaCiudadMundo({ nombre: ciudadNombre, pais: paisNombre, lat, lng }, weatherContainer, true);
+          input.value = '';
+
+          if (worldGlobe) {
+            worldGlobe.controls().autoRotate = false;
+            worldGlobe.pointOfView({ lat, lng, altitude: 1.5 }, 1200);
+          }
+        } else {
+          alert("No se encontró esa ciudad en el mundo.");
+        }
+      } catch (e) {
+        alert("Error al consultar el clima satelital.");
+      }
+    }
+
+    document.getElementById('worldWeatherInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') buscarClimaMundo();
+    });
+
+    /* RELOJ CHILE Y CONTADOR VISITAS */
     function actualizarReloj() {
       const ahora = new Date();
       const opciones = { timeZone: 'America/Santiago', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' };
@@ -1143,12 +1559,7 @@
       counterEl.textContent = String(BASE + localVisits).padStart(5, '0');
     }
 
-    renderPills();
-    actualizarVistaAdmin();
-    initCounter();
-    cargarClimaFranja('Santiago', coordsChile['santiago'].lat, coordsChile['santiago'].lng);
-
-    /* --- CONTROL SINCRONIZADO DE RADIO DELOREAN --- */
+    /* ---------------- RADIO DELOREAN PERMANENTE (CERO CORTES) ---------------- */
     let radioAudioPlayer = null;
     let currentStationId = localStorage.getItem('radio_delorean_station') || 'BuB9SaS2cWE';
     let savedVol = parseInt(localStorage.getItem('radio_delorean_vol') || '50', 10);
@@ -1229,6 +1640,19 @@
         }
       });
     }
+
+    window.addEventListener('resize', () => {
+      if (worldGlobe && vistaActual === 'mundo') {
+        worldGlobe.width(window.innerWidth).height(window.innerHeight - 65);
+      }
+    });
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderPills();
+      renderCamaras();
+      initCounter();
+      cargarClimaFranja('Santiago', coordsChile['santiago'].lat, coordsChile['santiago'].lng);
+    });
   </script>
 </body>
 </html>
