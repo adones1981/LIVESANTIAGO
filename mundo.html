@@ -177,7 +177,7 @@
       z-index: 1;
     }
 
-    /* LISTA LATERAL IZQUIERDA (CÁMARAS GLOBALES) */
+    /* LISTA LATERAL IZQUIERDA */
     .sidebar-links {
       position: absolute;
       left: 1.5rem;
@@ -262,19 +262,24 @@
       white-space: nowrap;
     }
 
-    /* REPRODUCTOR FLOTANTE EN EL LADO IZQUIERDO */
+    /* VENTANA FLOTANTE ARRASTRABLE Y REDIMENSIONABLE */
     .modal-player-float {
       position: absolute;
-      bottom: 2rem;
-      left: 1.5rem; /* Al lado izquierdo */
-      width: 390px;
+      top: 55%;
+      left: 1.5rem;
+      width: 420px;
+      min-width: 280px;
+      min-height: 200px;
+      max-width: 90vw;
+      max-height: 85vh;
       background: var(--card-bg);
       border: 1px solid var(--accent);
       border-radius: 12px;
       overflow: hidden;
-      z-index: 25;
+      z-index: 200;
       box-shadow: 0 10px 40px rgba(0, 229, 255, 0.25);
       display: none;
+      resize: both; /* Permite redimensionar desde la esquina */
     }
 
     .modal-player-bar {
@@ -282,8 +287,14 @@
       display: flex;
       justify-content: space-between;
       align-items: center;
-      background: rgba(0, 0, 0, 0.5);
+      background: rgba(0, 0, 0, 0.65);
       border-bottom: 1px solid var(--border);
+      cursor: grab; /* Indica que se puede arrastrar */
+      user-select: none;
+    }
+
+    .modal-player-bar:active {
+      cursor: grabbing;
     }
 
     .modal-player-bar span {
@@ -294,7 +305,8 @@
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
-      max-width: 320px;
+      max-width: 80%;
+      pointer-events: none;
     }
 
     .btn-close-player {
@@ -309,10 +321,10 @@
     .btn-close-player:hover { color: #fff; }
 
     .video-frame-box {
-      position: relative;
       width: 100%;
-      padding-top: 56.25%;
+      height: calc(100% - 35px);
       background: #000;
+      position: relative;
     }
 
     .video-frame-box iframe {
@@ -509,9 +521,9 @@
     <div class="links-list" id="worldLinksList"></div>
   </aside>
 
-  <!-- REPRODUCTOR FLOTANTE (LADO IZQUIERDO) -->
+  <!-- REPRODUCTOR FLOTANTE ARRASTRABLE Y REDIMENSIONABLE -->
   <div class="modal-player-float" id="modalPlayerFloat">
-    <div class="modal-player-bar">
+    <div class="modal-player-bar" id="modalPlayerBar">
       <span id="playerCamTitle">Cámara en Vivo</span>
       <button class="btn-close-player" onclick="cerrarReproductor()">&times;</button>
     </div>
@@ -532,9 +544,7 @@
         <button onclick="buscarClimaMundo()">IR</button>
       </div>
     </div>
-    <div class="weather-list-vertical" id="worldWeatherList">
-      <!-- Se llena con las principales capitales y resultados de búsqueda -->
-    </div>
+    <div class="weather-list-vertical" id="worldWeatherList"></div>
   </aside>
 
   <script>
@@ -567,7 +577,7 @@
       { id: "jOqASqt3vVI", city: "Ciudad del Cabo", sector: "Table Mountain", country: "Sudáfrica", lat: -33.9249, lng: 18.4241 }
     ];
 
-    /* PRINCIPALES CIUDADES PARA EL CLIMA VERTICAL */
+    /* CIUDADES CLIMA MUNDIAL */
     const ciudadesClimaMundo = [
       { nombre: "Nueva York", pais: "EE.UU.", lat: 40.7128, lng: -74.0060 },
       { nombre: "Londres", pais: "Reino Unido", lat: 51.5074, lng: -0.1278 },
@@ -642,7 +652,7 @@
       });
     }
 
-    /* SELECCIONAR CÁMARA (VENTANA AL LADO IZQUIERDO) */
+    /* SELECCIONAR CÁMARA */
     const playerBox = document.getElementById('modalPlayerFloat');
     const playerTitle = document.getElementById('playerCamTitle');
     const playerIframe = document.getElementById('playerIframe');
@@ -672,7 +682,80 @@
       if (worldGlobe) worldGlobe.controls().autoRotate = true;
     }
 
-    /* CLIMA MUNDIAL EN LA BARRA LATERAL DERECHA */
+    /* LÓGICA DRAG & DROP PARA LA VENTANA FLOTANTE */
+    (function makeDraggable() {
+      const floatBox = document.getElementById('modalPlayerFloat');
+      const headerBar = document.getElementById('modalPlayerBar');
+      let isDragging = false;
+      let startX, startY, initialLeft, initialTop;
+
+      headerBar.addEventListener('mousedown', (e) => {
+        if (e.target.classList.contains('btn-close-player')) return;
+        isDragging = true;
+        startX = e.clientX;
+        startY = e.clientY;
+        const rect = floatBox.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+
+        document.addEventListener('mousemove', onMouseMove);
+        document.addEventListener('mouseup', onMouseUp);
+      });
+
+      function onMouseMove(e) {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        let newX = initialLeft + dx;
+        let newY = initialTop + dy;
+
+        // Limitar dentro del viewport
+        newX = Math.max(10, Math.min(newX, window.innerWidth - floatBox.offsetWidth - 10));
+        newY = Math.max(70, Math.min(newY, window.innerHeight - floatBox.offsetHeight - 10));
+
+        floatBox.style.left = `${newX}px`;
+        floatBox.style.top = `${newY}px`;
+      }
+
+      function onMouseUp() {
+        isDragging = false;
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+      }
+
+      // Soporte Touch para móviles
+      headerBar.addEventListener('touchstart', (e) => {
+        if (e.target.classList.contains('btn-close-player')) return;
+        isDragging = true;
+        const touch = e.touches[0];
+        startX = touch.clientX;
+        startY = touch.clientY;
+        const rect = floatBox.getBoundingClientRect();
+        initialLeft = rect.left;
+        initialTop = rect.top;
+      });
+
+      headerBar.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        const touch = e.touches[0];
+        const dx = touch.clientX - startX;
+        const dy = touch.clientY - startY;
+
+        let newX = initialLeft + dx;
+        let newY = initialTop + dy;
+
+        newX = Math.max(10, Math.min(newX, window.innerWidth - floatBox.offsetWidth - 10));
+        newY = Math.max(70, Math.min(newY, window.innerHeight - floatBox.offsetHeight - 10));
+
+        floatBox.style.left = `${newX}px`;
+        floatBox.style.top = `${newY}px`;
+      });
+
+      headerBar.addEventListener('touchend', () => { isDragging = false; });
+    })();
+
+    /* CLIMA MUNDIAL DERECHO */
     const weatherContainer = document.getElementById('worldWeatherList');
 
     async function cargarClimaCiudadMundo(item, contenedor, prepend = false) {
@@ -735,7 +818,6 @@
           cargarClimaCiudadMundo({ nombre: ciudadNombre, pais: paisNombre, lat, lng }, weatherContainer, true);
           input.value = '';
 
-          // Centrar el globo en la ciudad buscada
           if (worldGlobe) {
             worldGlobe.controls().autoRotate = false;
             worldGlobe.pointOfView({ lat, lng, altitude: 1.5 }, 1200);
