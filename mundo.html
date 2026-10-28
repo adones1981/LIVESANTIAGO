@@ -18,8 +18,8 @@
       --bg: #07090e;
       --card-bg: rgba(15, 21, 35, 0.88);
       --border: rgba(255, 255, 255, 0.08);
-      --accent: #00ff66; /* Verde Neón */
-      --accent-glow: rgba(0, 255, 102, 0.4);
+      --accent: #00e5ff; /* Color cian original de Chile / Mundo */
+      --accent-glow: rgba(0, 229, 255, 0.35);
       --live-red: #ff334b;
       --text: #f1f5f9;
       --muted: #94a3b8;
@@ -36,7 +36,7 @@
       height: 100vh;
     }
 
-    /* HEADER */
+    /* HEADER ORIGINAL */
     header {
       position: absolute;
       top: 0;
@@ -58,9 +58,9 @@
 
     .brand-logo {
       width: 36px; height: 36px; border-radius: 8px;
-      background: rgba(0, 255, 102, 0.1); border: 1px solid var(--accent);
+      background: rgba(0, 229, 255, 0.1); border: 1px solid var(--accent);
       display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 0 15px rgba(0, 255, 102, 0.2);
+      box-shadow: 0 0 15px rgba(0, 229, 255, 0.2);
     }
 
     .brand-logo svg { width: 18px; height: 18px; fill: var(--accent); }
@@ -68,7 +68,7 @@
     .brand-text h1 span { color: var(--accent); }
 
     .btn-chile {
-      background: linear-gradient(135deg, rgba(0, 255, 102, 0.15), rgba(0, 255, 102, 0.25));
+      background: linear-gradient(135deg, rgba(0, 255, 204, 0.15), rgba(0, 229, 255, 0.25));
       border: 1px solid var(--accent);
       color: #fff; padding: 0.5rem 1rem; border-radius: 8px;
       font-size: 0.82rem; font-weight: 700; text-decoration: none;
@@ -78,7 +78,7 @@
 
     .btn-chile:hover { background: var(--accent); color: #07090e; }
 
-    /* MINI RADIO DELOREAN */
+    /* MINI RADIO DELOREAN CON TODAS LAS ESTACIONES */
     .mini-radio-bar {
       display: flex;
       align-items: center;
@@ -87,7 +87,7 @@
       border: 1px solid var(--accent);
       padding: 4px 10px;
       border-radius: 20px;
-      box-shadow: 0 0 10px rgba(0, 255, 102, 0.2);
+      box-shadow: 0 0 10px rgba(0, 229, 255, 0.2);
     }
 
     .mini-radio-title {
@@ -144,6 +144,8 @@
       gap: 3px;
       border-left: 1px solid rgba(255, 255, 255, 0.2);
       padding-left: 6px;
+      overflow-x: auto;
+      max-width: 320px;
     }
 
     .btn-mini-station {
@@ -155,6 +157,7 @@
       font-size: 0.6rem;
       font-family: 'JetBrains Mono', monospace;
       cursor: pointer;
+      white-space: nowrap;
     }
 
     .btn-mini-station.active {
@@ -174,10 +177,10 @@
       z-index: 1;
     }
 
-    /* LISTA LATERAL DERECHA (SOLO ENLACES PLANOS) */
+    /* LISTA LATERAL IZQUIERDA */
     .sidebar-links {
       position: absolute;
-      right: 1.5rem;
+      left: 1.5rem; /* Ubicado a la izquierda */
       top: 5.5rem;
       width: 290px;
       max-height: calc(100vh - 7rem);
@@ -234,10 +237,10 @@
     }
 
     .world-cam-link:hover, .world-cam-link.active {
-      background: rgba(0, 255, 102, 0.1);
+      background: rgba(0, 229, 255, 0.1);
       border-color: var(--accent);
       color: #fff;
-      transform: translateX(-3px);
+      transform: translateX(3px);
     }
 
     .link-city-title {
@@ -252,7 +255,7 @@
       font-size: 0.65rem;
       color: var(--accent);
       text-transform: uppercase;
-      background: rgba(0, 255, 102, 0.08);
+      background: rgba(0, 229, 255, 0.08);
       padding: 2px 6px;
       border-radius: 4px;
     }
@@ -261,14 +264,14 @@
     .modal-player-float {
       position: absolute;
       bottom: 2rem;
-      left: 1.5rem;
+      right: 1.5rem;
       width: 400px;
       background: var(--card-bg);
       border: 1px solid var(--accent);
       border-radius: 12px;
       overflow: hidden;
       z-index: 20;
-      box-shadow: 0 10px 40px rgba(0, 255, 102, 0.25);
+      box-shadow: 0 10px 40px rgba(0, 229, 255, 0.25);
       display: none;
     }
 
@@ -323,7 +326,7 @@
 
     @media (max-width: 768px) {
       .sidebar-links { width: calc(100% - 3rem); height: 210px; top: auto; bottom: 1rem; }
-      .modal-player-float { width: calc(100% - 3rem); left: 1.5rem; bottom: 230px; }
+      .modal-player-float { width: calc(100% - 3rem); right: 1.5rem; bottom: 230px; }
     }
   </style>
 </head>
@@ -337,12 +340,12 @@
         <h1>MUNDO <span>EN VIVO</span></h1>
       </div>
 
-      <!-- MINI RADIO DELOREAN -->
+      <!-- MINI RADIO DELOREAN (CON TODAS LAS EMISORAS RECUPERADAS) -->
       <div class="mini-radio-bar">
         <span class="mini-radio-title">⚡ RADIO DELOREAN</span>
         <div class="mini-radio-screen">
           <div class="mini-marquee">
-            RADIO DELOREAN LA RADIO DEL FUTURO - CLASICOS DE LOS 80S Y 90S - MUSICA 24/7 ⚡
+            RADIO DELOREAN LA RADIO DEL FUTURO - CLASICOS DE LOS 80S Y 90S - EMISORAS GLOBALES 24/7 ⚡
           </div>
         </div>
         <button class="btn-radio-play" id="btnMiniRadioPlay" onclick="toggleMiniRadio()" title="Reproducir / Pausar">▶</button>
@@ -354,6 +357,8 @@
           <button class="btn-mini-station" id="btn_st_34H1XIjnfKM" onclick="switchMiniStation('34H1XIjnfKM', this)">TECHNO</button>
           <button class="btn-mini-station" id="btn_st_8UM7FNEbiYs" onclick="switchMiniStation('8UM7FNEbiYs', this)">1955</button>
           <button class="btn-mini-station" id="btn_st_3LWMFjRZQ6k" onclick="switchMiniStation('3LWMFjRZQ6k', this)">METAL</button>
+          <button class="btn-mini-station" id="btn_st_W19rDfegcvM" onclick="switchMiniStation('W19rDfegcvM', this)">HEAVY</button>
+          <button class="btn-mini-station" id="btn_st__kse217FeQ0" onclick="switchMiniStation('_kse217FeQ0', this)">2015</button>
           <button class="btn-mini-station" id="btn_st_TSyjyTGoDro" onclick="switchMiniStation('TSyjyTGoDro', this)">1885</button>
         </div>
       </div>
@@ -361,14 +366,14 @@
       <div id="radioHiddenPlayer"></div>
     </div>
 
-    <!-- BOTÓN VOLVER A CHILE (ENLACE LIMPIO A INDEX) -->
-    <a href="index.html" class="btn-chile">🇨🇱 VOLVER A CHILE</a>
+    <!-- ENLACE NATIVO DIRECTO A CHILE (SALIDA LIMPIA FUERA DE IFRAME) -->
+    <a href="index.html" target="_top" class="btn-chile">🇨🇱 VOLVER A CHILE</a>
   </header>
 
   <!-- GLOBO INTERACTIVO -->
   <div id="globeViz"></div>
 
-  <!-- LISTA LATERAL (SOLO ENLACES) -->
+  <!-- LISTA LATERAL A LA IZQUIERDA (SOLO ENLACES PLANOS) -->
   <aside class="sidebar-links">
     <div class="sidebar-header">
       <span>🌐 CÁMARAS GLOBALES</span>
@@ -389,7 +394,12 @@
   </div>
 
   <script>
-    /* LISTA DE CÁMARAS DEL MUNDO */
+    /* COMPROBACIÓN ANTI-IFRAME: Si la página intenta abrirse dentro de un iframe en index, fuerza la salida completa */
+    if (window.top !== window.self) {
+      window.top.location.href = window.location.href;
+    }
+
+    /* DIRECTORIO DE CÁMARAS DEL MUNDO */
     const camarasMundo = [
       { id: "1-iS7_G1978", titulo: "Times Square", ciudad: "Nueva York", pais: "EE.UU.", lat: 40.7580, lng: -73.9855 },
       { id: "DDU-rZs-Ic4", titulo: "Torre Eiffel", ciudad: "París", pais: "Francia", lat: 48.8584, lng: 2.2945 },
@@ -401,7 +411,7 @@
       { id: "vXKn4qUQFMA", titulo: "Santiago Providencia", ciudad: "Santiago", pais: "Chile", lat: -33.4489, lng: -70.6693 }
     ];
 
-    /* INICIALIZAR GLOBO CON ICONOS PLANOS Y VERDES */
+    /* GLOBO 3D CON PUNTOS PLANOS VERDES 2D */
     let worldGlobe;
     function initGlobe() {
       const elem = document.getElementById('globeViz');
@@ -409,11 +419,10 @@
         .globeImageUrl('//unpkg.com/three-globe/example/img/earth-night.jpg')
         .bumpImageUrl('//unpkg.com/three-globe/example/img/earth-topology.png')
         .backgroundImageUrl('//unpkg.com/three-globe/example/img/night-sky.png')
-        // PUNTOS PLANOS VERDES 2D (Sin cilindros 3D)
         .pointsData(camarasMundo)
         .pointLat('lat')
         .pointLng('lng')
-        .pointColor(() => '#00ff66')
+        .pointColor(() => '#00ff66') // Puntos planos verdes
         .pointAltitude(0.01)
         .pointRadius(0.9)
         .pointLabel(d => `<div style="background:#0a1121;border:1px solid #00ff66;padding:4px 8px;border-radius:4px;color:#fff;font-family:monospace;font-size:11px;">🟢 ${d.titulo} - ${d.ciudad}</div>`)
@@ -421,13 +430,12 @@
           seleccionarCamara(point);
         });
 
-      // Vista inicial
       worldGlobe.pointOfView({ lat: 15, lng: -60, altitude: 2.2 });
       worldGlobe.controls().autoRotate = true;
       worldGlobe.controls().autoRotateSpeed = 0.35;
     }
 
-    /* RENDER DE ENLACES PLANOS EN LA BARRA */
+    /* RENDER DE ENLACES EN EL PANEL IZQUIERDO */
     const linksContainer = document.getElementById('worldLinksList');
     function renderLinks() {
       linksContainer.innerHTML = '';
@@ -446,24 +454,21 @@
       });
     }
 
-    /* SELECCIONAR CÁMARA (ZOOM PLANO + REPRODUCTOR) */
+    /* SELECCIONAR CÁMARA */
     const playerBox = document.getElementById('modalPlayerFloat');
     const playerTitle = document.getElementById('playerCamTitle');
     const playerIframe = document.getElementById('playerIframe');
 
     function seleccionarCamara(cam) {
-      // Resaltar enlace en la barra
       document.querySelectorAll('.world-cam-link').forEach(l => l.classList.remove('active'));
       const activeLink = document.getElementById(`link_${cam.id}`);
       if (activeLink) activeLink.classList.add('active');
 
-      // Centrar globo suavemente
       if (worldGlobe) {
         worldGlobe.controls().autoRotate = false;
         worldGlobe.pointOfView({ lat: cam.lat, lng: cam.lng, altitude: 1.4 }, 1200);
       }
 
-      // Abrir reproductor
       playerTitle.textContent = `${cam.titulo.toUpperCase()} (${cam.ciudad}, ${cam.pais})`;
       playerIframe.src = `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&rel=0`;
       playerBox.style.display = 'block';
