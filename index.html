@@ -956,15 +956,7 @@
     <div class="counter-badge"><span>VISITAS AL PANEL:</span> <span class="counter-number" id="visitCount">...</span></div>
     <div>CHILE LIVE MONITOR • TRANSMISIONES EN TIEMPO REAL VÍA YOUTUBE</div>
   </footer>
-<!-- SECCIÓN DELOREAN TV EN VIVO (Pegar en el HTML, fuera de <script>) -->
-<section style="width: 100%; max-width: 1120px; margin: 18px auto; padding: 0 12px;">
-  <iframe 
-    src="https://deloreantv.vercel.app/embed-tv.html" 
-    style="width: 100%; height: 460px; border: none; background: transparent; display: block;" 
-    allow="autoplay; fullscreen; encrypted-media" 
-    loading="lazy">
-  </iframe>
-</section>
+
   <script>
     /* ALTERNAR VISTAS SPA SIN TOCAR LA RADIO */
     let vistaActual = 'chile';
@@ -1004,34 +996,38 @@
       }
     }
   
-    /* ---------------- CÁMARAS CHILE ---------------- */
+    /* ---------------- CÁMARAS CHILE + DELOREAN TV ---------------- */
+    const DELOREAN_TV_ITEM = {
+      id: "deloreantv",
+      titulo: "DeLorean TV (Canales en Vivo)",
+      ciudad: "TV CHILE",
+      urlPersonalizada: "https://deloreantv.vercel.app/"
+    };
+
     const camarasIniciales = [
+      DELOREAN_TV_ITEM,
       { id: "XMSj64qslWc", titulo: "el aleman", ciudad: "farellones" },
       { id: "V9cneaP5hkI", titulo: "peñalolen", ciudad: "Santiago" },
-  
       { id: "uyt8JsITTac", titulo: "valle nevado ", ciudad: "Santiago" },
       { id: "RhdmP5017VM", titulo: " octava region ", ciudad: "concepcion" },
       { id: "tmS73xQ4zVc", titulo: "Valle nevado ", ciudad: "Santiago" },
       { id: "WokKI9mjk2k", titulo: "plaza italia", ciudad: "santiago " },
       { id: "5jPpMkg5daM", titulo: "valparaiso", ciudad: "Valparaiso" },
       { id: "U9YCYQe-VvE", titulo: "avendia chile", ciudad: "llolleo" },
-     { id: "KJQn3tC34Fs", titulo: "Faro Monumental", ciudad: "La Serena" },
+      { id: "KJQn3tC34Fs", titulo: "Faro Monumental", ciudad: "La Serena" },
       { id: "rV6JR-lvNQk", titulo: "la parva", ciudad: "santiago" },
       { id: "3u9bZF9e4Zc", titulo: "playa", ciudad: "mejillones" },
       { id: "Uyst_1Jvccc", titulo: "ñuñoa", ciudad: "Santiago" },
       { id: "ljEJytr2AQ4", titulo: "costanera center", ciudad: "santiago" },
       { id: "yEeIXw5ZK9M", titulo: "playa acapulco", ciudad: "Viña del mar" },
       { id: "obYSVVM7RB0", titulo: "playa chica", ciudad: "cartagena" },
-       { id: "hTCgYPhgmY4", titulo: "providencia/tobalaba", ciudad: "santiago" },
-       { id: "r93_Ggv4x5k", titulo: "luis thayer ojeda/los leones", ciudad: "santiago" },
-      
-      { id: "BVKRAzTSnB0", titulo: "observatorio ALMA", ciudad: "desierto de atacama" },
-      
-
-      
+      { id: "hTCgYPhgmY4", titulo: "providencia/tobalaba", ciudad: "santiago" },
+      { id: "r93_Ggv4x5k", titulo: "luis thayer ojeda/los leones", ciudad: "santiago" },
+      { id: "BVKRAzTSnB0", titulo: "observatorio ALMA", ciudad: "desierto de atacama" }
     ];
 
     const coordsChile = {
+      "tv chile": { lat: -33.4489, lng: -70.6693 },
       "santiago": { lat: -33.4489, lng: -70.6693 },
       "san antonio": { lat: -33.5933, lng: -71.6075 },
       "concepcion": { lat: -36.8270, lng: -73.0503 },
@@ -1044,6 +1040,12 @@
     };
 
     let camaras = JSON.parse(localStorage.getItem('chile_live_cams')) || camarasIniciales;
+    // Asegura que DeLorean TV aparezca primera incluso si ya existía localStorage antiguo
+    if (!camaras.some(c => c.id === 'deloreantv')) {
+      camaras.unshift(DELOREAN_TV_ITEM);
+      localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
+    }
+
     let favorites = JSON.parse(localStorage.getItem('chile_live_favs')) || [];
     let ciudadActiva = 'Todas';
     let textoBusqueda = '';
@@ -1097,6 +1099,12 @@
       const card = document.createElement('div');
       card.className = 'card';
       const wrapperId = `wrapper_${cam.id}_${originalIndex}`;
+
+      // Si tiene urlPersonalizada (como DeLorean TV) carga esa URL; si no, carga YouTube normal
+      const iframeSrc = cam.urlPersonalizada
+        ? cam.urlPersonalizada
+        : `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=0&mute=1&controls=1&rel=0`;
+
       card.innerHTML = `
         <div class="card-header">
           <div class="card-titles" onclick="abrirModalDetalle('${cam.id}')">
@@ -1112,7 +1120,7 @@
         </div>
         <div class="video-wrapper" id="${wrapperId}">
           <iframe 
-            src="https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=0&mute=1&controls=1&rel=0" 
+            src="${iframeSrc}" 
             title="${cam.titulo}" 
             loading="lazy" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
@@ -1130,7 +1138,7 @@
       const favCams = camaras.filter(c => favorites.includes(c.id));
       if (favCams.length > 0) {
         favsSection.style.display = 'block';
-        favs.forEach(cam => {
+        favCams.forEach(cam => {
           const origIdx = camaras.findIndex(c => c.id === cam.id);
           favsGrid.appendChild(createCardElement(cam, origIdx));
         });
@@ -1265,7 +1273,9 @@
 
       modalCamTitle.textContent = cam.titulo.toUpperCase();
       modalCamCity.textContent = `${cam.ciudad.toUpperCase()} • EN VIVO`;
-      modalBigIframe.src = `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&rel=0`;
+      modalBigIframe.src = cam.urlPersonalizada
+        ? cam.urlPersonalizada
+        : `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&rel=0`;
 
       const cNorm = cam.ciudad.trim().toLowerCase();
       const hermanas = camaras.filter(c => c.ciudad.trim().toLowerCase() === cNorm);
@@ -1287,7 +1297,8 @@
         modalSiblingsWrap.style.display = 'none';
       }
 
-      modalMapFrame.src = `https://maps.google.com/maps?q=${encodeURIComponent(cam.ciudad + ', Chile')}&t=&z=12&ie=UTF8&iwloc=&output=embed`;
+      const mapQuery = cam.urlPersonalizada ? 'Santiago, Chile' : `${cam.ciudad}, Chile`;
+      modalMapFrame.src = `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=12&ie=UTF8&iwloc=&output=embed`;
       cargarClimaModal(cam.ciudad);
       modalDetail.classList.add('open');
     }
@@ -1471,7 +1482,6 @@
         document.removeEventListener('mouseup', onMouseUp);
       }
 
-      // Touch móvil
       headerBar.addEventListener('touchstart', (e) => {
         if (e.target.classList.contains('btn-close-player')) return;
         isDragging = true;
