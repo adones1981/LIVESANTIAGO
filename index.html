@@ -386,12 +386,30 @@
       padding: 1.25rem;
     }
 
+    /* MODO PANTALLA COMPLETA EXCLUSIVO PARA DELOREAN TV (Sin clima ni ubicación) */
+    .modal-detail-box.tv-full-mode {
+      max-width: 98vw !important;
+      width: 98vw !important;
+      height: 94vh !important;
+      max-height: 94vh !important;
+      padding: 0.65rem !important;
+      overflow: hidden !important;
+      gap: 0.5rem !important;
+    }
+
+    .modal-detail-box.tv-full-mode .modal-big-player {
+      padding-top: 0 !important;
+      flex: 1 !important;
+      height: 100% !important;
+    }
+
     .modal-detail-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
       border-bottom: 1px solid var(--border);
       padding-bottom: 0.5rem;
+      flex-shrink: 0;
     }
 
     .modal-detail-title h2 { font-size: 1.05rem; color: #fff; font-weight: 700; }
@@ -911,7 +929,7 @@
 
   <!-- MODAL DETALLE CHILE -->
   <div class="modal-detail-overlay" id="modalDetail">
-    <div class="modal-detail-box">
+    <div class="modal-detail-box" id="modalDetailBox">
       <div class="modal-detail-header">
         <div class="modal-detail-title">
           <h2 id="modalCamTitle">Transmisión</h2>
@@ -932,7 +950,7 @@
         <div class="modal-siblings-strip" id="modalSiblingsStrip"></div>
       </div>
 
-      <div class="modal-bottom-grid">
+      <div class="modal-bottom-grid" id="modalBottomGrid">
         <div class="modal-weather-card">
           <span style="font-size:0.75rem; color:var(--accent); font-family:'JetBrains Mono', monospace; font-weight:bold;">CLIMA EN LA ZONA</span>
           <div style="display:flex; align-items:baseline; gap:8px;">
@@ -999,8 +1017,8 @@
     /* ---------------- CÁMARAS CHILE + DELOREAN TV ---------------- */
     const DELOREAN_TV_ITEM = {
       id: "deloreantv",
-      titulo: "DeLorean TV (Canales en Vivo)",
-      ciudad: "TV CHILE",
+      titulo: "DeLorean TV",
+      ciudad: "TV EN VIVO",
       urlPersonalizada: "https://deloreantv.vercel.app/"
     };
 
@@ -1040,11 +1058,14 @@
     };
 
     let camaras = JSON.parse(localStorage.getItem('chile_live_cams')) || camarasIniciales;
-    // Asegura que DeLorean TV aparezca primera incluso si ya existía localStorage antiguo
-    if (!camaras.some(c => c.id === 'deloreantv')) {
+    // Asegura que DeLorean TV exista y tenga su urlPersonalizada actualizada en localStorage
+    const tvIdx = camaras.findIndex(c => c.id === 'deloreantv');
+    if (tvIdx === -1) {
       camaras.unshift(DELOREAN_TV_ITEM);
-      localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
+    } else {
+      camaras[tvIdx] = { ...camaras[tvIdx], ...DELOREAN_TV_ITEM };
     }
+    localStorage.setItem('chile_live_cams', JSON.stringify(camaras));
 
     let favorites = JSON.parse(localStorage.getItem('chile_live_favs')) || [];
     let ciudadActiva = 'Todas';
@@ -1100,7 +1121,6 @@
       card.className = 'card';
       const wrapperId = `wrapper_${cam.id}_${originalIndex}`;
 
-      // Si tiene urlPersonalizada (como DeLorean TV) carga esa URL; si no, carga YouTube normal
       const iframeSrc = cam.urlPersonalizada
         ? cam.urlPersonalizada
         : `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=0&mute=1&controls=1&rel=0`;
@@ -1254,8 +1274,10 @@
       if (e.key === 'Enter') buscarClimaMini();
     });
 
-    /* MODAL DETALLE CHILE */
+    /* MODAL DETALLE CHILE (CON MODO FULLSCREEN SIN CLIMA NI UBICACIÓN PARA DELOREAN TV) */
     const modalDetail = document.getElementById('modalDetail');
+    const modalDetailBox = document.getElementById('modalDetailBox');
+    const modalBottomGrid = document.getElementById('modalBottomGrid');
     const modalCamTitle = document.getElementById('modalCamTitle');
     const modalCamCity = document.getElementById('modalCamCity');
     const modalBigIframe = document.getElementById('modalBigIframe');
@@ -1273,38 +1295,49 @@
 
       modalCamTitle.textContent = cam.titulo.toUpperCase();
       modalCamCity.textContent = `${cam.ciudad.toUpperCase()} • EN VIVO`;
-      modalBigIframe.src = cam.urlPersonalizada
-        ? cam.urlPersonalizada
-        : `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&rel=0`;
 
-      const cNorm = cam.ciudad.trim().toLowerCase();
-      const hermanas = camaras.filter(c => c.ciudad.trim().toLowerCase() === cNorm);
-
-      modalSiblingsStrip.innerHTML = '';
-      if (hermanas.length > 1) {
-        modalSiblingsWrap.style.display = 'block';
-        hermanas.forEach(h => {
-          const chip = document.createElement('div');
-          chip.className = `sibling-chip ${h.id === cam.id ? 'active' : ''}`;
-          chip.innerHTML = `
-            <img src="https://img.youtube.com/vi/${h.id}/mqdefault.jpg">
-            <div>${h.titulo}</div>
-          `;
-          chip.addEventListener('click', () => abrirModalDetalle(h.id));
-          modalSiblingsStrip.appendChild(chip);
-        });
-      } else {
+      if (cam.urlPersonalizada || cam.id === 'deloreantv') {
+        // MODO TV EN VIVO: Ocupa toda la pantalla, sin clima ni mapa
+        modalDetailBox.classList.add('tv-full-mode');
+        modalBottomGrid.style.display = 'none';
         modalSiblingsWrap.style.display = 'none';
+        modalBigIframe.src = cam.urlPersonalizada || "https://deloreantv.vercel.app/";
+      } else {
+        // MODO CÁMARA NORMAL: Muestra clima, ubicación y cámaras hermanas
+        modalDetailBox.classList.remove('tv-full-mode');
+        modalBottomGrid.style.display = 'grid';
+        modalBigIframe.src = `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&rel=0`;
+
+        const cNorm = cam.ciudad.trim().toLowerCase();
+        const hermanas = camaras.filter(c => c.ciudad.trim().toLowerCase() === cNorm);
+
+        modalSiblingsStrip.innerHTML = '';
+        if (hermanas.length > 1) {
+          modalSiblingsWrap.style.display = 'block';
+          hermanas.forEach(h => {
+            const chip = document.createElement('div');
+            chip.className = `sibling-chip ${h.id === cam.id ? 'active' : ''}`;
+            chip.innerHTML = `
+              <img src="https://img.youtube.com/vi/${h.id}/mqdefault.jpg">
+              <div>${h.titulo}</div>
+            `;
+            chip.addEventListener('click', () => abrirModalDetalle(h.id));
+            modalSiblingsStrip.appendChild(chip);
+          });
+        } else {
+          modalSiblingsWrap.style.display = 'none';
+        }
+
+        modalMapFrame.src = `https://maps.google.com/maps?q=${encodeURIComponent(cam.ciudad + ', Chile')}&t=&z=12&ie=UTF8&iwloc=&output=embed`;
+        cargarClimaModal(cam.ciudad);
       }
 
-      const mapQuery = cam.urlPersonalizada ? 'Santiago, Chile' : `${cam.ciudad}, Chile`;
-      modalMapFrame.src = `https://maps.google.com/maps?q=${encodeURIComponent(mapQuery)}&t=&z=12&ie=UTF8&iwloc=&output=embed`;
-      cargarClimaModal(cam.ciudad);
       modalDetail.classList.add('open');
     }
 
     function cerrarModalDetalle() {
       modalDetail.classList.remove('open');
+      modalDetailBox.classList.remove('tv-full-mode');
       modalBigIframe.src = '';
     }
 
