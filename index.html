@@ -355,6 +355,84 @@
     .video-wrapper { position: relative; width: 100%; padding-top: 56.25%; background: #000; }
     .video-wrapper iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
 
+    /* BARRA MINIATURA PARA DELOREAN TV */
+    .tv-mini-controls {
+      position: absolute;
+      bottom: 8px;
+      left: 8px;
+      right: 8px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      background: rgba(7, 9, 14, 0.88);
+      backdrop-filter: blur(8px);
+      border: 1px solid var(--border-hover);
+      padding: 4px 8px;
+      border-radius: 6px;
+      z-index: 15;
+      opacity: 0.82;
+      transition: opacity 0.2s ease;
+    }
+
+    .video-wrapper:hover .tv-mini-controls {
+      opacity: 1;
+    }
+
+    .tv-mini-btn {
+      background: rgba(255, 255, 255, 0.08);
+      color: var(--accent);
+      border: 1px solid var(--border-hover);
+      border-radius: 4px;
+      padding: 2px 6px;
+      font-size: 0.68rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tv-mini-btn:hover {
+      background: var(--accent);
+      color: #07090e;
+    }
+
+    .tv-mini-label {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.68rem;
+      font-weight: 700;
+      color: #fff;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      margin: 0 2px;
+    }
+
+    .tv-mini-chips {
+      display: flex;
+      gap: 3px;
+      margin-left: auto;
+    }
+
+    .tv-num-chip {
+      background: rgba(255, 255, 255, 0.06);
+      color: var(--muted);
+      border: 1px solid var(--border);
+      border-radius: 3px;
+      padding: 1px 5px;
+      font-size: 0.62rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+
+    .tv-num-chip:hover,
+    .tv-num-chip.active {
+      background: var(--accent);
+      color: #07090e;
+      border-color: var(--accent);
+    }
+
     /* MODAL CHILE */
     .modal-detail-overlay {
       position: fixed;
@@ -415,7 +493,7 @@
     .modal-detail-title h2 { font-size: 1.05rem; color: #fff; font-weight: 700; }
     .modal-detail-title p { font-size: 0.72rem; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
 
-    .modal-head-actions { display: flex; align-items: center; gap: 0.5rem; }
+    .modal-head-actions { display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; }
 
     .btn-close-modal {
       background: none; border: none; color: var(--muted);
@@ -936,6 +1014,7 @@
           <p id="modalCamCity">CIUDAD • EN VIVO</p>
         </div>
         <div class="modal-head-actions">
+          <button class="btn-inspect" id="btnModalTvPanel" style="display: none;" onclick="abrirPanelDeLoreanCompleto()">🎛️ CONTROL TV</button>
           <button class="btn-fullscreen" onclick="pantallaCompletaElemento(document.getElementById('modalBigPlayerWrapper'))" title="Pantalla Completa">⛶ PANTALLA COMPLETA</button>
           <button class="btn-close-modal" onclick="cerrarModalDetalle()">&times;</button>
         </div>
@@ -1013,6 +1092,51 @@
         cerrarReproductor();
       }
     }
+
+    /* ---------------- CONFIGURACIÓN CANALES DELOREAN TV (MINIATURA Y MODAL) ---------------- */
+    const deloreanTvChannels = [
+      { num: "01", name: "24 HORAS", channelId: "UCTXNz3gjAypWp3EhlIATEJQ" },
+      { num: "02", name: "TVN", channelId: "UCaVaCaiG6qRzDiJDuEGKOhQ" },
+      { num: "03", name: "CANAL 13", videoId: "EoXTa5HBm1M" },
+      { num: "04", name: "T13 VIVO", channelId: "UCsRnhjcUCR78Q3Ud6OXCTNg" },
+      { num: "05", name: "MEGANOTICIAS", channelId: "UCkccyEbqhhM3uKOI6Shm-4Q" },
+      { num: "06", name: "CHV", videoId: "jnCW702_qfo" }
+    ];
+
+    let deloreanTvIdx = 0;
+
+    function getDeLoreanTvEmbedUrl(ch, muted = 1) {
+      if (ch.videoId) {
+        return `https://www.youtube-nocookie.com/embed/${ch.videoId}?autoplay=1&mute=${muted}&controls=1&rel=0`;
+      }
+      return `https://www.youtube.com/embed/live_stream?channel=${ch.channelId}&autoplay=1&mute=${muted}&controls=1&rel=0`;
+    }
+
+    function setDeLoreanTvChannel(idx) {
+      deloreanTvIdx = (idx + deloreanTvChannels.length) % deloreanTvChannels.length;
+      const ch = deloreanTvChannels[deloreanTvIdx];
+      const url = getDeLoreanTvEmbedUrl(ch, 1);
+
+      document.querySelectorAll('.delorean-mini-iframe').forEach(ifr => {
+        ifr.src = url;
+      });
+      document.querySelectorAll('.delorean-mini-label').forEach(lbl => {
+        lbl.textContent = `CH ${ch.num} • ${ch.name}`;
+      });
+      document.querySelectorAll('.tv-num-chip').forEach(chip => {
+        chip.classList.toggle('active', parseInt(chip.dataset.idx, 10) === deloreanTvIdx);
+      });
+    }
+
+    function stepDeLoreanTv(delta, e) {
+      if (e) e.stopPropagation();
+      setDeLoreanTvChannel(deloreanTvIdx + delta);
+    }
+
+    function selectDeLoreanTv(idx, e) {
+      if (e) e.stopPropagation();
+      setDeLoreanTvChannel(idx);
+    }
   
     /* ---------------- CÁMARAS CHILE + DELOREAN TV ---------------- */
     const DELOREAN_TV_ITEM = {
@@ -1058,7 +1182,6 @@
     };
 
     let camaras = JSON.parse(localStorage.getItem('chile_live_cams')) || camarasIniciales;
-    // Asegura que DeLorean TV exista y tenga su urlPersonalizada actualizada en localStorage
     const tvIdx = camaras.findIndex(c => c.id === 'deloreantv');
     if (tvIdx === -1) {
       camaras.unshift(DELOREAN_TV_ITEM);
@@ -1121,9 +1244,32 @@
       card.className = 'card';
       const wrapperId = `wrapper_${cam.id}_${originalIndex}`;
 
-      const iframeSrc = cam.urlPersonalizada
-        ? cam.urlPersonalizada
-        : `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=0&mute=1&controls=1&rel=0`;
+      const isTvCard = cam.id === 'deloreantv';
+      const currentTvChannel = deloreanTvChannels[deloreanTvIdx];
+
+      const iframeSrc = isTvCard
+        ? getDeLoreanTvEmbedUrl(currentTvChannel, 1)
+        : (cam.urlPersonalizada
+            ? cam.urlPersonalizada
+            : `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=0&mute=1&controls=1&rel=0`);
+
+      const miniTvOverlayHtml = isTvCard
+        ? `
+          <div class="tv-mini-controls" onclick="event.stopPropagation()">
+            <button class="tv-mini-btn" onclick="stepDeLoreanTv(-1, event)" title="Canal anterior">◀</button>
+            <span class="tv-mini-label delorean-mini-label">CH ${currentTvChannel.num} • ${currentTvChannel.name}</span>
+            <button class="tv-mini-btn" onclick="stepDeLoreanTv(1, event)" title="Canal siguiente">▶</button>
+            <div class="tv-mini-chips">
+              ${deloreanTvChannels
+                .map(
+                  (ch, i) =>
+                    `<button class="tv-num-chip ${i === deloreanTvIdx ? 'active' : ''}" data-idx="${i}" onclick="selectDeLoreanTv(${i}, event)" title="${ch.name}">${ch.num}</button>`
+                )
+                .join('')}
+            </div>
+          </div>
+        `
+        : '';
 
       card.innerHTML = `
         <div class="card-header">
@@ -1140,12 +1286,14 @@
         </div>
         <div class="video-wrapper" id="${wrapperId}">
           <iframe 
+            class="${isTvCard ? 'delorean-mini-iframe' : ''}"
             src="${iframeSrc}" 
             title="${cam.titulo}" 
             loading="lazy" 
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen" 
             allowfullscreen>
           </iframe>
+          ${miniTvOverlayHtml}
         </div>
       `;
       return card;
@@ -1288,24 +1436,33 @@
     const mWeatherWind = document.getElementById('mWeatherWind');
     const mWeatherRange = document.getElementById('mWeatherRange');
     const modalMapFrame = document.getElementById('modalMapFrame');
+    const btnModalTvPanel = document.getElementById('btnModalTvPanel');
+
+    function abrirPanelDeLoreanCompleto() {
+      modalCamTitle.textContent = "DELOREAN TV • PANEL DE CANALES";
+      modalCamCity.textContent = "CONTROL REMOTO COMPLETO";
+      modalBigIframe.src = "https://deloreantv.vercel.app/";
+    }
 
     function abrirModalDetalle(camId) {
       const cam = camaras.find(c => c.id === camId);
       if (!cam) return;
 
-      modalCamTitle.textContent = cam.titulo.toUpperCase();
-      modalCamCity.textContent = `${cam.ciudad.toUpperCase()} • EN VIVO`;
-
       if (cam.urlPersonalizada || cam.id === 'deloreantv') {
-        // MODO TV EN VIVO: Ocupa toda la pantalla, sin clima ni mapa
+        const currentCh = deloreanTvChannels[deloreanTvIdx];
+        modalCamTitle.textContent = `DELOREAN TV • CH ${currentCh.num} ${currentCh.name}`;
+        modalCamCity.textContent = "TV EN VIVO • SONIDO ACTIVADO";
         modalDetailBox.classList.add('tv-full-mode');
         modalBottomGrid.style.display = 'none';
         modalSiblingsWrap.style.display = 'none';
-        modalBigIframe.src = cam.urlPersonalizada || "https://deloreantv.vercel.app/";
+        if (btnModalTvPanel) btnModalTvPanel.style.display = 'inline-block';
+        modalBigIframe.src = getDeLoreanTvEmbedUrl(currentCh, 0);
       } else {
-        // MODO CÁMARA NORMAL: Muestra clima, ubicación y cámaras hermanas
+        modalCamTitle.textContent = cam.titulo.toUpperCase();
+        modalCamCity.textContent = `${cam.ciudad.toUpperCase()} • EN VIVO`;
         modalDetailBox.classList.remove('tv-full-mode');
         modalBottomGrid.style.display = 'grid';
+        if (btnModalTvPanel) btnModalTvPanel.style.display = 'none';
         modalBigIframe.src = `https://www.youtube-nocookie.com/embed/${cam.id}?autoplay=1&mute=1&rel=0`;
 
         const cNorm = cam.ciudad.trim().toLowerCase();
